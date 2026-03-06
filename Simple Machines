@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simple Machines — Test Prep v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --card: #1a1a26;
+    --border: #2a2a3a;
+    --accent: #f0c060;
+    --accent2: #60c0f0;
+    --accent3: #f06090;
+    --accent4: #90f0a0;
+    --accent5: #c090f0;
+    --text: #e8e8f0;
+    --muted: #888899;
+    --formula-bg: #0d1520;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(240,192,96,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(240,192,96,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .page {
+    position: relative;
+    z-index: 1;
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 40px 20px 80px;
+  }
+  .header {
+    text-align: center;
+    margin-bottom: 40px;
+    animation: fadeDown 0.6s ease;
+  }
+  .header .badge {
+    display: inline-block;
+    background: var(--accent3);
+    color: #fff;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+  }
+  .header h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(48px, 10vw, 90px);
+    letter-spacing: 4px;
+    line-height: 0.9;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .header p { color: var(--muted); font-size: 15px; margin-top: 12px; }
+
+.nav {
+display: flex;
+gap: 7px;
+margin-bottom: 30px;
+flex-wrap: wrap;
+animation: fadeUp 0.5s ease 0.2s both;
+}
+.nav-btn {
+background: var(–card);
+border: 1px solid var(–border);
+color: var(–muted);
+font-family: ‘DM Sans’, sans-serif;
+font-size: 13px;
+font-weight: 500;
+padding: 8px 15px;
+border-radius: 8px;
+cursor: pointer;
+transition: all 0.2s;
+}
+.nav-btn:hover { border-color: var(–accent); color: var(–accent); }
+.nav-btn.active { background: var(–accent); color: var(–bg); border-color: var(–accent); font-weight: 700; }
+.nav-btn.new-badge { position: relative; }
+.nav-btn.new-badge::after {
+content: ‘NEW’;
+position: absolute;
+top: -8px; right: -6px;
+background: var(–accent3);
+color: #fff;
+font-size: 8px;
+font-weight: 700;
+padding: 1px 5px;
+border-radius: 4px;
+letter-spacing: 1px;
+}
+
+.section { display: none; animation: fadeUp 0.4s ease; }
+.section.active { display: block; }
+
+.section-title {
+font-family: ‘Bebas Neue’, sans-serif;
+font-size: 36px;
+letter-spacing: 2px;
+color: var(–accent);
+margin-bottom: 6px;
+}
+.section-sub { color: var(–muted); font-size: 14px; margin-bottom: 24px; }
+
+.formula-card {
+background: var(–formula-bg);
+border: 1px solid var(–accent2);
+border-radius: 12px;
+padding: 20px 24px;
+margin-bottom: 20px;
+position: relative;
+overflow: hidden;
+}
+.formula-card::before {
+content: ‘’;
+position: absolute;
+top: 0; left: 0; right: 0;
+height: 2px;
+background: linear-gradient(90deg, var(–accent2), transparent);
+}
+.formula-card.purple { border-color: var(–accent5); }
+.formula-card.purple::before { background: linear-gradient(90deg, var(–accent5), transparent); }
+.formula-card.green { border-color: var(–accent4); }
+.formula-card.green::before { background: linear-gradient(90deg, var(–accent4), transparent); }
+
+.formula-label {
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 10px;
+letter-spacing: 2px;
+text-transform: uppercase;
+color: var(–accent2);
+margin-bottom: 10px;
+}
+.formula-card.purple .formula-label { color: var(–accent5); }
+.formula-card.green .formula-label { color: var(–accent4); }
+
+.formula {
+font-family: ‘JetBrains Mono’, monospace;
+font-size: clamp(14px, 2.5vw, 20px);
+color: var(–accent);
+font-weight: 700;
+margin-bottom: 8px;
+line-height: 1.6;
+}
+.formula-note { font-size: 13px; color: var(–muted); line-height: 1.6; }
+.formula-note strong { color: var(–text); }
+
+.rearrange {
+margin-top: 12px;
+padding-top: 12px;
+border-top: 1px dashed var(–border);
+}
+.rearrange-label {
+font-size: 11px;
+color: var(–accent3);
+font-family: ‘JetBrains Mono’, monospace;
+letter-spacing: 1px;
+text-transform: uppercase;
+margin-bottom: 6px;
+}
+
+.example-card {
+background: var(–card);
+border: 1px solid var(–border);
+border-radius: 12px;
+padding: 20px 24px;
+margin-bottom: 16px;
+}
+.ex-label {
+display: inline-block;
+background: var(–accent);
+color: var(–bg);
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 10px;
+font-weight: 700;
+letter-spacing: 2px;
+text-transform: uppercase;
+padding: 3px 10px;
+border-radius: 4px;
+margin-bottom: 12px;
+}
+.ex-label.purple { background: var(–accent5); }
+.ex-label.green { background: var(–accent4); color: #000; }
+.ex-label.pink { background: var(–accent3); color: #fff; }
+
+.ex-q { font-size: 14px; color: var(–text); line-height: 1.6; margin-bottom: 14px; }
+.ex-steps {
+background: var(–bg);
+border-radius: 8px;
+padding: 14px 18px;
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 13px;
+color: var(–accent2);
+line-height: 2.1;
+}
+.step-line { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.step-num { color: var(–accent3); font-size: 11px; min-width: 22px; }
+.step-ans { color: var(–accent4); font-weight: 700; }
+
+.info-block {
+background: var(–card);
+border: 1px solid var(–border);
+border-left: 3px solid var(–accent4);
+border-radius: 8px;
+padding: 16px 20px;
+margin-bottom: 16px;
+font-size: 14px;
+line-height: 1.7;
+color: var(–text);
+}
+.info-block strong { color: var(–accent4); }
+.info-block.purple { border-left-color: var(–accent5); }
+.info-block.purple strong { color: var(–accent5); }
+.info-block.yellow { border-left-color: var(–accent); }
+.info-block.yellow strong { color: var(–accent); }
+.tip-label {
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 10px;
+letter-spacing: 2px;
+color: var(–accent4);
+text-transform: uppercase;
+margin-bottom: 6px;
+}
+.info-block.purple .tip-label { color: var(–accent5); }
+.info-block.yellow .tip-label { color: var(–accent); }
+
+.warn-block {
+background: rgba(240,96,144,0.08);
+border: 1px solid rgba(240,96,144,0.3);
+border-radius: 8px;
+padding: 14px 18px;
+margin-bottom: 16px;
+font-size: 13px;
+color: var(–text);
+line-height: 1.6;
+}
+.warn-block strong { color: var(–accent3); }
+
+.two-col {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 14px;
+margin-bottom: 16px;
+}
+@media (max-width: 620px) { .two-col { grid-template-columns: 1fr; } }
+
+.mini-card {
+background: var(–formula-bg);
+border: 1px solid var(–border);
+border-radius: 10px;
+padding: 14px 16px;
+}
+.mini-card .mini-title {
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 10px;
+letter-spacing: 2px;
+text-transform: uppercase;
+color: var(–accent5);
+margin-bottom: 8px;
+}
+.mini-card .mini-formula {
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 13px;
+color: var(–accent);
+font-weight: 700;
+line-height: 1.8;
+}
+.mini-card .mini-note { font-size: 12px; color: var(–muted); margin-top: 6px; line-height: 1.5; }
+
+table {
+width: 100%;
+border-collapse: collapse;
+margin-bottom: 20px;
+font-size: 13px;
+}
+th {
+background: var(–formula-bg);
+color: var(–accent2);
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 11px;
+letter-spacing: 1px;
+text-transform: uppercase;
+padding: 12px 14px;
+text-align: left;
+border-bottom: 1px solid var(–border);
+}
+td { padding: 11px 14px; border-bottom: 1px solid var(–border); color: var(–text); vertical-align: top; line-height: 1.5; }
+tr:hover td { background: rgba(255,255,255,0.02); }
+.mono { font-family: ‘JetBrains Mono’, monospace; color: var(–accent); font-size: 12px; }
+
+.divider { height: 1px; background: linear-gradient(90deg, transparent, var(–border), transparent); margin: 28px 0; }
+h3 { font-family: ‘Bebas Neue’, sans-serif; font-size: 22px; letter-spacing: 1px; color: var(–accent2); margin: 22px 0 12px; }
+
+@keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 600px) {
+.page { padding: 24px 14px 60px; }
+table { font-size: 12px; }
+th, td { padding: 9px 10px; }
+}
+</style>
+
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="badge">🔧 Updated — All Topics Covered</div>
+    <h1>Simple<br>Machines</h1>
+    <p>Mechanical Advantage · IMA · AMA · Efficiency · Gears · Levers · Pulleys · Inclined Planes</p>
+  </div>
+
+  <div class="nav">
+    <button class="nav-btn new-badge active" onclick="show('ma', this)">💪 Mech. Advantage</button>
+    <button class="nav-btn" onclick="show('efficiency', this)">⚡ Efficiency</button>
+    <button class="nav-btn" onclick="show('ima-ama', this)">📐 IMA &amp; AMA</button>
+    <button class="nav-btn" onclick="show('inclined', this)">📏 Inclined Plane</button>
+    <button class="nav-btn" onclick="show('gears', this)">⚙️ Gear Ratios</button>
+    <button class="nav-btn" onclick="show('levers', this)">🪙 Levers</button>
+    <button class="nav-btn" onclick="show('pulleys', this)">🔁 Pulleys</button>
+    <button class="nav-btn" onclick="show('wheel', this)">🔵 Wheel &amp; Axle</button>
+    <button class="nav-btn" onclick="show('cheatsheet', this)">📋 Cheat Sheet</button>
+  </div>
+
+  <!-- ===================== MECHANICAL ADVANTAGE (NEW!) ===================== -->
+
+  <div class="section active" id="ma">
+    <div class="section-title">Mechanical Advantage (MA)</div>
+    <div class="section-sub">The BIG concept — how much a machine multiplies your force. A larger number = machine does MORE work for you.</div>
+
+```
+<div class="info-block yellow">
+  <div class="tip-label">🧠 What Is Mechanical Advantage?</div>
+  Mechanical Advantage (MA) tells you <strong>how many times a machine multiplies the force you put in.</strong><br><br>
+  • MA = <strong>2</strong> → the machine doubles your force (you push with 10 N, machine pushes with 20 N)<br>
+  • MA = <strong>0.5</strong> → the machine cuts your force in half (but increases speed/distance)<br>
+  • MA = <strong>1</strong> → no force advantage, just redirects force (like a single fixed pulley)<br><br>
+  <strong>A LARGER MA number = the machine is doing MORE of the work for you!</strong>
+</div>
+
+<div class="divider"></div>
+<h3>THE TWO MA FORMULAS — KNOW BOTH!</h3>
+
+<div class="two-col">
+  <div class="mini-card">
+    <div class="mini-title">Formula 1 — Using FORCE</div>
+    <div class="mini-formula">MA = Output Force<br>      ──────────<br>       Input Force</div>
+    <div class="mini-note">Output force = what the machine produces (resistance force / weight of object)<br>Input force = what YOU apply (effort force)</div>
+  </div>
+  <div class="mini-card">
+    <div class="mini-title">Formula 2 — Using DISTANCE (Levers)</div>
+    <div class="mini-formula">MA = Input Arm<br>      ──────────<br>      Output Arm</div>
+    <div class="mini-note">Input arm = distance from fulcrum to where YOU push<br>Output arm = distance from fulcrum to the load</div>
+  </div>
+</div>
+
+<div class="warn-block">
+  <strong>⚠️ Why two different formulas?</strong> Both measure the same thing (MA) but from two different angles. Formula 1 uses actual measured forces. Formula 2 uses distances (for levers). In a perfect world they'd give the same answer — but friction makes them slightly different. That's why we have IMA vs AMA.
+</div>
+
+<div class="divider"></div>
+<h3>EXAMPLES — FORMULA 1 (Force)</h3>
+
+<div class="example-card">
+  <div class="ex-label">Example 1 — Simple</div>
+  <div class="ex-q">You push with <strong>15 N</strong> (input/effort force). The machine lifts an object weighing <strong>60 N</strong> (output/resistance force). What is the MA?</div>
+  <div class="ex-steps">
+    <div class="step-line"><span class="step-num">→</span><span>MA = Output Force ÷ Input Force</span></div>
+    <div class="step-line"><span class="step-num">→</span><span>MA = 60 ÷ 15</span></div>
+    <div class="step-line"><span class="step-num">✓</span><span class="step-ans">MA = 4 &nbsp;← machine multiplies your force 4 times!</span></div>
+  </div>
+</div>
+
+<div class="example-card">
+  <div class="ex-label purple">Example 2 — Inclined Plane (from your worksheet!)</div>
+  <div class="ex-q">Without a ramp, it takes <strong>120 g</strong> to lift an object directly. With the ramp, you only need <strong>75 g</strong> of input force. What is the MA?</div>
+  <div class="ex-steps">
+    <div class="step-line"><span class="step-num">→</span><span>MA = Output Force ÷ Input Force</span></div>
+    <div class="step-line"><span class="step-num">→</span><span>MA = 120 ÷ 75</span></div>
+    <div class="step-line"><span class="step-num">✓</span><span class="step-ans">MA = 1.6</span></div>
+  </div>
+</div>
+
+<div class="example-card">
+  <div class="ex-label green">Example 3 — Ramp B from your worksheet!</div>
+  <div class="ex-q">Output force (without ramp) = <strong>120 g</strong>. Input force (with ramp) = <strong>20 g</strong>. Find MA.</div>
+  <div class="ex-steps">
+    <div class="step-line"><span class="step-num">→</span><span>MA = 120 ÷ 20</span></div>
+    <div class="step-line"><span class="step-num">✓</span><span class="step-ans">MA = 6 &nbsp;← ramp multiplies your force 6 times!</span></div>
+  </div>
+</div>
+
+<div class="divider"></div>
+<h3>EXAMPLES — FORMULA 2 (Distance / Lever Arm)</h3>
+
+<div class="example-card">
+  <div class="ex-label pink">Lever Example 1</div>
+  <div class="ex-q">You push a lever. Your hand is <strong>40 cm</strong> from the fulcrum (input arm). The rock is <strong>10 cm</strong> from the fulcrum (output arm). What is the MA?</div>
+  <div class="ex-steps">
+    <div class="step-line"><span class="step-num">→</span><span>MA = Input Arm ÷ Output Arm</span></div>
+    <div class="step-line"><span class="step-num">→</span><span>MA = 40 ÷ 10</span></div>
+    <div class="step-line"><span class="step-num">✓</span><span class="step-ans">MA = 4 &nbsp;← lever multiplies your force 4 times!</span></div>
+  </div>
+</div>
+
+<div class="example-card">
+  <div class="ex-label pink">Lever Example 2</div>
+  <div class="ex-q">Input arm = <strong>37 m</strong>. Output arm (resistance distance) = <strong>12 m</strong>. Find MA.</div>
+  <div class="ex-steps">
+    <div class="step-line"><span class="step-num">→</span><span>MA = Input Arm ÷ Output Arm</span></div>
+    <div class="step-line"><span class="step-num">→</span><span>MA = 37 ÷ 12</span></div>
+    <div class="step-line"><span class="step-num">✓</span><span class="step-ans">MA = 3.08</span></div>
+  </div>
+</div>
+
+<div class="example-card">
+  <div class="ex-label pink">Lever Example 3 — MA less than 1</div>
+  <div class="ex-q">Input arm = <strong>24 m</strong>. Output arm = <strong>30 m</strong>. Find MA. What does this mean?</div>
+  <div class="ex-steps">
+    <div class="step-line"><span class="step-num">→</span><span>MA = 24 ÷ 30</span></div>
+    <div class="step-line"><span class="step-num">✓</span><span class="step-ans">MA = 0.8 &nbsp;← less than 1! No force advantage.</span></div>
+    <div class="step-line"><span class="step-num">→</span><span>This lever trades force for speed/distance (Class 3 lever, like your arm)</span></div>
+  </div>
+</div>
+
+<div class="divider"></div>
+<h3>REARRANGEMENTS — Solve for what you don't have</h3>
+
+<div class="formula-card purple">
+  <div class="formula-label">All 3 Versions — Force Formula</div>
+  <div class="formula">MA = Output Force ÷ Input Force</div>
+  <div class="rearrange">
+    <div class="rearrange-label">🔄 Solve for Output Force</div>
+    <div class="formula" style="font-size:15px;">Output Force = MA × Input Force</div>
+  </div>
+  <div class="rearrange">
+    <div class="rearrange-label">🔄 Solve for Input Force</div>
+    <div class="formula" style="font-size:15px;">Input Force = Output Force ÷ MA</div>
+  </div>
+</div>
+
+<div class="example-card">
+  <div class="ex-label purple">Find Input Force</div>
+  <div class="ex-q">A machine has MA = <strong>5</strong>. You need to lift a <strong>300 N</strong> object. How much force do YOU need to apply?</div>
+  <div class="ex-steps">
+    <div class="step-line"><span class="step-num">→</span><span>Input Force = Output Force ÷ MA</span></div>
+    <div class="step-line"><span class="step-num">→</span><span>= 300 ÷ 5</span></div>
+    <div class="step-line"><span class="step-num">✓</span><span class="step-ans">= 60 N &nbsp;← you only need 60 N to lift 300 N!</span></div>
+  </div>
+</div>
+
+<div class="example-card">
+  <div class="ex-label purple">Find Output Force</div>
+  <div class="ex-q">MA = <strong>8</strong>. You apply <strong>45 N</strong>. What force does the machine produce?</div>
+  <div class="ex-steps">
+    <div class="step-line"><span class="step-num">→</span><span>Output Force = MA × Input Force</span></div>
+    <div class="step-line"><span class="step-num">→</span><span>= 8 × 45</span></div>
+    <div class="step-line"><span class="step-num">✓</span><span class="step-ans">= 360 N</span></div>
+  </div>
+</div>
+
+<div class="divider"></div>
+<h3>IMA vs AMA — THE DIFFERENCE</h3>
+
+<div class="info-block purple">
+  <div class="tip-label">Theoretical vs Actual</div>
+  <strong>IMA (Ideal MA)</strong> = calculated from distances/measurements. Assumes NO friction. This is the <strong>theoretical</strong> (perfect world) value.<br><br>
+  <strong>AMA (Actual MA)</strong> = calculated from real measured forces. Includes friction losses. This is the <strong>actual</strong> (real world) value.<br><br>
+  AMA is <strong>always less than or equal to</strong> IMA because friction eats some of your effort.
+</div>
+
+<div class="example-card">
+  <div class="ex-label purple">IMA vs AMA Side-by-Side (Ramp A from your worksheet)</div>
+  <div class="ex-q">Ramp A: Length = <strong>38 cm</strong>, Height = <strong>3 cm</strong>. Without ramp = <strong>120 g</strong>. With ramp = <strong>15 g</strong>.</div>
+  <div class="ex-steps">
+    <div class="step-line"><span class="step-num">IMA:</span><span>= Length ÷ Height = 38 ÷ 3 = <span class="step-ans">12.67</span></span></div>
+    <div class="step-line"><span class="step-num">AMA:</span><span>= Output ÷ Input = 120 ÷ 15 = <span class="step-ans">8</span></span></div>
+    <div class="step-line"><span class="step-num">Eff:</span><span>= (AMA ÷ IMA) × 100 = (8 ÷ 12.67) × 100 = <span class="step-ans">63.1%</span></span></div>
+  </div>
+</div>
+```
+
+  </div>
+
+  <!-- ===================== EFFICIENCY ===================== -->
+
+  <div class="section" id="efficiency">
+    <div class="section-title">Efficiency</div>
+    <div class="section-sub">How much of your work input actually becomes useful work output?</div>
+
+```
+<div class="info-block">
+  <div class="tip-label">What is it?</div>
+  Efficiency tells you how "good" a machine is at not wasting energy. A perfect machine = <strong>100%</strong>. Real machines are always less than 100% because friction wastes some energy as heat.
+</div>
+
+<div class="formula-card">
+  <div class="formula-label">Main Formula — Work Method</div>
+  <div class="formula">Efficiency = (Work Output ÷ Work Input) × 100%</div>
+  <div class="formula-note">Work is measured in <strong>Joules (J)</strong>. Answer is always a <strong>percent %</strong>.</div>
+  <div class="rearrange">
+    <div class="rearrange-label">🔄 Rearrangements</div>
+    <div class="formula" style="font-size:15px;">Work Output = (Efficiency% ÷ 100) × Work Input</div>
+    <div class="formula" style="font-size:15px;">Work Input = Work Output ÷ (Efficiency% ÷ 100)</div>
+  </div>
+</div>
+
+<div class="formula-card">
+  <div class="formula-label">Main Formula — MA Method</div>
+  <div class="formula">Efficiency = (AMA ÷ IMA) × 100%</div>
+  <div class="formula-note">Use this when you have both IMA and AMA already calculated.</div>
+</div>
+
+<div class="example-card">
+  <div class="ex-label">Example 1 — Find Efficiency</div>
+  <div class="ex-q">A cell phone charger uses <strong>4.83 J</strong> but only <strong>1.31 J</strong> goes into the battery. How efficient?</div>
+  <div class="ex-steps">
+    <div class="step-line"><span class="step-num">→</span><span>Efficiency = (1.31 ÷ 4.83) × 100</span></div>
+    <div class="step-line"><span class="step-num">✓</span><span class="step-ans">= 27.1%</span></div>
+  </div>
+</div>
+
+<div class="example-card">
+  <div class="ex-label">Example 2 — Find Work Output</div>
+  <div class="ex-q">Bicycle is <strong>92% efficient</strong>. Cyclist inputs <strong>100 J</strong>. How many joules move the bike?</div>
+  <div class="ex-steps">
+    <div class="step-line"><span class="step-num">→</span><span>Work Out = (92 ÷ 100) × 100 = 0.92 × 100</span></div>
+    <div class="step-line"><span class="step-num">✓</span><span class="step-ans">= 92 J</span></div>
+  </div>
+</div>
+
+<div class="example-card">
+  <div class="ex-label">Example 3 — Find Work Input</div>
+  <div class="ex-q">Engine is <strong>15% efficient</strong>. Needs <strong>15,000 J</strong> of output. How much input?</div>
+  <div class="ex-steps">
+    <div class="step-line"><span class="step-num">→</span><span>Work In = 15,000 ÷ (15 ÷ 100) = 15,000 ÷ 0.15</span></div>
+    <div class="step-line"><span class="step-num">✓</span><span class="step-ans">= 100,000 J</span></div>
+  </div>
+</div>
+
+<div class="example-card">
+  <div class="ex-label green">Example 4 — Efficiency using AMA/IMA</div>
+  <div class="ex-q">Ramp: IMA = <strong>6</strong>, AMA = <strong>5.22</strong>. What is the efficiency?</div>
+  <div class="ex-steps">
+    <div class="step-line"><span class="step-num">→</span><span>Efficiency = (AMA ÷ IMA) × 100</span></div>
+    <div class="step-line"><span class="step-num">→</span><span>= (5.22 ÷ 6) × 100</span></div>
+    <div class="step-line"><span class="step-num">✓</span><span class="step-ans">= 87%</span></div>
+  </div>
+</div>
+
+<div class="warn-block">
+  <strong>⚠️ Common Mistake:</strong> 60% as a decimal = 0.60. Always divide by 100 to convert percent to decimal before multiplying!
+</div>
+```
+
+  </div>
+
+  <!-- ===================== IMA & AMA ===================== -->
+
+  <div class="section" id="ima-ama">
+    <div class="section-title">IMA &amp; AMA</div>
+    <div class="section-sub">Ideal (theoretical) vs. Actual (real) Mechanical Advantage</div>
+
+```
+<div class="info-block purple">
+  <div class="tip-label">The Big Picture</div>
+  <strong>IMA</strong> = uses distances/measurements. No friction assumed. Theoretical.<br>
+  <strong>AMA</strong> = uses real measured forces. Includes friction. Actual.<br>
+  <strong>AMA is ALWAYS ≤ IMA</strong> in the real world.<br>
+  <strong>Efficiency</strong> = (AMA ÷ IMA) × 100%
+</div>
+
+<div class="formula-card">
+  <div class="formula-label">IMA — Inclined Plane (Ramp)</div>
+  <div class="formula">IMA = Length of Ramp ÷ Height of Ramp</div>
+  <div class="formula-note">Also: effort distance ÷ resistance distance</div>
+</div>
+
+<div class="formula-card">
+  <div class="formula-label">AMA — Any Machine</div>
+  <div class="formula">AMA = Resistance Force ÷ Effort Force</div>
+  <div class="formula-note"><strong>Resistance force</strong> = weight of object (what you fight against)<br><strong>Effort force</strong> = how hard YOU push/pull</div>
+  <div class="rearrange">
+    <div class="rearrange-label">🔄 Rearrangements</div>
+    <div class="formula" style="font-size:14px;">Resistance Force = AMA × Effort Force</div>
+    <div class="formula" style="font-size:14px;">Effort Force = Resistance Force ÷ AMA</div>
+  </div>
+</div>
+
+<div class="example-card">
+  <div class="ex-label purple">Full 3-Step Example</div>
+  <div class="ex-q">Ramp: <strong>12 m</strong> long, <strong>2 m</strong> tall. You push with <strong>150 N</strong>. Box weighs <strong>783 N</strong>. Find IMA, AMA, and Efficiency.</div>
+  <div class="ex-steps">
+    <div class="step-line"><span class="step-num">1.</span><span>IMA = 12 ÷ 2 = <span class="step-ans">6</span></span></div>
+    <div class="step-line"><span class="step-num">2.</span><span>AMA = 783 ÷ 150 = <span class="step-ans">5.22</span></span></div>
+    <div class="step-line"><span class="step-num">3.</span><span>Efficiency = (5.22 ÷ 6) × 100 = <span class="step-ans">87%</span></span></div>
+  </div>
+</div>
+
+<div class="example-card">
+  <div class="ex-label purple">Ramp D from your worksheet!</div>
+  <div class="ex-q">Ramp D: Length = <strong>31 cm</strong>, Height = <strong>14 cm</strong>. Without ramp = <strong>120 g</strong>. With ramp = <strong>60 g</strong>.</div>
+  <div class="ex-steps">
+    <div class="step-line"><span class="step-num">IMA</span><span>= 31 ÷ 14 = <span class="step-ans">2.21</span></span></div>
+    <div class="step-line"><span class="step-num">AMA</span><span>= 120 ÷ 60 = <span class="step-ans">2</span></span></div>
+    <div class="step-line"><span class="step-num">Eff</span><span>= (2 ÷ 2.21) × 100 = <span class="step-ans">90.5%</span></span></div>
+  </div>
+</div>
+```
+
+  </div>
+
+  <!-- ===================== INCLINED PLANE ===================== -->
+
+  <div class="section" id="inclined">
+    <div class="section-title">Inclined Plane (Ramp)</div>
+    <div class="section-sub">A flat surface tilted at an angle — the longer/shallower the ramp, the easier the push</div>
+
+```
+<div class="info-block yellow">
+  <div class="tip-label">Key Idea</div>
+  A ramp lets you use <strong>less force</strong> over a <strong>longer distance</strong> to do the same work. The gentler (shallower) the ramp = <strong>higher MA</strong> = easier. The steeper the ramp = <strong>lower MA</strong> = harder.
+</div>
+
+<div class="formula-card">
+  <div class="formula-label">MA of Inclined Plane</div>
+  <div class="formula">MA = Slope Length ÷ Height</div>
+  <div class="formula-note">Slope length = the long side of the ramp you travel along<br>Height = the vertical rise (how tall it is)</div>
+</div>
+
+<div class="example-card">
+  <div class="ex-label">Ramp A — From Your Lab</div>
+  <div class="ex-q">Length = <strong>38 cm</strong>, Height = <strong>3 cm</strong>. MA from dimensions?</div>
+  <div class="ex-steps">
+    <div class="step-line"><span class="step-num">→</span><span>MA = 38 ÷ 3</span></div>
+    <div class="step-line"><span class="step-num">✓</span><span class="step-ans">= 12.67 (very gentle ramp = big advantage)</span></div>
+  </div>
+</div>
+
+<div class="example-card">
+  <div class="ex-label">Ramp B — From Your Lab</div>
+  <div class="ex-q">Length = <strong>30.5 cm</strong>, Height = <strong>7 cm</strong>.</div>
+  <div class="ex-steps">
+    <div class="step-line"><span class="step-num">→</span><span>MA = 30.5 ÷ 7</span></div>
+    <div class="step-line"><span class="step-num">✓</span><span class="step-ans">= 4.36</span></div>
+  </div>
+</div>
+
+<div class="example-card">
+  <div class="ex-label">Ramp C — From Your Lab</div>
+  <div class="ex-q">Length = <strong>34 cm</strong>, Height = <strong>10 cm</strong>.</div>
+  <div class="ex-steps">
+    <div class="step-line"><span class="step-num">→</span><span>MA = 34 ÷ 10</span></div>
+    <div class="step-line"><span class="step-num">✓</span><span class="step-ans">= 3.4</span></div>
+  </div>
+</div>
+
+<div class="example-card">
+  <div class="ex-label">Ramp D — From Your Lab</div>
+  <div class="ex-q">Length = <strong>31 cm</strong>, Height = <strong>14 cm</strong>.</div>
+  <div class="ex-steps">
+    <div class="step-line"><span class="step-num">→</span><span>MA = 31 ÷ 14</span></div>
+    <div class="step-line"><span class="step-num">✓</span><span class="step-ans">= 2.21 (steep ramp = lowest advantage)</span></div>
+  </div>
+</div>
+
+<div class="info-block">
+  <div class="tip-label">Conclusions from the Lab</div>
+  <strong>Ramp A had the GREATEST mechanical advantage (12.67)</strong> because it had the longest slope and shortest height — the most gradual incline.<br><br>
+  The two methods of measuring MA (from dimensions vs from forces) give <strong>different values</strong> because real-world friction reduces the actual MA below the ideal. The difference was large for steep ramps and smaller for shallow ones.
+</div>
+
+<div class="info-block yellow">
+  <div class="tip-label">Conclusions Question 2 — Engineer Ramp</div>
+  If you need to move a wheelbarrow up 100 feet, use the ramp with the <strong>highest MA (most gradual slope, like Ramp A)</strong> because you need to apply the least force — important for a heavy wheelbarrow over a long distance.
+</div>
+
+<div class="warn-block">
+  <strong>⚠️ Sources of Error in the Lab:</strong> Friction on the surface, not measuring the spring scale while it's moving, measuring length/height inaccurately, the object slipping or tilting, and human error reading the scale.
+</div>
+```
+
+  </div>
+
+  <!-- ===================== GEARS ===================== -->
+
+  <div class="section" id="gears">
+    <div class="section-title">Gear Ratios</div>
+    <div class="section-sub">How many times does one gear spin compared to another?</div>
+
+```
+<div class="info-block">
+  <div class="tip-label">Key Idea</div>
+  Gears are <strong>round objects with teeth</strong>. More teeth = spins slower. Fewer teeth = spins faster.<br>
+  Gears touching each other always spin in <strong>opposite directions</strong>.
+</div>
+
+<div class="formula-card">
+  <div class="formula-label">Gear Ratio / Output Turns</div>
+  <div class="formula">Output Turns = (Input Teeth ÷ Output Teeth) × Input Turns</div>
+  <div class="formula-note">Input gear = the gear you're turning (driver). Output gear = the gear being driven.</div>
+</div>
+
+<div class="example-card">
+  <div class="ex-label">Example 1</div>
+  <div class="ex-q"><strong>36-tooth</strong> gear turns <strong>3 times</strong> → connected to <strong>12-tooth</strong> gear. How many times does the small gear turn?</div>
+  <div class="ex-steps">
+    <div class="step-line"><span class="step-num">→</span><span>Output = (36 ÷ 12) × 3 = 3 × 3</span></div>
+    <div class="step-line"><span class="step-num">✓</span><span class="step-ans">= 9 turns</span></div>
+  </div>
+</div>
+
+<div class="example-card">
+  <div class="ex-label">Example 2 — Big to Small</div>
+  <div class="ex-q"><strong>72-tooth</strong> gear makes <strong>1 turn</strong> → connected to <strong>12-tooth</strong> gear. How many turns does the small gear make?</div>
+  <div class="ex-steps">
+    <div class="step-line"><span class="step-num">→</span><span>Output = (72 ÷ 12) × 1</span></div>
+    <div class="step-line"><span class="step-num">✓</span><span class="step-ans">= 6 turns</span></div>
+  </div>
+</div>
+
+<div class="example-card">
+  <div class="ex-label green">Example 3 — Three Gears</div>
+  <div class="ex-q">Top=12, Middle=24, Bottom=36 teeth. What's the total gear ratio?</div>
+  <div class="ex-steps">
+    <div class="step-line"><span class="step-num">1.</span><span>Ratio 1 (Top→Middle) = 12 ÷ 24 = 0.5</span></div>
+    <div class="step-line"><span class="step-num">2.</span><span>Ratio 2 (Middle→Bottom) = 24 ÷ 36 = 0.67</span></div>
+    <div class="step-line"><span class="step-num">3.</span><span>Total = 0.5 × 0.67 = <span class="step-ans">0.34</span></span></div>
+  </div>
+</div>
+
+<div class="warn-block">
+  <strong>⚠️ Direction:</strong> With 3 gears — Top goes RIGHT → Middle goes LEFT → Bottom goes RIGHT again (same as top).
+</div>
+```
+
+  </div>
+
+  <!-- ===================== LEVERS ===================== -->
+
+  <div class="section" id="levers">
+    <div class="section-title">Levers</div>
+    <div class="section-sub">A bar that pivots on a fulcrum — know your 3 classes AND both MA formulas</div>
+
+```
+<div class="info-block yellow">
+  <div class="tip-label">3 Classes — Quick Recall</div>
+  <strong>Class 1</strong> — Fulcrum in MIDDLE. Ex: seesaw, pliers, scissors.<br>
+  <strong>Class 2</strong> — Load (output) in MIDDLE. Ex: wheelbarrow, bottle opener. Always MA &gt; 1.<br>
+  <strong>Class 3</strong> — Effort (input) in MIDDLE. Ex: your arm/elbow, tennis racket, tweezers. MA &lt; 1 (multiplies speed, not force).
+</div>
+
+<div class="two-col">
+  <div class="mini-card">
+    <div class="mini-title">IMA of Lever</div>
+    <div class="mini-formula">IMA = Effort Distance<br>       ──────────────<br>       Resistance Distance<br>(from fulcrum)</div>
+    <div class="mini-note">Use distances (lengths of arms). Theoretical value.</div>
+  </div>
+  <div class="mini-card">
+    <div class="mini-title">AMA / MA of Lever</div>
+    <div class="mini-formula">MA = Output Force<br>      ──────────<br>      Input Force<br>(actual forces)</div>
+    <div class="mini-note">Use measured forces in Newtons. Actual value.</div>
+  </div>
+</div>
+
+<div class="example-card">
+  <div class="ex-label">Full Lever Example</div>
+  <div class="ex-q">Effort arm = <strong>5.8 m</strong>, Resistance arm = <strong>6.3 m</strong>. Effort force = <strong>57.7 N</strong>. Load = <strong>45 N</strong>. Find IMA, AMA, Efficiency.</div>
+  <div class="ex-steps">
+    <div class="step-line"><span class="step-num">IMA</span><span>= 5.8 ÷ 6.3 = <span class="step-ans">0.92</span></span></div>
+    <div class="step-line"><span class="step-num">AMA</span><span>= 45 ÷ 57.7 = <span class="step-ans">0.78</span></span></div>
+    <div class="step-line"><span class="step-num">Eff</span><span>= (0.78 ÷ 0.92) × 100 = <span class="step-ans">~84.8%</span></span></div>
+  </div>
+</div>
+
+<div class="example-card">
+  <div class="ex-label pink">AMA Lever Practice</div>
+  <div class="ex-q">You push down with <strong>75 N</strong> (effort). Object weighs <strong>597 N</strong> (resistance). What is the AMA?</div>
+  <div class="ex-steps">
+    <div class="step-line"><span class="step-num">→</span><span>AMA = 597 ÷ 75</span></div>
+    <div class="step-line"><span class="step-num">✓</span><span class="step-ans">= 7.96</span></div>
+  </div>
+</div>
+```
+
+  </div>
+
+  <!-- ===================== PULLEYS ===================== -->
+
+  <div class="section" id="pulleys">
+    <div class="section-title">Pulleys</div>
+    <div class="section-sub">Count the supporting ropes — that's your IMA</div>
+
+```
+<div class="info-block">
+  <div class="tip-label">THE Rule</div>
+  <strong>IMA = number of ropes supporting the load.</strong> The rope you pull (going up over the top to YOUR hand) does NOT count.
+</div>
+
+<div class="formula-card">
+  <div class="formula-label">Pulley Formulas</div>
+  <div class="formula">IMA = # of supporting ropes</div>
+  <div class="formula">AMA = Load (resistance force) ÷ Effort force</div>
+  <div class="formula">Force per rope = Load ÷ IMA</div>
+  <div class="formula">Efficiency = (AMA ÷ IMA) × 100%</div>
+</div>
+
+<div class="example-card">
+  <div class="ex-label">Pulley Efficiency — Problem 12</div>
+  <div class="ex-q">Pulley system with <strong>5 supporting ropes</strong>. Load = <strong>100 N</strong>. You pull with <strong>22 N</strong>.</div>
+  <div class="ex-steps">
+    <div class="step-line"><span class="step-num">IMA</span><span>= 5 (count the ropes)</span></div>
+    <div class="step-line"><span class="step-num">AMA</span><span>= 100 ÷ 22 = 4.55</span></div>
+    <div class="step-line"><span class="step-num">Eff</span><span>= (4.55 ÷ 5) × 100 = <span class="step-ans">91%</span></span></div>
+  </div>
+</div>
+
+<div class="example-card">
+  <div class="ex-label">Single Fixed Pulley</div>
+  <div class="ex-q">Load = <strong>30 N</strong>. You pull with <strong>50 N</strong>. Efficiency?</div>
+  <div class="ex-steps">
+    <div class="step-line"><span class="step-num">IMA</span><span>= 1</span></div>
+    <div class="step-line"><span class="step-num">AMA</span><span>= 30 ÷ 50 = 0.6</span></div>
+    <div class="step-line"><span class="step-num">Eff</span><span>= (0.6 ÷ 1) × 100 = <span class="step-ans">60%</span></span></div>
+  </div>
+</div>
+```
+
+  </div>
+
+  <!-- ===================== WHEEL & AXLE ===================== -->
+
+  <div class="section" id="wheel">
+    <div class="section-title">Wheel &amp; Axle</div>
+    <div class="section-sub">Big circle (wheel) + small circle (axle) = special 360° lever</div>
+
+```
+<div class="info-block">
+  <div class="tip-label">Key Idea</div>
+  Turn the <strong>wheel</strong> → get more force at the axle (but slower). Turn the <strong>axle</strong> → get more speed at the wheel (but less force).<br>
+  Big wheel + tiny axle = <strong>huge MA</strong>.
+</div>
+
+<div class="formula-card">
+  <div class="formula-label">IMA of Wheel &amp; Axle</div>
+  <div class="formula">IMA = Radius of Wheel ÷ Radius of Axle</div>
+  <div class="formula" style="font-size:15px;">OR: Diameter of Wheel ÷ Diameter of Axle</div>
+  <div class="formula-note">Use whichever you're given — just be consistent! Don't mix radius and diameter.</div>
+</div>
+
+<div class="example-card">
+  <div class="ex-label">Example 1</div>
+  <div class="ex-q">Wheel diameter = <strong>12 cm</strong>. Axle diameter = <strong>1.5 cm</strong>.</div>
+  <div class="ex-steps">
+    <div class="step-line"><span class="step-num">→</span><span>IMA = 12 ÷ 1.5</span></div>
+    <div class="step-line"><span class="step-num">✓</span><span class="step-ans">= 8</span></div>
+  </div>
+</div>
+
+<div class="example-card">
+  <div class="ex-label">Example 2</div>
+  <div class="ex-q">Wheel = <strong>13 cm</strong> diameter. Axle = <strong>3 cm</strong> diameter.</div>
+  <div class="ex-steps">
+    <div class="step-line"><span class="step-num">→</span><span>IMA = 13 ÷ 3</span></div>
+    <div class="step-line"><span class="step-num">✓</span><span class="step-ans">= 4.33</span></div>
+  </div>
+</div>
+```
+
+  </div>
+
+  <!-- ===================== CHEAT SHEET ===================== -->
+
+  <div class="section" id="cheatsheet">
+    <div class="section-title">Master Cheat Sheet</div>
+    <div class="section-sub">Every single formula — print this in your brain before the test</div>
+
+```
+<table>
+  <thead>
+    <tr><th>Concept</th><th>Formula</th><th>Notes</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>MA (Force)</strong></td><td class="mono">MA = Output Force ÷ Input Force</td><td>Output = resistance/weight. Input = effort/you.</td></tr>
+    <tr><td><strong>MA (Lever arm)</strong></td><td class="mono">MA = Input Arm ÷ Output Arm</td><td>Both measured from fulcrum.</td></tr>
+    <tr><td><strong>Find Output Force</strong></td><td class="mono">Output F = MA × Input F</td><td>Rearrangement of MA formula</td></tr>
+    <tr><td><strong>Find Input Force</strong></td><td class="mono">Input F = Output F ÷ MA</td><td>Rearrangement of MA formula</td></tr>
+    <tr><td><strong>Efficiency (Work)</strong></td><td class="mono">Eff = (W.Out ÷ W.In) × 100%</td><td>Joules in, Joules out</td></tr>
+    <tr><td><strong>Efficiency (MA)</strong></td><td class="mono">Eff = (AMA ÷ IMA) × 100%</td><td>Use when you have both MA values</td></tr>
+    <tr><td><strong>IMA — Ramp</strong></td><td class="mono">IMA = Length ÷ Height</td><td>Slope length ÷ vertical height</td></tr>
+    <tr><td><strong>IMA — Lever</strong></td><td class="mono">IMA = Effort Dist ÷ Resist Dist</td><td>Both from fulcrum</td></tr>
+    <tr><td><strong>IMA — Pulley</strong></td><td class="mono">IMA = # supporting ropes</td><td>Don't count the pull rope!</td></tr>
+    <tr><td><strong>IMA — Wheel/Axle</strong></td><td class="mono">IMA = Wheel R ÷ Axle R</td><td>Or diameter ÷ diameter</td></tr>
+    <tr><td><strong>AMA — Any Machine</strong></td><td class="mono">AMA = Resistance F ÷ Effort F</td><td>Real measured forces (Newtons)</td></tr>
+    <tr><td><strong>Gear Output Turns</strong></td><td class="mono">Out = (In teeth ÷ Out teeth) × In turns</td><td>More teeth = turns slower</td></tr>
+    <tr><td><strong>3 Gear Total Ratio</strong></td><td class="mono">Total = Ratio1 × Ratio2</td><td>Multiply the two pair ratios</td></tr>
+    <tr><td><strong>Force Per Rope</strong></td><td class="mono">Force = Load ÷ IMA</td><td>Pulleys only</td></tr>
+  </tbody>
+</table>
+
+<div class="divider"></div>
+<h3>KEY FACTS TO MEMORIZE</h3>
+
+<div class="two-col">
+  <div class="info-block yellow" style="margin-bottom:0">
+    <div class="tip-label">MA Quick Rules</div>
+    <strong>MA &gt; 1</strong> = machine multiplies force ✓<br>
+    <strong>MA = 1</strong> = just redirects force<br>
+    <strong>MA &lt; 1</strong> = multiplies speed/distance<br>
+    <strong>Bigger MA = easier = less force needed</strong>
+  </div>
+  <div class="info-block purple" style="margin-bottom:0">
+    <div class="tip-label">IMA vs AMA</div>
+    <strong>IMA</strong> = distances = theoretical = perfect world<br>
+    <strong>AMA</strong> = forces = actual = real world<br>
+    <strong>AMA always ≤ IMA</strong> (friction!)<br>
+    <strong>Efficiency = AMA÷IMA × 100%</strong>
+  </div>
+</div>
+
+<div style="height:14px"></div>
+
+<div class="info-block">
+  <div class="tip-label">Lever Classes</div>
+  <strong>Class 1</strong> — Fulcrum in middle (seesaw, pliers) — can be &gt;1 or &lt;1<br>
+  <strong>Class 2</strong> — Load in middle (wheelbarrow) — always &gt;1 MA<br>
+  <strong>Class 3</strong> — Effort in middle (your arm, tweezers) — always &lt;1 MA
+</div>
+
+<div class="warn-block">
+  <strong>🎯 Universal Test Strategy — 3 Steps:</strong><br>
+  <strong>Step 1:</strong> Find IMA (from distances, rope count, or dimensions)<br>
+  <strong>Step 2:</strong> Find AMA (resistance force ÷ effort force)<br>
+  <strong>Step 3:</strong> Efficiency = (AMA ÷ IMA) × 100%<br><br>
+  If a problem only asks for one step — just do that step. If it gives you forces, use them for AMA. If it gives you distances, use them for IMA.
+</div>
+```
+
+  </div>
+
+</div>
+
+<script>
+  function show(id, btn) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+
+</body>
+</html>
