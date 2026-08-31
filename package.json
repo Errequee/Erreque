@@ -1,0 +1,14 @@
+{
+  "name": "taller-libre",
+  "version": "1.0.0",
+  "description": "Suite gratuita de herramientas DTF que corre entera en el navegador.",
+  "private": true,
+  "scripts": {
+    "build": "python3 build.py",
+    "test": "node test/smoke.js",
+    "serve": "python3 -m http.server 8080"
+  },
+  "devDependencies": {
+    "playwright": "^1.49.1"
+  }
+}
