@@ -36,10 +36,43 @@
     return Number(v).toLocaleString('es-MX', { minimumFractionDigits: d == null ? 2 : d, maximumFractionDigits: d == null ? 2 : d });
   };
 
+  /* Guardado. En un visor incrustado el navegador bloquea los enlaces de descarga,
+     así que se pide al anfitrión que guarde el archivo; en la web normal, enlace y ya. */
+  var saver = null;
+  function saveApi() {
+    if (!saver) {
+      saver = (window.claude && typeof claude.use === 'function')
+        ? claude.use('downloads').catch(function () { return null; })
+        : Promise.resolve(null);
+    }
+    return saver;
+  }
+
   NV.download = function (blob, name) {
-    var u = URL.createObjectURL(blob), a = el('a', { href: u, download: name });
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(function () { URL.revokeObjectURL(u); }, 4000);
+    return saveApi().then(function (d) {
+      if (!d) {
+        var u = URL.createObjectURL(blob), a = el('a', { href: u, download: name });
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(function () { URL.revokeObjectURL(u); }, 4000);
+        NV.toast('Archivo descargado.', 'ok');
+        return;
+      }
+      return d.save({ filename: name, data: blob }).then(function () {
+        NV.toast('Archivo guardado.', 'ok');
+      }, function (e) {
+        var code = e && e.code, ext = (name.split('.').pop() || '').toUpperCase();
+        if (code === 'declined') return;
+        if (code === 'rejected_extension' || code === 'extension_not_enabled') {
+          NV.toast('Esta vista no puede guardar archivos ' + ext + '. Abre el sitio completo para descargarlo.', 'bad');
+        } else if (code === 'too_large') {
+          NV.toast('El archivo pasa de 16 MB. Baja los DPI o divide el trabajo en varias hojas.', 'bad');
+        } else if (code === 'rate_limited') {
+          NV.toast('Ya hay una descarga esperando confirmación. Termínala y vuelve a intentar.', 'bad');
+        } else {
+          NV.toast('No se pudo guardar el archivo.', 'bad');
+        }
+      });
+    });
   };
 
   NV.blobOf = function (canvas, type, quality) {
@@ -459,7 +492,7 @@
             .then(function (b) { NV.download(b, api.name + '-' + t.slug + '.' + (ex.ext || 'png')); finish(); });
         } catch (e) { NV.toast('No se pudo exportar: ' + e.message, 'bad'); vw.busy(false); }
       }, 12);
-      function finish() { vw.busy(false); NV.toast('Archivo descargado.', 'ok'); }
+      function finish() { vw.busy(false); }
     }
   };
 

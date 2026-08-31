@@ -51,11 +51,17 @@ Netlify, Cloudflare Pages) o levántalo en local:
 npm run serve      # http://localhost:8080
 ```
 
-También hay una versión de un solo archivo, útil para pasarla por USB o WhatsApp:
+También hay versiones de un solo archivo:
 
 ```sh
-npm run build      # genera dist/taller-libre.html con todo dentro
+npm run build                  # dist/taller-libre.html — HTML completo, para USB o WhatsApp
+python3 build.py --artifact    # dist/artifact.html — sin <html>/<head>/<body>, para incrustar
 ```
+
+En un visor incrustado el navegador bloquea los enlaces de descarga, así que `NV.download`
+pide al anfitrión que guarde el archivo (`claude.use('downloads')`) y cae al enlace normal
+cuando eso no existe. En esa vista el ZIP de separación por tintas no está permitido: la
+herramienta lo avisa y pide abrir el sitio completo.
 
 ## Cómo está hecho
 
