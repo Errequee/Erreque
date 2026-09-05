@@ -1388,7 +1388,7 @@ tbody tr:hover{background:var(--raise)}
       html: NV.svg('<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>') + '<span>Tools</span>'
     });
     var menu = el('div', { class: 'picker-menu' });
-    menu.appendChild(el('div', { class: 'head eyebrow', text: 'All 13 tools' }));
+    menu.appendChild(el('div', { class: 'head eyebrow', text: 'All 16 tools' }));
     NV.tools.forEach(function (t) {
       menu.appendChild(el('a', { href: '#/' + t.slug, html: t.name + '<small>' + t.tagline + '</small>' }));
     });
@@ -1440,9 +1440,9 @@ tbody tr:hover{background:var(--raise)}
     var cv = el('canvas');
     hero.appendChild(cv);
     hero.appendChild(el('div', { class: 'wrap' }, [el('div', { class: 'hero-in' }, [
-      el('div', { class: 'eyebrow', text: 'Digital workshop · 13 tools' }),
+      el('div', { class: 'eyebrow', text: 'Digital workshop · 16 tools' }),
       el('h1', { html: 'The whole <em>DTF</em> shop<br>in your browser' }),
-      el('p', { text: 'Knock out backgrounds, clean up contours, build halftones, vectorize, gang up print sheets and price the job. No account, no watermarks, and not one file uploaded.' }),
+      el('p', { text: 'Check a file before it costs you film, knock out backgrounds, clean up contours, build halftones and rhinestone layouts, vectorize, gang up print sheets and price the job. No account, no watermarks, and not one file uploaded.' }),
       el('div', { class: 'badges' }, [
         el('span', { class: 'badge hot', text: 'Free forever' }),
         el('span', { class: 'badge', text: 'No sign-up' }),
@@ -1548,6 +1548,296 @@ tbody tr:hover{background:var(--raise)}
 
 </script>
 
+<script>
+/* Workshop guide: the order to work in, and what each tool is actually for. */
+(function () {
+  'use strict';
+  var el = NV.el;
+
+  var STEPS = [
+    ['Start from the biggest file you have',
+     'Everything downstream inherits the resolution you begin with. A 600 px logo blown up to 28 cm will look soft no matter what you do to it. Check what you have before you spend time on it.',
+     'dtf-check', 'Run the file check'],
+    ['Knock the background out',
+     'Flat backgrounds — white, chroma, studio — come off with the wand in a click or two. Then fix the leftovers by hand with the brushes rather than fighting the tolerance slider.',
+     'remove-background', 'Open the background remover'],
+    ['Clean the contour',
+     'A cutout leaves a rim of pixels from the old background. Shrink by 1–2 px with defringe on and the halo goes. This is the step most people skip, and it is the one that shows on the shirt.',
+     'reduce-edges', 'Open the edge tool'],
+    ['Kill the partial alpha',
+     'White ink prints solid or not at all. Soft shadows, glows and feathered edges come out grey and dirty. Push them to solid or clear before printing, not after.',
+     'semi-transparency', 'Open the alpha tool'],
+    ['Size it in centimetres, not pixels',
+     'Set the real print size and the DPI together. The PNG carries the resolution in its header, so the RIP places it correctly instead of guessing.',
+     'resize', 'Open the resizer'],
+    ['Gang it onto the roll',
+     'Film is sold by the metre, so the money is made here. Pack the sheet by height, set a small gap and read the run length before you print.',
+     'gang-sheets', 'Open print sheets'],
+    ['Price it from your own numbers',
+     'Cost per piece comes from the roll price, ink, powder, labour minutes and waste. Work it out once for your shop and quote from that, not from what someone else charges.',
+     'pricing', 'Open the calculator']
+  ];
+
+  var MISTAKES = [
+    ['Printing a JPG', 'JPG has no transparency, so the background prints as a rectangle. It also adds blocky artefacts around hard edges. Work in PNG from the start.'],
+    ['Gradients that fade to nothing', 'A gradient fading to transparent is partial alpha, which is exactly what the printer cannot do. Use a dot fade instead — solid dots that get smaller read as a fade to the eye and print cleanly.'],
+    ['Hairlines under half a millimetre', 'Thin strokes lift off the film or disappear under the press. Thicken them or print the design larger.'],
+    ['Trusting the screen for colour', 'Film sits a little flatter than a backlit monitor. A small lift in vibrance and contrast usually lands closer to what you saw.'],
+    ['Skipping the test press', 'Every film and every fabric behaves differently. One test on the same garment costs a few pesos; a bad run costs the whole order.']
+  ];
+
+  NV.register({
+    slug: 'guide',
+    name: 'Workshop guide',
+    group: 'Cutout cleanup',
+    tagline: 'The order to work in, what each tool fixes and the mistakes that cost film.',
+    icon: NV.svg('<path d="M4 4.5A1.5 1.5 0 0 1 5.5 3H19v18H5.5A1.5 1.5 0 0 1 4 19.5z"/><path d="M8 7.5h7M8 11h7M8 14.5h4"/>'),
+    kind: 'custom',
+    render: function (host) {
+      var t = this;
+      var wrap = el('div', { class: 'wrap doc' });
+      wrap.appendChild(el('div', { class: 'eyebrow', text: 'Start here' }));
+      wrap.appendChild(el('h1', { style: 'font-size:34px;text-transform:uppercase;margin:8px 0 10px', text: t.name }));
+      wrap.appendChild(el('p', { text: 'Every tool here does one job. Run them in this order and the file that reaches the printer is already right. Nothing is locked, nothing expires, and no file you open ever leaves your browser.' }));
+
+      wrap.appendChild(el('h2', { text: 'The order to work in' }));
+      var steps = el('div', { style: 'display:flex;flex-direction:column;gap:2px;margin-top:6px' });
+      STEPS.forEach(function (s, i) {
+        var row = el('div', {
+          style: 'display:grid;grid-template-columns:44px 1fr;gap:16px;padding:16px 0;border-top:1px solid var(--line-soft)'
+        });
+        row.appendChild(el('div', {
+          class: 'mono',
+          style: 'font-size:13px;color:var(--accent);padding-top:2px',
+          text: ('0' + (i + 1)).slice(-2)
+        }));
+        var right = el('div', {});
+        right.appendChild(el('h3', { style: 'margin:0 0 6px', text: s[0] }));
+        right.appendChild(el('p', { style: 'margin:0 0 10px', text: s[1] }));
+        right.appendChild(el('a', { class: 'btn', href: '#/' + s[2], text: s[3] + ' →' }));
+        row.appendChild(right);
+        steps.appendChild(row);
+      });
+      wrap.appendChild(steps);
+
+      wrap.appendChild(el('h2', { text: 'What costs people film' }));
+      var m = el('div', { style: 'display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:8px' });
+      MISTAKES.forEach(function (x) {
+        m.appendChild(el('div', { class: 'panelbox' }, [
+          el('h3', { style: 'margin:0 0 7px;font-size:15.5px', text: x[0] }),
+          el('p', { style: 'margin:0;font-size:13.5px', text: x[1] })
+        ]));
+      });
+      wrap.appendChild(m);
+
+      wrap.appendChild(el('h2', { text: 'The rest of the bench' }));
+      wrap.appendChild(el('p', { text: 'Not every job needs every tool. These are the ones you reach for when a particular problem shows up.' }));
+      var grid = el('div', { class: 'grid', style: 'padding-top:8px' });
+      ['enhance', 'vectorize', 'halftones', 'rhinestones', 'frames-grunge', 'convert', 'mockups', 'sizing'].forEach(function (slug) {
+        var tool = NV.byId[slug];
+        if (!tool) return;
+        grid.appendChild(el('a', { class: 'card', href: '#/' + slug }, [
+          el('span', { class: 'ico', html: tool.icon }),
+          el('h3', { text: tool.name }),
+          el('p', { text: tool.tagline })
+        ]));
+      });
+      wrap.appendChild(grid);
+
+      host.appendChild(wrap);
+      host.appendChild(NV.footer());
+    }
+  });
+})();
+
+</script>
+<script>
+/* DTF check: audits a file for print readiness and fixes what it finds. */
+(function () {
+  'use strict';
+  var el = NV.el, CM = 2.54;
+
+  function analyse(src, full, p) {
+    var d = src.data, n = src.width * src.height, i;
+    var semi = 0, opaque = 0, clear = 0, sat = 0, lum = 0, white = 0, satN = 0;
+    for (i = 0; i < n; i++) {
+      var a = d[i * 4 + 3];
+      if (a < 8) { clear++; continue; }
+      if (a < 248) semi++;
+      opaque++;
+      var r = d[i * 4], g = d[i * 4 + 1], b = d[i * 4 + 2];
+      var mx = Math.max(r, g, b), mn = Math.min(r, g, b);
+      sat += mx ? (mx - mn) / mx : 0;
+      lum += (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+      if (mx > 244 && mn > 236) white++;
+      satN++;
+    }
+    /* Corners tell you whether a background was ever removed. */
+    var w = src.width, h = src.height;
+    var corners = [0, w - 1, (h - 1) * w, h * w - 1].map(function (k) { return d[k * 4 + 3]; });
+    var cornerOpaque = corners.filter(function (a) { return a > 200; }).length;
+
+    var dpi = full.width / (p.printWidthCm / CM);
+    var printHeightCm = full.height / dpi * CM;
+
+    /* Thinnest strokes: how much of the art sits within half a millimetre of an edge. */
+    var sdf = IM.alphaSDF(src, 128);
+    var pxPerMm = src.width / (p.printWidthCm * 10);
+    var thinPx = 0.35 * pxPerMm;
+    var thin = 0;
+    for (i = 0; i < n; i++) if (sdf[i] > 0 && sdf[i] < thinPx) thin++;
+
+    /* The analysis runs on the preview, so scale counts back to the real file. */
+    var k2 = (full.width * full.height) / n;
+    return {
+      n: n, semi: semi, semiFull: Math.round(semi * k2), opaque: opaque, clear: clear,
+      semiPct: opaque ? semi / opaque * 100 : 0,
+      coverage: clear < n ? (n - clear) / n * 100 : 0,
+      sat: satN ? sat / satN * 100 : 0,
+      lum: satN ? lum / satN * 100 : 0,
+      whitePct: opaque ? white / opaque * 100 : 0,
+      thinPct: opaque ? thin / opaque * 100 : 0,
+      cornerOpaque: cornerOpaque, hasAlpha: clear > n * 0.005,
+      dpi: dpi, printHeightCm: printHeightCm,
+      fullW: full.width, fullH: full.height
+    };
+  }
+
+  function verdicts(a, p) {
+    var v = [];
+    v.push({
+      n: '01', t: 'Semi-transparency',
+      grade: a.semiPct < 0.5 ? 'good' : a.semiPct < 3 ? 'ok' : 'bad',
+      text: a.semiPct < 0.5
+        ? 'Only ' + NV.fmt(a.semiPct, 2) + ' % of the artwork has partial alpha. Nothing to fix.'
+        : NV.fmt(a.semiFull, 0) + ' px are semi-transparent (' + NV.fmt(a.semiPct, 1) +
+          ' %). White ink cannot print partial alpha, so these come out dirty or grey at the edges.'
+    });
+    v.push({
+      n: '02', t: 'Background',
+      grade: !a.hasAlpha ? 'bad' : a.cornerOpaque > 0 ? 'ok' : 'good',
+      text: !a.hasAlpha
+        ? 'The file has no transparency at all. The background will print as a solid rectangle.'
+        : a.cornerOpaque > 0
+          ? a.cornerOpaque + ' of 4 corners are still opaque. Check that no background is left behind.'
+          : 'Transparent background, corners clear. Ready for DTF.'
+    });
+    v.push({
+      n: '03', t: 'Resolution',
+      grade: a.dpi >= 290 ? 'good' : a.dpi >= 180 ? 'ok' : 'bad',
+      text: NV.fmt(a.dpi, 0) + ' DPI · ' + a.fullW + ' × ' + a.fullH + ' px at ' +
+        NV.fmt(p.printWidthCm, 1) + ' × ' + NV.fmt(a.printHeightCm, 1) + ' cm. ' +
+        (a.dpi >= 290 ? 'Optimal for DTF.'
+          : a.dpi >= 180 ? 'Usable, but the edges will soften. Upscale if you can.'
+            : 'Too low: this will print visibly pixelated. Upscale or print smaller.')
+    });
+    v.push({
+      n: '04', t: 'Colour',
+      grade: a.sat >= 30 ? 'good' : a.sat >= 18 ? 'ok' : 'bad',
+      text: 'Average saturation ' + NV.fmt(a.sat, 0) + ' %, brightness ' + NV.fmt(a.lum, 0) + ' %. ' +
+        (a.sat >= 30 ? 'Colour has enough punch for film.'
+          : 'DTF lays down a little flatter than the screen. A touch of vibrance and contrast helps.')
+    });
+    v.push({
+      n: '05', t: 'Fine detail',
+      grade: a.thinPct < 4 ? 'good' : a.thinPct < 12 ? 'ok' : 'bad',
+      text: NV.fmt(a.thinPct, 1) + ' % of the artwork sits within 0.35 mm of an edge. ' +
+        (a.thinPct < 4 ? 'Strokes are thick enough to transfer cleanly.'
+          : 'There are hairlines this thin. They tend to lift off the film or vanish under the press — thicken them or print larger.')
+    });
+    v.push({
+      n: '06', t: 'White ink and film',
+      grade: 'info',
+      text: 'The art covers ' + NV.fmt(a.coverage, 0) + ' % of the canvas' +
+        (a.whitePct > 12 ? ', and ' + NV.fmt(a.whitePct, 0) + ' % of it is near-white — that area leans on the white underbase, so keep the press firm.' : '.')
+    });
+    return v;
+  }
+
+  var GRADE = {
+    good: ['Good', 'var(--ok)'], ok: ['Check', 'var(--amber)'],
+    bad: ['Fix', 'var(--bad)'], info: ['Note', 'var(--dim)']
+  };
+
+  NV.register({
+    slug: 'dtf-check',
+    name: 'DTF file check',
+    group: 'Cutout cleanup',
+    tagline: 'Audit a file before it costs you film: alpha, background, DPI, colour and hairlines.',
+    icon: NV.svg('<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/><path d="M11 8v3.5M11 14.5v.01"/>'),
+    intro: 'Six checks on the file you are about to send to the printer. Anything it flags, it can also fix here — then download the corrected PNG.',
+    debounce: 260,
+    controls: [
+      { k: 'num', id: 'printWidthCm', label: 'Print it at this width', unit: 'cm', def: 28, min: 1, max: 300, step: 0.5 },
+      { k: 'note', text: 'Every verdict below is measured against that width. Change it and the report re-runs.' },
+      { k: 'group', label: 'Fixes' },
+      { k: 'check', id: 'fixSemi', label: 'Correct semi-transparency', def: false },
+      { k: 'range', id: 'semiLo', label: 'Erase below', min: 0, max: 254, step: 1, def: 40, unit: ' alpha', show: function (p) { return p.fixSemi; } },
+      { k: 'range', id: 'semiHi', label: 'Solidify above', min: 1, max: 255, step: 1, def: 190, unit: ' alpha', show: function (p) { return p.fixSemi; } },
+      { k: 'check', id: 'fixHalo', label: 'Remove the edge halo', def: false },
+      { k: 'check', id: 'fixColor', label: 'Lift colour for film', def: false },
+      { k: 'range', id: 'vibrance', label: 'Vibrance', min: 0, max: 60, step: 1, def: 18, unit: '', show: function (p) { return p.fixColor; } },
+      { k: 'range', id: 'contrast', label: 'Contrast', min: 0, max: 40, step: 1, def: 10, unit: '', show: function (p) { return p.fixColor; } },
+      { k: 'note', text: 'With no fixes ticked the preview is your untouched file, so you can compare against the report.' }
+    ],
+    setup: function (api) {
+      var box = el('div', { style: 'display:flex;flex-direction:column;gap:9px' });
+      var body = document.querySelector('.rail-body');
+      body.insertBefore(box, body.querySelector('.group-t'));
+      api.state.custom.report = box;
+    },
+    process: function (c) {
+      var a = analyse(c.src, c.state.full, c.p);
+      var box = c.state.custom.report;
+      if (box) {
+        box.innerHTML = '';
+        box.appendChild(el('div', { class: 'group-t', style: 'margin:0', text: 'Report' }));
+        verdicts(a, c.p).forEach(function (v) {
+          var g = GRADE[v.grade];
+          var card = el('div', {
+            style: 'border:1px solid var(--line);border-left:3px solid ' + g[1] +
+              ';border-radius:6px;padding:9px 11px;display:flex;flex-direction:column;gap:4px'
+          });
+          card.appendChild(el('div', { style: 'display:flex;justify-content:space-between;align-items:baseline;gap:8px' }, [
+            el('span', { style: 'font-size:13px;font-weight:600', text: v.n + '  ' + v.t }),
+            el('span', {
+              class: 'mono',
+              style: 'font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:' + g[1],
+              text: g[0]
+            })
+          ]));
+          card.appendChild(el('p', { class: 'hint', style: 'margin:0', text: v.text }));
+          box.appendChild(card);
+        });
+      }
+
+      var out = IM.copy(c.src), p = c.p;
+      if (p.fixSemi) out = IM.alphaLevels(out, p.semiLo, Math.max(p.semiLo + 1, p.semiHi), false);
+      if (p.fixHalo) { out = IM.defringe(out, 0.8, 250); out = IM.reshapeAlpha(out, 0.75, 0.8, 128); }
+      if (p.fixColor) out = IM.adjust(out, { contrast: p.contrast, saturation: p.vibrance, brightness: 0 });
+      return out;
+    },
+    exports: [
+      { label: 'Download corrected PNG', ext: 'png' },
+      {
+        label: 'Save the report (TXT)', ext: 'txt', secondary: true,
+        make: function (api, done) {
+          var a = analyse(api.src, api.state.full, api.params);
+          var lines = ['DTF file check — ' + api.name,
+            'Printed at ' + api.params.printWidthCm + ' cm wide', ''];
+          verdicts(a, api.params).forEach(function (v) {
+            lines.push('[' + GRADE[v.grade][0].toUpperCase() + '] ' + v.n + ' ' + v.t);
+            lines.push('    ' + v.text, '');
+          });
+          NV.download(new Blob([lines.join('\n')], { type: 'text/plain' }), api.name + '-dtf-check.txt');
+          done();
+        }
+      }
+    ]
+  });
+})();
+
+</script>
 <script>
 /* Remove background: a colour wand plus erase and restore brushes. */
 (function () {
@@ -2340,6 +2630,239 @@ tbody tr:hover{background:var(--raise)}
 
 </script>
 <script>
+/* Rhinestones: turns artwork into a stud placement pattern with a real stone count. */
+(function () {
+  'use strict';
+  var el = NV.el;
+
+  /* Standard stone sizes, in millimetres. */
+  var SS = { ss6: 2.0, ss8: 2.4, ss10: 2.8, ss12: 3.2, ss16: 3.9, ss20: 4.7, ss30: 6.4 };
+
+  /* Colours that actually exist in a stone catalogue. */
+  var STONES = [
+    ['Crystal', '#e8ecf2'], ['Crystal AB', '#d6e6f2'], ['Jet', '#17171b'],
+    ['Black Diamond', '#6d6f77'], ['Hematite', '#4a4c55'], ['Siam', '#a3162b'],
+    ['Light Siam', '#c8324a'], ['Rose', '#e5468b'], ['Fuchsia', '#b8206b'],
+    ['Amethyst', '#6a3b8f'], ['Sapphire', '#1b4f9c'], ['Aquamarine', '#7fc4d8'],
+    ['Emerald', '#157a4e'], ['Peridot', '#a8c64c'], ['Topaz', '#e2a93b'],
+    ['Sun', '#e06a21'], ['Gold Quartz', '#c99a3e'], ['Rose Gold', '#c98a79']
+  ].map(function (s) { return { name: s[0], hex: s[1], rgb: IM.rgb(s[1]) }; });
+
+  function nearestStone(r, g, b) {
+    var best = STONES[0], bd = 1e9;
+    for (var i = 0; i < STONES.length; i++) {
+      var d = IM.colorDistance(r, g, b, STONES[i].rgb[0], STONES[i].rgb[1], STONES[i].rgb[2]);
+      if (d < bd) { bd = d; best = STONES[i]; }
+    }
+    return best;
+  }
+
+  /* Where the stones go. Everything downstream reads this. */
+  function place(src, p) {
+    var w = src.width, h = src.height, d = src.data;
+    var pxPerMm = w / Math.max(1, p.widthCm * 10);
+    var stoneMm = SS[p.stone] || 2.8;
+    var stonePx = stoneMm * pxPerMm;
+    var pitch = (stoneMm + p.gap) * pxPerMm;
+    if (pitch < 1.2) pitch = 1.2;
+
+    var keep = new Uint8Array(w * h), i, n = w * h;
+    for (i = 0; i < n; i++) {
+      var a = d[i * 4 + 3];
+      if (a < p.threshold) continue;
+      if (p.ignoreLight) {
+        var lum = 0.2126 * d[i * 4] + 0.7152 * d[i * 4 + 1] + 0.0722 * d[i * 4 + 2];
+        if (lum > 242) continue;
+      }
+      keep[i] = 1;
+    }
+    if (p.mode === 'outline') {                       // stones only along the contour
+      var sdf = IM.alphaSDF(src, p.threshold);
+      var band = Math.max(stonePx, p.outlineMm * pxPerMm);
+      for (i = 0; i < n; i++) if (keep[i] && (sdf[i] < 0 || sdf[i] > band)) keep[i] = 0;
+    }
+
+    var rowStep = p.layout === 'offset' ? pitch * 0.866 : pitch;   // hex rows sit closer
+    var stones = [], counts = {};
+    var half = stonePx / 2;
+    for (var row = 0, y = half; y <= h - half + pitch; y += rowStep, row++) {
+      var xoff = (p.layout === 'offset' && row % 2) ? pitch / 2 : 0;
+      for (var x = half + xoff; x <= w - half; x += pitch) {
+        var cover = 0, hits = 0, cr = 0, cg = 0, cb = 0;
+        var x0 = Math.max(0, Math.round(x - half)), x1 = Math.min(w - 1, Math.round(x + half));
+        var y0 = Math.max(0, Math.round(y - half)), y1 = Math.min(h - 1, Math.round(y + half));
+        var st = Math.max(1, Math.floor((x1 - x0) / 5));
+        for (var yy = y0; yy <= y1; yy += st) for (var xx = x0; xx <= x1; xx += st) {
+          var k = yy * w + xx;
+          hits++;
+          if (!keep[k]) continue;
+          cover++;
+          cr += d[k * 4]; cg += d[k * 4 + 1]; cb += d[k * 4 + 2];
+        }
+        if (!hits || cover / hits < p.density / 100) continue;
+        var stone = p.colorMode === 'source'
+          ? nearestStone(cr / cover, cg / cover, cb / cover)
+          : { name: 'Chosen colour', hex: p.stoneColor };
+        stones.push({ x: x, y: y, r: half, hex: stone.hex });
+        counts[stone.name] = (counts[stone.name] || 0) + 1;
+      }
+    }
+    return {
+      stones: stones, counts: counts, pxPerMm: pxPerMm,
+      stoneMm: stoneMm, pitchMm: stoneMm + p.gap,
+      heightCm: h / pxPerMm / 10
+    };
+  }
+
+  function shade(hex, k) {
+    var c = IM.rgb(hex);
+    return 'rgb(' + c.map(function (v) {
+      return Math.round(IM.clamp(k > 0 ? v + (255 - v) * k : v * (1 + k), 0, 255));
+    }).join(',') + ')';
+  }
+
+  function draw(res, w, h, p) {
+    var cv = document.createElement('canvas');
+    cv.width = w; cv.height = h;
+    var ctx = cv.getContext('2d');
+    if (p.backdrop !== 'none') {
+      ctx.fillStyle = p.backdrop === 'dark' ? '#14120f' : '#f4f1ea';
+      ctx.fillRect(0, 0, w, h);
+    }
+    res.stones.forEach(function (s) {
+      if (p.template) {                                // flat dots: the cutting template
+        ctx.fillStyle = '#000';
+        ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 6.2832); ctx.fill();
+        return;
+      }
+      var g = ctx.createRadialGradient(s.x - s.r * 0.32, s.y - s.r * 0.32, s.r * 0.1, s.x, s.y, s.r);
+      g.addColorStop(0, shade(s.hex, 0.55));
+      g.addColorStop(0.55, s.hex);
+      g.addColorStop(1, shade(s.hex, -0.32));
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 6.2832); ctx.fill();
+      if (s.r > 2.2) {
+        ctx.strokeStyle = 'rgba(0,0,0,.25)';
+        ctx.lineWidth = Math.max(0.4, s.r * 0.09);
+        ctx.stroke();
+        ctx.fillStyle = 'rgba(255,255,255,.55)';      // the facet catching the light
+        ctx.beginPath();
+        ctx.arc(s.x - s.r * 0.3, s.y - s.r * 0.34, s.r * 0.2, 0, 6.2832);
+        ctx.fill();
+      }
+    });
+    return ctx.getImageData(0, 0, w, h);
+  }
+
+  NV.register({
+    slug: 'rhinestones',
+    name: 'Rhinestone patterns',
+    group: 'Print effects',
+    tagline: 'Turn artwork into a stud layout with the real stone count you need to order.',
+    icon: NV.svg('<circle cx="12" cy="5.5" r="2.4"/><circle cx="6" cy="12" r="2.4"/><circle cx="18" cy="12" r="2.4"/><circle cx="12" cy="18.5" r="2.4"/>'),
+    intro: 'Stones sit on a real lattice at their real size, so the count and the layout match what you will actually stick down. Set the finished width first — everything is measured from it.',
+    debounce: 200,
+    controls: [
+      { k: 'num', id: 'widthCm', label: 'Finished design width', unit: 'cm', def: 25, min: 2, max: 200, step: 0.5 },
+      { k: 'select', id: 'stone', label: 'Stone size', def: 'ss10', opts: [['ss6', 'SS6 · 2.0 mm'], ['ss8', 'SS8 · 2.4 mm'], ['ss10', 'SS10 · 2.8 mm'], ['ss12', 'SS12 · 3.2 mm'], ['ss16', 'SS16 · 3.9 mm'], ['ss20', 'SS20 · 4.7 mm'], ['ss30', 'SS30 · 6.4 mm']] },
+      { k: 'range', id: 'gap', label: 'Gap between stones', min: 0, max: 3, step: 0.1, def: 0.4, unit: ' mm', dec: 1 },
+      { k: 'seg', id: 'layout', label: 'Layout', def: 'offset', opts: [['offset', 'Offset rows'], ['grid', 'Square grid']] },
+      { k: 'group', label: 'Coverage' },
+      { k: 'seg', id: 'mode', label: 'Fill', def: 'fill', opts: [['fill', 'Whole shape'], ['outline', 'Outline only']] },
+      { k: 'range', id: 'outlineMm', label: 'Outline thickness', min: 1, max: 20, step: 0.5, def: 5, unit: ' mm', dec: 1, show: function (p) { return p.mode === 'outline'; } },
+      { k: 'range', id: 'density', label: 'Place a stone from', min: 10, max: 90, step: 5, def: 45, unit: ' % cover' },
+      { k: 'range', id: 'threshold', label: 'Alpha threshold', min: 8, max: 250, step: 2, def: 128, unit: '' },
+      { k: 'check', id: 'ignoreLight', label: 'Skip near-white areas', def: false },
+      { k: 'group', label: 'Stones' },
+      { k: 'seg', id: 'colorMode', label: 'Colour', def: 'source', opts: [['source', 'Match artwork'], ['mono', 'One colour']] },
+      { k: 'color', id: 'stoneColor', label: 'Stone colour', def: '#e8ecf2', show: function (p) { return p.colorMode === 'mono'; } },
+      { k: 'check', id: 'template', label: 'Template view (flat dots for cutting)', def: false },
+      { k: 'seg', id: 'backdrop', label: 'Preview on', def: 'none', opts: [['none', 'Transparent'], ['dark', 'Dark'], ['light', 'Light']] }
+    ],
+    setup: function (api) {
+      var box = el('div', { style: 'border:1px solid var(--line);border-radius:6px;padding:12px;display:flex;flex-direction:column;gap:8px' });
+      var body = document.querySelector('.rail-body');
+      body.insertBefore(box, body.children[1] || null);   // right under the intro
+      api.state.custom.report = box;
+    },
+    process: function (c) {
+      var res = place(c.src, c.p);
+      c.state.custom.last = res;
+      var box = c.state.custom.report;
+      if (box) {
+        var names = Object.keys(res.counts).sort(function (a, b) { return res.counts[b] - res.counts[a]; });
+        box.innerHTML = '';
+        box.appendChild(el('div', { class: 'eyebrow', text: 'Stone count' }));
+        box.appendChild(el('div', {
+          style: 'font-family:var(--f-display);font-size:30px;font-weight:800;line-height:1;color:var(--accent)',
+          text: NV.fmt(res.stones.length, 0)
+        }));
+        box.appendChild(el('p', {
+          class: 'hint',
+          text: res.stoneMm.toFixed(1) + ' mm stones · pitch ' + res.pitchMm.toFixed(1) + ' mm · ' +
+            c.p.widthCm + ' × ' + res.heightCm.toFixed(1) + ' cm · ' +
+            NV.fmt(Math.ceil(res.stones.length / 144), 0) + ' gross'
+        }));
+        if (names.length) {
+          var t = el('table'), tb = el('tbody');
+          names.forEach(function (n) {
+            var hex = (STONES.filter(function (s) { return s.name === n; })[0] || {}).hex || c.p.stoneColor;
+            tb.appendChild(el('tr', {}, [
+              el('td', {}, [
+                el('span', { style: 'display:inline-block;width:11px;height:11px;border-radius:50%;background:' + hex + ';border:1px solid var(--line);margin-right:7px;vertical-align:-1px' }),
+                el('span', { text: n })
+              ]),
+              el('td', { class: 'num', text: NV.fmt(res.counts[n], 0) })
+            ]));
+          });
+          t.appendChild(tb);
+          box.appendChild(el('div', { class: 'scroll-x', style: 'max-height:230px;overflow-y:auto' }, [t]));
+        }
+      }
+      return draw(res, c.src.width, c.src.height, c.p);
+    },
+    exports: [
+      { label: 'Download PNG', ext: 'png' },
+      {
+        label: 'Download SVG template', ext: 'svg', secondary: true,
+        make: function (api, done) {
+          var res = place(api.src, api.params), p = api.params;
+          var mm = function (v) { return +(v / res.pxPerMm).toFixed(2); };
+          var W = mm(api.src.width), H = mm(api.src.height);
+          var s = '<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" ' +
+            'width="' + W + 'mm" height="' + H + 'mm" viewBox="0 0 ' + W + ' ' + H + '">\n' +
+            '  <!-- ' + res.stones.length + ' stones, ' + res.stoneMm.toFixed(1) + ' mm, pitch ' + res.pitchMm.toFixed(1) + ' mm -->\n';
+          res.stones.forEach(function (st) {
+            s += '  <circle cx="' + mm(st.x) + '" cy="' + mm(st.y) + '" r="' + mm(st.r) +
+              '" fill="' + (p.template ? '#000000' : st.hex) + '"/>\n';
+          });
+          NV.download(new Blob([s + '</svg>\n'], { type: 'image/svg+xml' }), api.name + '-rhinestones.svg');
+          done();
+        }
+      },
+      {
+        label: 'Stone list (CSV)', ext: 'csv', secondary: true,
+        make: function (api, done) {
+          var res = api.state.custom.last || place(api.src, api.params);
+          var rows = [['Colour', 'Stones', 'Gross']];
+          Object.keys(res.counts).forEach(function (n) {
+            rows.push([n, res.counts[n], Math.ceil(res.counts[n] / 144)]);
+          });
+          rows.push([]);
+          rows.push(['Total', res.stones.length, Math.ceil(res.stones.length / 144)]);
+          rows.push(['Stone size mm', res.stoneMm.toFixed(1)]);
+          rows.push(['Design width cm', api.params.widthCm]);
+          NV.download(new Blob([rows.map(function (r) { return r.join(','); }).join('\n')],
+            { type: 'text/csv' }), api.name + '-stones.csv');
+          done();
+        }
+      }
+    ]
+  });
+})();
+
+</script>
+<script>
 /* Frames and grunge: distress, dirty texture and workshop-style borders. */
 (function () {
   'use strict';
@@ -2726,6 +3249,13 @@ tbody tr:hover{background:var(--raise)}
     ctx.fillRect(0, 0, W, H);
   }
 
+  /* Adult tee, flat chest width x body length in cm. */
+  var CHART = {
+    s:  { w: 46, h: 70 }, m: { w: 51, h: 73 }, l: { w: 56, h: 76 },
+    xl: { w: 61, h: 79 }, xxl: { w: 66, h: 81 }, xxxl: { w: 71, h: 84 }
+  };
+  var TOTE = { w: 38, h: 42 };
+
   var weaveCache = null;
   function weave() {
     if (weaveCache) return weaveCache;
@@ -2754,7 +3284,8 @@ tbody tr:hover{background:var(--raise)}
       var parts = NV.bench(host, t);
       var p = {
         garment: 'tee', garmentColor: '#f2f0eb', background: '#e8e3d8',
-        size: 42, x: 50, y: 40, rot: 0, opacity: 96, fabric: true, guide: true
+        size: 42, x: 50, y: 40, rot: 0, opacity: 96, fabric: true, guide: true,
+        garmentSize: 'm', ruler: true
       };
       var design = null, photo = null;
 
@@ -2764,6 +3295,25 @@ tbody tr:hover{background:var(--raise)}
       parts.stage.appendChild(wrap);
       var info = el('div', { class: 'meta', text: 'Drag the artwork to place it' });
       parts.stage.appendChild(info);
+
+      /* Pixels per centimetre, taken from the drawn garment's real width. */
+      function scale() {
+        if (p.garment === 'tote') return { pxcm: 700 / TOTE.w, g: TOTE };
+        if (p.garment === 'photo') return null;
+        var g = CHART[p.garmentSize] || CHART.m;
+        return { pxcm: 538 / g.w, g: g };          // the tee body spans 331..869 px
+      }
+
+      function measure() {
+        var sc = scale();
+        if (!sc || !design) return null;
+        var z = zone();
+        var dw = z.w * (p.size / 100);
+        return {
+          w: dw / sc.pxcm, h: dw * design.height / design.width / sc.pxcm,
+          gw: sc.g.w, gh: sc.g.h
+        };
+      }
 
       function zone() {
         if (p.garment === 'tote') return { x: 320, y: 470, w: 560, h: 600 };
@@ -2823,6 +3373,26 @@ tbody tr:hover{background:var(--raise)}
         ctx.restore();
 
         if (p.garment === 'tee' && garment) teeDetails(ctx);
+        var mm = measure();
+        if (mm && p.ruler) {
+          var pad = 16, bx = 26, by = 26, bw = 300, bh = 94;
+          ctx.fillStyle = 'rgba(10,9,8,.82)';
+          if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(bx, by, bw, bh, 10); ctx.fill(); }
+          else ctx.fillRect(bx, by, bw, bh);
+          ctx.strokeStyle = 'rgba(255,45,126,.5)'; ctx.lineWidth = 1.5;
+          if (ctx.roundRect) ctx.stroke();
+          ctx.textBaseline = 'top';
+          ctx.fillStyle = '#FF2D7E';
+          ctx.font = '600 13px ui-monospace, monospace';
+          ctx.fillText('ARTWORK SIZE', bx + pad, by + pad);
+          ctx.fillStyle = '#F3EEE6';
+          ctx.font = '700 30px ui-sans-serif, system-ui, sans-serif';
+          ctx.fillText(mm.w.toFixed(1) + ' × ' + mm.h.toFixed(1) + ' cm', bx + pad, by + pad + 20);
+          ctx.fillStyle = '#A99E8F';
+          ctx.font = '500 12px ui-monospace, monospace';
+          ctx.fillText((p.garment === 'tote' ? 'TOTE' : String(p.garmentSize).toUpperCase()) +
+            '  ·  GARMENT ' + mm.gw + ' × ' + mm.gh + ' cm', bx + pad, by + pad + 58);
+        }
         if (p.guide) {
           ctx.strokeStyle = 'rgba(255,45,126,.75)';
           ctx.setLineDash([10, 8]);
@@ -2871,6 +3441,8 @@ tbody tr:hover{background:var(--raise)}
         { k: 'button', label: 'Load a garment photo', act: function () { pIn.click(); }, },
         { k: 'color', id: 'garmentColor', label: 'Garment colour', def: '#f2f0eb', show: function (q) { return q.garment !== 'photo'; } },
         { k: 'color', id: 'background', label: 'Background colour', def: '#e8e3d8', show: function (q) { return q.garment !== 'photo'; } },
+        { k: 'select', id: 'garmentSize', label: 'Garment size', def: 'm', show: function (q) { return q.garment === 'tee'; },
+          opts: [['s', 'S · 46 × 70 cm'], ['m', 'M · 51 × 73 cm'], ['l', 'L · 56 × 76 cm'], ['xl', 'XL · 61 × 79 cm'], ['xxl', '2XL · 66 × 81 cm'], ['xxxl', '3XL · 71 × 84 cm']] },
         { k: 'group', label: 'Placement' },
         { k: 'range', id: 'size', label: 'Size', min: 5, max: 130, step: 1, def: 42, unit: ' %' },
         { k: 'range', id: 'x', label: 'Horizontal position', min: -30, max: 130, step: 0.5, def: 50, unit: ' %', dec: 0 },
@@ -2879,19 +3451,21 @@ tbody tr:hover{background:var(--raise)}
         { k: 'range', id: 'opacity', label: 'Opacity', min: 20, max: 100, step: 1, def: 96, unit: ' %' },
         { k: 'group', label: 'Realism' },
         { k: 'check', id: 'fabric', label: 'Fabric texture', def: true },
-        { k: 'check', id: 'guide', label: 'Show the print area', def: true }
+        { k: 'check', id: 'guide', label: 'Show the print area', def: true },
+        { k: 'check', id: 'ruler', label: 'Show the artwork size in cm', def: true, show: function (q) { return q.garment !== 'photo'; } }
       ], p, function () { render(); });
       ui.sync();
-      parts.body.appendChild(el('p', { class: 'hint', text: 'Drag on the canvas to move it and scroll to scale. The dashed area is the suggested print zone.' }));
+      parts.body.appendChild(el('p', { class: 'hint', text: 'Drag on the canvas to move it and scroll to scale. The dashed area is the suggested print zone, and the readout is the real size the artwork would print at on this garment.' }));
 
       parts.foot.appendChild(el('button', {
         class: 'btn primary wide', text: 'Download mockup',
         onclick: function () {
           if (!design) return NV.toast('Load an artwork first.', 'bad');
-          var g = p.guide; p.guide = false; render();
+          var g = p.guide, r = p.ruler;
+          p.guide = false; p.ruler = false; render();
           NV.blobOf(cv).then(function (b) {
             NV.download(b, 'mockup-' + p.garment + '.png');
-            p.guide = g; render();
+            p.guide = g; p.ruler = r; render();
           });
         }
       }));

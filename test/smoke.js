@@ -15,8 +15,8 @@ if (!fs.existsSync(path.join(SP, 'test.png'))) {
   execFileSync('python3', [path.join(__dirname, 'fixtures.py')], { cwd: SP });
 }
 
-const IMAGE_TOOLS = ['remove-background','reduce-edges','semi-transparency','enhance','vectorize','resize','convert','halftones','frames-grunge'];
-const CUSTOM_TOOLS = ['gang-sheets','mockups','pricing','sizing'];
+const IMAGE_TOOLS = ['dtf-check','remove-background','reduce-edges','semi-transparency','enhance','vectorize','resize','convert','halftones','rhinestones','frames-grunge'];
+const CUSTOM_TOOLS = ['guide','gang-sheets','mockups','pricing','sizing'];
 
 (async () => {
   const browser = await chromium.launch(CHROME ? { executablePath: CHROME } : {});
@@ -38,7 +38,7 @@ const CUSTOM_TOOLS = ['gang-sheets','mockups','pricing','sizing'];
   // --- home ---
   const cards = await page.$$eval('.card', n => n.length);
   console.log('HOME');
-  cards === 13 ? ok(`${cards} tools listed`) : fail(`expected 13 cards, found ${cards}`);
+  cards === 16 ? ok(`${cards} tools listed`) : fail(`expected 16 cards, found ${cards}`);
   const groups = await page.$$eval('.sheet-head h2', n => n.map(x => x.textContent));
   ok('groups: ' + groups.join(' | '));
 
@@ -142,6 +142,10 @@ const CUSTOM_TOOLS = ['gang-sheets','mockups','pricing','sizing'];
       await page.waitForTimeout(300);
       const price2 = await page.textContent('.panelbox div[style*="38px"]');
       price2 !== price ? ok('recalculates when an input changes: ' + price2) : fail('did not recalculate');
+    }
+    if (slug === 'guide') {
+      const steps = await page.$$eval('.doc a.btn', n => n.length);
+      steps >= 7 ? ok(steps + ' step links') : fail('guide steps missing: ' + steps);
     }
     if (slug === 'sizing') {
       const rows = await page.$$eval('tbody tr', n => n.length);

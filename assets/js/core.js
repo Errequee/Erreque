@@ -507,7 +507,7 @@
       html: NV.svg('<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>') + '<span>Tools</span>'
     });
     var menu = el('div', { class: 'picker-menu' });
-    menu.appendChild(el('div', { class: 'head eyebrow', text: 'All 13 tools' }));
+    menu.appendChild(el('div', { class: 'head eyebrow', text: 'All 16 tools' }));
     NV.tools.forEach(function (t) {
       menu.appendChild(el('a', { href: '#/' + t.slug, html: t.name + '<small>' + t.tagline + '</small>' }));
     });
@@ -559,9 +559,9 @@
     var cv = el('canvas');
     hero.appendChild(cv);
     hero.appendChild(el('div', { class: 'wrap' }, [el('div', { class: 'hero-in' }, [
-      el('div', { class: 'eyebrow', text: 'Digital workshop · 13 tools' }),
+      el('div', { class: 'eyebrow', text: 'Digital workshop · 16 tools' }),
       el('h1', { html: 'The whole <em>DTF</em> shop<br>in your browser' }),
-      el('p', { text: 'Knock out backgrounds, clean up contours, build halftones, vectorize, gang up print sheets and price the job. No account, no watermarks, and not one file uploaded.' }),
+      el('p', { text: 'Check a file before it costs you film, knock out backgrounds, clean up contours, build halftones and rhinestone layouts, vectorize, gang up print sheets and price the job. No account, no watermarks, and not one file uploaded.' }),
       el('div', { class: 'badges' }, [
         el('span', { class: 'badge hot', text: 'Free forever' }),
         el('span', { class: 'badge', text: 'No sign-up' }),

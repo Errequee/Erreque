@@ -1,6 +1,6 @@
 # Open Press — free DTF tools
 
-Thirteen tools for DTF printing, screen printing and cut vinyl. The whole thing runs in
+Sixteen tools for DTF printing, screen printing and cut vinyl. The whole thing runs in
 the browser: no account, no subscription, no watermarks and no files sent to any server.
 There is no backend because none is needed — every image operation happens on your own
 machine with Canvas and JavaScript.
@@ -11,6 +11,8 @@ machine with Canvas and JavaScript.
 
 | Tool | What it does |
 |---|---|
+| Workshop guide | The order to work in, what each tool fixes, and the mistakes that cost film. |
+| DTF file check | Six checks on a file before it costs you film — semi-transparency, background, DPI, colour, hairlines and coverage — each with a one-click fix and a saveable report. |
 | Remove background | Colour wand (tolerance and connected-area) plus erase and restore brushes. |
 | Reduce edges | Shrinks or grows the contour with sub-pixel precision, kills the halo a cutout leaves, and clears specks and holes. |
 | Remove semi-transparency | Turns partial alpha — which the printer cannot reproduce — into solid or clear. Includes a magenta inspector. |
@@ -29,6 +31,7 @@ machine with Canvas and JavaScript.
 | Tool | What it does |
 |---|---|
 | Halftones and fades | Dot screens with angle, shape and weight; gradients that dissolve into solid dots; CMYK separation at the classic angles. |
+| Rhinestone patterns | Places stones on a real lattice at their real size and gives you the count, the colour split and an SVG template to cut. |
 | Frames and grunge | Distress from fractal noise (whole artwork or contour only), dirty texture and frames. |
 
 **Production**
@@ -36,7 +39,7 @@ machine with Canvas and JavaScript.
 | Tool | What it does |
 |---|---|
 | Print sheets | Gangs several designs onto the roll with shelf packing, measures the run and exports the PNG at real DPI. |
-| Mockups | A tee and a tote drawn in code, or your own photo, with shading and fabric texture clipped to the garment. |
+| Mockups | A tee and a tote drawn in code, or your own photo, with shading and fabric texture clipped to the garment, and a readout of the real print size in centimetres. |
 | Pricing calculator | Real cost per piece (film, ink, powder, labour, waste) and selling price. Remembers your numbers. |
 | Standard sizes | Print sizes by garment size, placements, a pressing reference and a centimetres-to-pixels converter. |
 
@@ -51,12 +54,16 @@ Pages) or serve it locally:
 npm run serve      # http://localhost:8080
 ```
 
-There are also single-file builds:
+There are also single-file builds and a deploy bundle:
 
 ```sh
 npm run build                  # dist/open-press.html — complete HTML, for a USB stick or a chat
+npm run package                # dist/open-press-site.zip — drag onto Cloudflare Pages or Netlify
 python3 build.py --artifact    # dist/artifact.html — no <html>/<head>/<body>, for embedding
 ```
+
+The zip holds one folder: `index.html` (the whole app), `404.html`, `_headers`
+with the Content-Type and cache rules a static host needs, and a deploy README.
 
 Embedded viewers block download links, so `NV.download` asks the host to save the file
 (`claude.use('downloads')`) and falls back to a plain anchor when that isn't available. In
@@ -77,6 +84,7 @@ assets/js/core.js        tool registry, hash routing, viewer with zoom and compa
                          controls, exporting, ZIP and PNG DPI
 assets/js/tools/*.js     one tool per file
 build.py                 bundles everything into a single HTML file
+package.py               wraps that build into the deployable zip
 test/smoke.js            Chromium smoke test
 ```
 
@@ -125,7 +133,7 @@ npm install
 npm test
 ```
 
-Opens all 13 tools in Chromium, loads test images generated on the fly, moves every
+Opens all 16 tools in Chromium, loads test images generated on the fly, moves every
 slider, toggles the segments and checkboxes, and fails on any console error.
 
 ## Privacy

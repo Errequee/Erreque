@@ -1,0 +1,29 @@
+# Header rules for Open Press. Cloudflare Pages and Netlify both read this file.
+#
+# The Content-Type lines are deliberate. A host that serves an .html file as
+# anything else makes Safari stop rendering it and offer to DOWNLOAD the page
+# instead. Saying the type out loud removes that possibility.
+#
+# There is intentionally NO "X-Content-Type-Options: nosniff". nosniff forbids
+# the browser from correcting a wrong Content-Type, which turns a mis-typed
+# response into a forced download with no way to recover.
+
+/*.html
+  Content-Type: text/html; charset=utf-8
+  Referrer-Policy: strict-origin-when-cross-origin
+  Cache-Control: public, max-age=0, must-revalidate
+
+/
+  Content-Type: text/html; charset=utf-8
+  Cache-Control: public, max-age=0, must-revalidate
+
+# The app is one file with no service worker, so must-revalidate is what keeps
+# a redeploy visible immediately instead of serving a stale copy for hours.
+
+# No cross-origin isolation headers here on purpose. Nothing in Open Press uses
+# SharedArrayBuffer or worker threads - it is plain Canvas on the main thread -
+# and COEP would only risk blocking the Google Fonts stylesheet.
+
+/*
+  X-Frame-Options: SAMEORIGIN
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=()

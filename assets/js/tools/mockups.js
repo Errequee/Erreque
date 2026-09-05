@@ -86,6 +86,13 @@
     ctx.fillRect(0, 0, W, H);
   }
 
+  /* Adult tee, flat chest width x body length in cm. */
+  var CHART = {
+    s:  { w: 46, h: 70 }, m: { w: 51, h: 73 }, l: { w: 56, h: 76 },
+    xl: { w: 61, h: 79 }, xxl: { w: 66, h: 81 }, xxxl: { w: 71, h: 84 }
+  };
+  var TOTE = { w: 38, h: 42 };
+
   var weaveCache = null;
   function weave() {
     if (weaveCache) return weaveCache;
@@ -114,7 +121,8 @@
       var parts = NV.bench(host, t);
       var p = {
         garment: 'tee', garmentColor: '#f2f0eb', background: '#e8e3d8',
-        size: 42, x: 50, y: 40, rot: 0, opacity: 96, fabric: true, guide: true
+        size: 42, x: 50, y: 40, rot: 0, opacity: 96, fabric: true, guide: true,
+        garmentSize: 'm', ruler: true
       };
       var design = null, photo = null;
 
@@ -124,6 +132,25 @@
       parts.stage.appendChild(wrap);
       var info = el('div', { class: 'meta', text: 'Drag the artwork to place it' });
       parts.stage.appendChild(info);
+
+      /* Pixels per centimetre, taken from the drawn garment's real width. */
+      function scale() {
+        if (p.garment === 'tote') return { pxcm: 700 / TOTE.w, g: TOTE };
+        if (p.garment === 'photo') return null;
+        var g = CHART[p.garmentSize] || CHART.m;
+        return { pxcm: 538 / g.w, g: g };          // the tee body spans 331..869 px
+      }
+
+      function measure() {
+        var sc = scale();
+        if (!sc || !design) return null;
+        var z = zone();
+        var dw = z.w * (p.size / 100);
+        return {
+          w: dw / sc.pxcm, h: dw * design.height / design.width / sc.pxcm,
+          gw: sc.g.w, gh: sc.g.h
+        };
+      }
 
       function zone() {
         if (p.garment === 'tote') return { x: 320, y: 470, w: 560, h: 600 };
@@ -183,6 +210,26 @@
         ctx.restore();
 
         if (p.garment === 'tee' && garment) teeDetails(ctx);
+        var mm = measure();
+        if (mm && p.ruler) {
+          var pad = 16, bx = 26, by = 26, bw = 300, bh = 94;
+          ctx.fillStyle = 'rgba(10,9,8,.82)';
+          if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(bx, by, bw, bh, 10); ctx.fill(); }
+          else ctx.fillRect(bx, by, bw, bh);
+          ctx.strokeStyle = 'rgba(255,45,126,.5)'; ctx.lineWidth = 1.5;
+          if (ctx.roundRect) ctx.stroke();
+          ctx.textBaseline = 'top';
+          ctx.fillStyle = '#FF2D7E';
+          ctx.font = '600 13px ui-monospace, monospace';
+          ctx.fillText('ARTWORK SIZE', bx + pad, by + pad);
+          ctx.fillStyle = '#F3EEE6';
+          ctx.font = '700 30px ui-sans-serif, system-ui, sans-serif';
+          ctx.fillText(mm.w.toFixed(1) + ' × ' + mm.h.toFixed(1) + ' cm', bx + pad, by + pad + 20);
+          ctx.fillStyle = '#A99E8F';
+          ctx.font = '500 12px ui-monospace, monospace';
+          ctx.fillText((p.garment === 'tote' ? 'TOTE' : String(p.garmentSize).toUpperCase()) +
+            '  ·  GARMENT ' + mm.gw + ' × ' + mm.gh + ' cm', bx + pad, by + pad + 58);
+        }
         if (p.guide) {
           ctx.strokeStyle = 'rgba(255,45,126,.75)';
           ctx.setLineDash([10, 8]);
@@ -231,6 +278,8 @@
         { k: 'button', label: 'Load a garment photo', act: function () { pIn.click(); }, },
         { k: 'color', id: 'garmentColor', label: 'Garment colour', def: '#f2f0eb', show: function (q) { return q.garment !== 'photo'; } },
         { k: 'color', id: 'background', label: 'Background colour', def: '#e8e3d8', show: function (q) { return q.garment !== 'photo'; } },
+        { k: 'select', id: 'garmentSize', label: 'Garment size', def: 'm', show: function (q) { return q.garment === 'tee'; },
+          opts: [['s', 'S · 46 × 70 cm'], ['m', 'M · 51 × 73 cm'], ['l', 'L · 56 × 76 cm'], ['xl', 'XL · 61 × 79 cm'], ['xxl', '2XL · 66 × 81 cm'], ['xxxl', '3XL · 71 × 84 cm']] },
         { k: 'group', label: 'Placement' },
         { k: 'range', id: 'size', label: 'Size', min: 5, max: 130, step: 1, def: 42, unit: ' %' },
         { k: 'range', id: 'x', label: 'Horizontal position', min: -30, max: 130, step: 0.5, def: 50, unit: ' %', dec: 0 },
@@ -239,19 +288,21 @@
         { k: 'range', id: 'opacity', label: 'Opacity', min: 20, max: 100, step: 1, def: 96, unit: ' %' },
         { k: 'group', label: 'Realism' },
         { k: 'check', id: 'fabric', label: 'Fabric texture', def: true },
-        { k: 'check', id: 'guide', label: 'Show the print area', def: true }
+        { k: 'check', id: 'guide', label: 'Show the print area', def: true },
+        { k: 'check', id: 'ruler', label: 'Show the artwork size in cm', def: true, show: function (q) { return q.garment !== 'photo'; } }
       ], p, function () { render(); });
       ui.sync();
-      parts.body.appendChild(el('p', { class: 'hint', text: 'Drag on the canvas to move it and scroll to scale. The dashed area is the suggested print zone.' }));
+      parts.body.appendChild(el('p', { class: 'hint', text: 'Drag on the canvas to move it and scroll to scale. The dashed area is the suggested print zone, and the readout is the real size the artwork would print at on this garment.' }));
 
       parts.foot.appendChild(el('button', {
         class: 'btn primary wide', text: 'Download mockup',
         onclick: function () {
           if (!design) return NV.toast('Load an artwork first.', 'bad');
-          var g = p.guide; p.guide = false; render();
+          var g = p.guide, r = p.ruler;
+          p.guide = false; p.ruler = false; render();
           NV.blobOf(cv).then(function (b) {
             NV.download(b, 'mockup-' + p.garment + '.png');
-            p.guide = g; render();
+            p.guide = g; p.ruler = r; render();
           });
         }
       }));

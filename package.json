@@ -6,7 +6,8 @@
   "scripts": {
     "build": "python3 build.py",
     "test": "node test/smoke.js",
-    "serve": "python3 -m http.server 8080"
+    "serve": "python3 -m http.server 8080",
+    "package": "python3 package.py"
   },
   "devDependencies": {
     "playwright": "^1.49.1"
