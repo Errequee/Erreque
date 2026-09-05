@@ -1,4 +1,4 @@
-/* Primitivas de proceso de imagen. Todo corre en el navegador. */
+/* Image-processing primitives. Everything runs in the browser. */
 (function (root) {
   'use strict';
   var IM = {};
@@ -29,7 +29,7 @@
     return x.getImageData(0, 0, w, h);
   };
 
-  /* Reescalado progresivo: al reducir, dividir a la mitad conserva el detalle. */
+  /* Progressive rescaling: when shrinking, halving at a time preserves detail. */
   IM.resize = function (src, w, h, smooth) {
     w = Math.max(1, Math.round(w)); h = Math.max(1, Math.round(h));
     var cur = src.width ? src : IM.canvasOf(src);
@@ -56,7 +56,7 @@
     return out;
   };
 
-  /* --- Transformada de distancia exacta (Felzenszwalb & Huttenlocher) --- */
+  /* --- Exact distance transform (Felzenszwalb & Huttenlocher) --- */
   function dt1d(f, d, v, z, idx, srcIdx, n) {
     var k = 0, q, s;
     v[0] = 0; z[0] = -INF; z[1] = INF;
@@ -76,7 +76,7 @@
     }
   }
 
-  /* seeds: Uint8Array (1 = semilla). Devuelve distancia² y, opcional, índice del píxel semilla más cercano. */
+  /* seeds: Uint8Array (1 = seed). Returns squared distance and, optionally, the index of the nearest seed pixel. */
   IM.edt = function (seeds, w, h, wantIndex) {
     var n = w * h, i, x, y;
     var f = new Float64Array(Math.max(w, h));
@@ -110,7 +110,7 @@
     return { dist: dist, near: near };
   };
 
-  /* Campo de distancia con signo del borde alfa. Positivo = dentro. */
+  /* Signed distance field from the alpha edge. Positive = inside. */
   IM.alphaSDF = function (id, thr) {
     var w = id.width, h = id.height, n = w * h, p = id.data, i;
     var inside = new Uint8Array(n), outside = new Uint8Array(n);
@@ -118,8 +118,8 @@
     for (i = 0; i < n; i++) {
       if (p[i * 4 + 3] >= thr) inside[i] = 1; else outside[i] = 1;
     }
-    var din = IM.edt(outside, w, h).dist;   // dentro -> distancia al exterior
-    var dout = IM.edt(inside, w, h).dist;   // fuera  -> distancia al interior
+    var din = IM.edt(outside, w, h).dist;   // inside  -> distance to the outside
+    var dout = IM.edt(inside, w, h).dist;   // outside -> distance to the inside
     var sdf = new Float32Array(n);
     for (i = 0; i < n; i++) {
       sdf[i] = inside[i] ? Math.sqrt(din[i]) - 0.5 : -(Math.sqrt(dout[i]) - 0.5);
@@ -127,7 +127,7 @@
     return sdf;
   };
 
-  /* Contrae (radio > 0) o expande (radio < 0) el alfa con borde suave. */
+  /* Contracts (radius > 0) or expands (radius < 0) the alpha with a soft edge. */
   IM.reshapeAlpha = function (id, radius, feather, thr) {
     var w = id.width, h = id.height, n = w * h, p = id.data;
     var sdf = IM.alphaSDF(id, thr);
@@ -140,7 +140,7 @@
     return out;
   };
 
-  /* Empuja el color de los píxeles opacos hacia el exterior: mata halos y permite expandir. */
+  /* Pushes the colour of opaque pixels outward: kills halos and makes expanding possible. */
   IM.bleed = function (id, thr) {
     var w = id.width, h = id.height, n = w * h, p = id.data, i;
     thr = thr == null ? 250 : thr;
@@ -157,7 +157,7 @@
     return out;
   };
 
-  /* Desfleque: reemplaza el color de los píxeles de borde por el del sólido más próximo. */
+  /* Defringe: replaces edge-pixel colour with that of the nearest solid pixel. */
   IM.defringe = function (id, amount, thr) {
     if (amount <= 0) return IM.copy(id);
     var bled = IM.bleed(id, thr);
@@ -166,14 +166,14 @@
     for (i = 0; i < n; i++) {
       a = p[i * 4 + 3];
       if (a === 0 || a >= thr) continue;
-      t = (1 - a / thr) * amount;               // más translúcido, más se corrige
+      t = (1 - a / thr) * amount;               // the more translucent, the stronger the fix
       for (k = 0; k < 3; k++) q[i * 4 + k] = p[i * 4 + k] * (1 - t) + b[i * 4 + k] * t;
     }
     return out;
   };
 
-  /* Desenfoque gaussiano aproximado (3 pasadas de caja) sobre un canal Float32.
-     Los buffers se reciben de fuera: en imágenes grandes reservar aquí cuesta más que el filtro. */
+  /* Approximate gaussian blur (3 box passes) over a Float32 channel.
+     Buffers come from outside: on big images allocating here costs more than the filter. */
   IM.blurChannel = function (src, w, h, r, scratch) {
     if (r < 0.4) return src;
     var sc = scratch || {};
@@ -218,15 +218,15 @@
     return dst;
   }
 
-  /* Máscara de enfoque sobre luminancia, respetando alfa. */
+  /* Unsharp mask over luminance, respecting alpha. */
   IM.unsharp = function (id, amount, radius, threshold) {
     if (amount <= 0) return IM.copy(id);
     var w = id.width, h = id.height, n = w * h, p = id.data, i, k;
     var out = IM.copy(id), q = out.data;
-    var canal = new Float32Array(n), sc = {};
-    for (k = 0; k < 3; k++) {                     // un canal a la vez: menos memoria en imágenes grandes
-      for (i = 0; i < n; i++) canal[i] = p[i * 4 + k];
-      var bl = IM.blurChannel(canal, w, h, radius, sc);
+    var chan = new Float32Array(n), sc = {};
+    for (k = 0; k < 3; k++) {                     // one channel at a time: less memory on big images
+      for (i = 0; i < n; i++) chan[i] = p[i * 4 + k];
+      var bl = IM.blurChannel(chan, w, h, radius, sc);
       for (i = 0; i < n; i++) {
         var d = p[i * 4 + k] - bl[i];
         if (d > -threshold && d < threshold) continue;
@@ -271,7 +271,7 @@
     return out;
   };
 
-  /* Curva de alfa: por debajo de lo -> 0, por encima de hi -> 255. */
+  /* Alpha curve: below lo -> 0, above hi -> 255. */
   IM.alphaLevels = function (id, lo, hi, hard) {
     var p = id.data, n = id.width * id.height, i, a;
     var out = IM.copy(id), q = out.data;
@@ -292,7 +292,7 @@
     return Math.sqrt((2 + rm / 256) * dr * dr + 4 * dg * dg + (2 + (255 - rm) / 256) * db * db) / 3;
   };
 
-  /* Relleno por proximidad de color desde semillas. Devuelve máscara del fondo. */
+  /* Fill by colour proximity from seed points. Returns the background mask. */
   IM.floodMask = function (id, seeds, tol, contiguous) {
     var w = id.width, h = id.height, n = w * h, p = id.data;
     var mask = new Uint8Array(n), i, s;
@@ -324,7 +324,7 @@
     return mask;
   };
 
-  /* Cuantización k-medias sobre píxeles opacos. */
+  /* k-means quantization over opaque pixels. */
   IM.quantize = function (id, k, iters) {
     var p = id.data, n = id.width * id.height, i, j, c;
     iters = iters || 12;
@@ -334,7 +334,7 @@
     k = Math.min(k, idx.length);
     var cen = [], used = {};
     cen.push([p[idx[0] * 4], p[idx[0] * 4 + 1], p[idx[0] * 4 + 2]]);
-    while (cen.length < k) {                       // siembra tipo k-means++
+    while (cen.length < k) {                       // k-means++ style seeding
       var best = -1, bestD = -1;
       for (j = 0; j < idx.length; j += Math.max(1, (idx.length / 900) | 0)) {
         var q = idx[j] * 4, dmin = 1e9;
@@ -377,7 +377,7 @@
     return { palette: cen, map: map };
   };
 
-  /* Contorno exacto de una máscara: bucles cerrados sobre las aristas del píxel. */
+  /* Exact contour of a mask: closed loops along the pixel edges. */
   IM.traceMask = function (mask, w, h) {
     var gw = w + 1, edges = new Map(), i, x, y;
     function vid(x, y) { return y * gw + x; }
@@ -401,7 +401,7 @@
           var outs = edges.get(cur);
           if (!outs || !outs.length) break;
           var pick = 0;
-          if (outs.length > 1 && prev >= 0) {                 // deshace nudos en diagonal
+          if (outs.length > 1 && prev >= 0) {                 // untangles diagonal knots
             var pdx = (cur % gw) - (prev % gw), pdy = ((cur / gw) | 0) - ((prev / gw) | 0);
             var bestScore = -9;
             for (var t = 0; t < outs.length; t++) {
@@ -456,7 +456,7 @@
     return r.length > 2 ? r : pts;
   };
 
-  /* Polígono cerrado -> path SVG, recto o suavizado con Catmull-Rom. */
+  /* Closed polygon -> SVG path, straight or smoothed with Catmull-Rom. */
   IM.pathData = function (pts, smooth, dec) {
     var n = pts.length, i, d, f = function (v) { return +v.toFixed(dec == null ? 2 : dec); };
     if (n < 3) return '';
@@ -484,7 +484,7 @@
     return m ? [parseInt(m[1], 16), parseInt(m[2], 16), parseInt(m[3], 16)] : [0, 0, 0];
   };
 
-  /* Ruido de valor + fbm, para texturas grunge. */
+  /* Value noise + fbm, for grunge textures. */
   IM.noise = function (w, h, scale, octaves, seed) {
     var out = new Float32Array(w * h), x, y, o;
     var rnd = mulberry(seed || 1);

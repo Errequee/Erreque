@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Empaqueta el sitio en un solo archivo.
+"""Bundle the site into a single file.
 
-    python3 build.py              -> dist/taller-libre.html  (HTML completo, autónomo)
-    python3 build.py --artifact   -> dist/artifact.html      (sin <html>/<head>/<body>,
-                                     para incrustar en un contenedor que ya los aporta)
+    python3 build.py              -> dist/open-press.html  (complete, self-contained HTML)
+    python3 build.py --artifact   -> dist/artifact.html    (no <html>/<head>/<body>, for
+                                     embedding in a container that supplies its own)
 """
 import re, sys, pathlib
 
@@ -28,12 +28,12 @@ if "--artifact" in sys.argv:
     head = out[out.index("<title>"):out.index("</head>")]
     head = re.sub(r'<link rel="(icon|preconnect)"[^>]*>\s*', "", head)
     head = re.sub(r"<meta[^>]*>\s*", "", head)
-    head = re.sub(r"<title>.*?</title>", "<title>Taller Libre DTF</title>", head, flags=re.S)
+    head = re.sub(r"<title>.*?</title>", "<title>Open Press DTF</title>", head, flags=re.S)
     body = out[out.index("<body>") + len("<body>"):out.index("</body>")]
     out = head.strip() + "\n" + body.strip() + "\n"
     target = dist / "artifact.html"
 else:
-    target = dist / "taller-libre.html"
+    target = dist / "open-press.html"
 
 target.write_text(out, encoding="utf-8")
 print(f"{target} — {len(out)/1024:.0f} KB")

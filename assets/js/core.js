@@ -1,11 +1,11 @@
-/* Núcleo: registro de herramientas, enrutado, banco de trabajo y exportación. */
+/* Core: tool registry, routing, workbench and exporting. */
 (function (root) {
   'use strict';
   var NV = { tools: [], byId: {} };
 
   NV.register = function (t) { NV.tools.push(t); NV.byId[t.slug] = t; };
 
-  /* ---------------- utilidades ---------------- */
+  /* ---------------- helpers ---------------- */
   function el(tag, attrs, kids) {
     var n = document.createElement(tag), k;
     if (attrs) for (k in attrs) {
@@ -33,11 +33,11 @@
   };
 
   NV.fmt = function (v, d) {
-    return Number(v).toLocaleString('es-MX', { minimumFractionDigits: d == null ? 2 : d, maximumFractionDigits: d == null ? 2 : d });
+    return Number(v).toLocaleString('en-US', { minimumFractionDigits: d == null ? 2 : d, maximumFractionDigits: d == null ? 2 : d });
   };
 
-  /* Guardado. En un visor incrustado el navegador bloquea los enlaces de descarga,
-     así que se pide al anfitrión que guarde el archivo; en la web normal, enlace y ya. */
+  /* Saving. Embedded viewers block download links, so we ask the host to save the
+     file; on a normal web host a plain anchor does the job. */
   var saver = null;
   function saveApi() {
     if (!saver) {
@@ -54,22 +54,22 @@
         var u = URL.createObjectURL(blob), a = el('a', { href: u, download: name });
         document.body.appendChild(a); a.click(); a.remove();
         setTimeout(function () { URL.revokeObjectURL(u); }, 4000);
-        NV.toast('Archivo descargado.', 'ok');
+        NV.toast('File downloaded.', 'ok');
         return;
       }
       return d.save({ filename: name, data: blob }).then(function () {
-        NV.toast('Archivo guardado.', 'ok');
+        NV.toast('File saved.', 'ok');
       }, function (e) {
         var code = e && e.code, ext = (name.split('.').pop() || '').toUpperCase();
         if (code === 'declined') return;
         if (code === 'rejected_extension' || code === 'extension_not_enabled') {
-          NV.toast('Esta vista no puede guardar archivos ' + ext + '. Abre el sitio completo para descargarlo.', 'bad');
+          NV.toast('This view cannot save ' + ext + ' files. Open the full site to download it.', 'bad');
         } else if (code === 'too_large') {
-          NV.toast('El archivo pasa de 16 MB. Baja los DPI o divide el trabajo en varias hojas.', 'bad');
+          NV.toast('The file is over 16 MB. Lower the DPI or split the job across sheets.', 'bad');
         } else if (code === 'rate_limited') {
-          NV.toast('Ya hay una descarga esperando confirmación. Termínala y vuelve a intentar.', 'bad');
+          NV.toast('A download is already waiting for confirmation. Finish it and try again.', 'bad');
         } else {
-          NV.toast('No se pudo guardar el archivo.', 'bad');
+          NV.toast('The file could not be saved.', 'bad');
         }
       });
     });
@@ -80,7 +80,7 @@
   };
 
   NV.safeName = function (s) {
-    return (s || 'diseno').replace(/\.[^.]+$/, '').replace(/[^\w\-]+/g, '-').replace(/^-|-$/g, '').slice(0, 48) || 'diseno';
+    return (s || 'artwork').replace(/\.[^.]+$/, '').replace(/[^\w\-]+/g, '-').replace(/^-|-$/g, '').slice(0, 48) || 'diseno';
   };
 
   var crcTable = (function () {
@@ -99,7 +99,7 @@
     return (c ^ 0xFFFFFFFF) >>> 0;
   }
 
-  /* Inserta la resolución física (pHYs) en un PNG: importa al imprimir. */
+  /* Write the physical resolution (pHYs) into a PNG: it matters when printing. */
   NV.pngWithDpi = function (blob, dpi) {
     return blob.arrayBuffer().then(function (buf) {
       var src = new Uint8Array(buf);
@@ -112,7 +112,7 @@
       dv.setUint32(8, ppm); dv.setUint32(12, ppm);
       chunk[16] = 1;
       dv.setUint32(17, crc32(chunk, 4, 13));
-      var at = 8 + 25;                               // tras la firma y el IHDR
+      var at = 8 + 25;                               // after the signature and the IHDR
       var out = new Uint8Array(src.length + chunk.length);
       out.set(src.subarray(0, at), 0);
       out.set(chunk, at);
@@ -121,7 +121,7 @@
     });
   };
 
-  /* ZIP sin compresión: suficiente para PNG/SVG ya comprimidos. */
+  /* Stored (uncompressed) ZIP: enough for PNG and SVG, already compressed. */
   NV.zip = function (files) {
     var enc = new TextEncoder(), parts = [], central = [], offset = 0;
     return Promise.all(files.map(function (f) {
@@ -158,12 +158,12 @@
     return new Promise(function (res, rej) {
       var img = new Image();
       img.onload = function () { res(img); };
-      img.onerror = function () { rej(new Error('No se pudo leer la imagen.')); };
+      img.onerror = function () { rej(new Error('that image could not be read.')); };
       img.src = URL.createObjectURL(file);
     });
   };
 
-  /* ---------------- controles ---------------- */
+  /* ---------------- controls ---------------- */
   NV.controls = function (host, spec, params, onChange) {
     var nodes = [];
     spec.forEach(function (c) {
@@ -249,7 +249,7 @@
     return p;
   };
 
-  /* ---------------- visor ---------------- */
+  /* ---------------- viewer ---------------- */
   NV.viewer = function (stage) {
     var view = el('div', { class: 'viewer' });
     var plate = el('div', { class: 'plate' });
@@ -257,7 +257,7 @@
     var div = el('div', { class: 'divider' }, [el('div', { style: 'position:absolute;left:-9px;top:0;bottom:0;width:19px;cursor:ew-resize' })]);
     plate.appendChild(base); plate.appendChild(top); plate.appendChild(div);
     view.appendChild(plate);
-    var busy = el('div', { class: 'busy' }, [el('div', { class: 'spin' }), el('span', { text: 'Procesando' })]);
+    var busy = el('div', { class: 'busy' }, [el('div', { class: 'spin' }), el('span', { text: 'Working' })]);
     var meta = el('div', { class: 'meta' });
     var bar = el('div', { class: 'toolbar' });
     var st = { s: 1, tx: 0, ty: 0, split: 0, cmp: false, w: 0, h: 0 };
@@ -265,8 +265,8 @@
     function apply() {
       plate.style.transform = 'translate(-50%,-50%) translate(' + st.tx + 'px,' + st.ty + 'px) scale(' + st.s + ')';
       div.style.left = (st.w * st.split / 100) + 'px';
-      /* El original solo asoma a la izquierda del divisor; si no, el resultado tapa todo
-         y las zonas transparentes muestran el tablero, no la imagen vieja. */
+      /* The original only shows left of the divider; otherwise the result covers
+         everything and transparent areas reveal the checkerboard, not the old image. */
       base.style.clipPath = 'inset(0 ' + (100 - st.split) + '% 0 0)';
       top.style.clipPath = 'inset(0 0 0 ' + st.split + '%)';
       plate.classList.toggle('smooth', st.s < 1);
@@ -288,16 +288,16 @@
       st.s = ns; apply();
     }
 
-    var zoomLabel = el('button', { type: 'button', text: '100%', title: 'Ajustar a la ventana', onclick: fit });
-    var cmpBtn = el('button', { type: 'button', text: 'Comparar', title: 'Ver el original a la izquierda' });
+    var zoomLabel = el('button', { type: 'button', text: '100%', title: 'Fit to window', onclick: fit });
+    var cmpBtn = el('button', { type: 'button', text: 'Compare', title: 'Show the original on the left' });
     cmpBtn.addEventListener('click', function () {
       st.cmp = !st.cmp; st.split = st.cmp ? 50 : 0;
       view.classList.toggle('cmp', st.cmp); cmpBtn.classList.toggle('on', st.cmp); apply();
     });
-    bar.appendChild(el('button', { type: 'button', text: '−', title: 'Alejar', onclick: function () { zoom(1 / 1.25); } }));
+    bar.appendChild(el('button', { type: 'button', text: '−', title: 'Zoom out', onclick: function () { zoom(1 / 1.25); } }));
     bar.appendChild(zoomLabel);
-    bar.appendChild(el('button', { type: 'button', text: '+', title: 'Acercar', onclick: function () { zoom(1.25); } }));
-    bar.appendChild(el('button', { type: 'button', text: '1:1', title: 'Tamaño real', onclick: function () { st.s = 1; st.tx = st.ty = 0; apply(); } }));
+    bar.appendChild(el('button', { type: 'button', text: '+', title: 'Zoom in', onclick: function () { zoom(1.25); } }));
+    bar.appendChild(el('button', { type: 'button', text: '1:1', title: 'Actual size', onclick: function () { st.s = 1; st.tx = st.ty = 0; apply(); } }));
     bar.appendChild(cmpBtn);
 
     view.addEventListener('wheel', function (e) { e.preventDefault(); zoom(e.deltaY < 0 ? 1.12 : 1 / 1.12, e.clientX, e.clientY); }, { passive: false });
@@ -334,7 +334,7 @@
         plate.style.marginLeft = 0; plate.style.marginTop = 0;
       },
       fit: fit, apply: apply,
-      /* base = original (izquierda), top = resultado */
+      /* base = original (left), top = result */
       paintBase: function (src) { paint(base, src); },
       paintTop: function (src) { paint(top, src); }
     };
@@ -347,8 +347,8 @@
     }
   };
 
-  /* ---------------- banco de trabajo de imagen ---------------- */
-  /* Estructura común: rail de controles a la izquierda, mesa de trabajo a la derecha. */
+  /* ---------------- image workbench ---------------- */
+  /* Shared layout: control rail on the left, work surface on the right. */
   NV.bench = function (host, t) {
     var bench = el('div', { class: 'bench' });
     var rail = el('div', { class: 'rail' });
@@ -373,8 +373,8 @@
 
     var drop = el('div', { class: 'drop' }, [
       el('div', { html: NV.svg('<path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>') }),
-      el('b', { text: 'Suelta tu diseño aquí' }),
-      el('small', { text: 'PNG, JPG o WEBP. Nada sale de tu equipo: todo se procesa en este navegador.' })
+      el('b', { text: 'Drop your artwork here' }),
+      el('small', { text: 'PNG, JPG or WEBP. Nothing leaves your computer: it all runs in this browser.' })
     ]);
     var input = el('input', { type: 'file', accept: t.accept || 'image/*', style: 'display:none' });
     drop.addEventListener('click', function () { input.click(); });
@@ -389,7 +389,7 @@
       var f = e.dataTransfer.files[0]; if (f) load(f);
     });
     stage.appendChild(drop); stage.appendChild(input);
-    body.appendChild(el('p', { class: 'hint', text: t.help || 'Carga una imagen para empezar.' }));
+    body.appendChild(el('p', { class: 'hint', text: t.help || 'Load an image to get started.' }));
 
     function load(file) {
       NV.loadImage(file).then(function (img) {
@@ -424,9 +424,9 @@
       ui.sync();
 
       if (t.manual) {
-        foot.appendChild(el('button', { class: 'btn primary wide', text: 'Procesar', onclick: function () { schedule(true); } }));
+        foot.appendChild(el('button', { class: 'btn primary wide', text: 'Run', onclick: function () { schedule(true); } }));
       }
-      (t.exports || [{ label: 'Descargar PNG', ext: 'png' }]).forEach(function (ex) {
+      (t.exports || [{ label: 'Download PNG', ext: 'png' }]).forEach(function (ex) {
         foot.appendChild(el('button', {
           class: 'btn ' + (ex.secondary ? 'ghost' : 'primary') + ' wide',
           text: ex.label,
@@ -434,7 +434,7 @@
         }));
       });
       foot.appendChild(el('button', {
-        class: 'btn ghost wide', text: 'Cambiar imagen',
+        class: 'btn ghost wide', text: 'Change image',
         onclick: function () { stage.innerHTML = ''; stage.appendChild(drop); stage.appendChild(input); body.innerHTML = ''; foot.innerHTML = ''; state.out = null; }
       }));
 
@@ -461,9 +461,9 @@
           vw.size(res.width || state.prev.width, res.height || state.prev.height);
           vw.paintBase(state.prev);
           vw.paintTop(res);
-          vw.meta(state.full.width + ' × ' + state.full.height + ' px' + (state.k < 1 ? '  ·  vista previa ' + Math.round(state.k * 100) + '%' : ''));
+          vw.meta(state.full.width + ' × ' + state.full.height + ' px' + (state.k < 1 ? '  ·  preview ' + Math.round(state.k * 100) + '%' : ''));
         } catch (e) {
-          NV.toast('Error al procesar: ' + e.message, 'bad');
+          NV.toast('Processing failed: ' + e.message, 'bad');
           if (window.console) console.error(e);
         }
         vw.busy(false);
@@ -490,13 +490,13 @@
           NV.blobOf(cv, type, ex.quality)
             .then(function (b) { return (type === 'image/png' && params.dpi) ? NV.pngWithDpi(b, params.dpi) : b; })
             .then(function (b) { NV.download(b, api.name + '-' + t.slug + '.' + (ex.ext || 'png')); finish(); });
-        } catch (e) { NV.toast('No se pudo exportar: ' + e.message, 'bad'); vw.busy(false); }
+        } catch (e) { NV.toast('Export failed: ' + e.message, 'bad'); vw.busy(false); }
       }, 12);
       function finish() { vw.busy(false); }
     }
   };
 
-  /* ---------------- estructura del sitio ---------------- */
+  /* ---------------- site chrome ---------------- */
   var LOGO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">' +
     '<circle cx="12" cy="12" r="6.2"/><path d="M12 1.5v5M12 17.5v5M1.5 12h5M17.5 12h5"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/></svg>';
 
@@ -504,10 +504,10 @@
     var picker = el('div', { class: 'picker' });
     var btn = el('button', {
       class: 'iconbtn', type: 'button',
-      html: NV.svg('<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>') + '<span>Herramientas</span>'
+      html: NV.svg('<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>') + '<span>Tools</span>'
     });
     var menu = el('div', { class: 'picker-menu' });
-    menu.appendChild(el('div', { class: 'head eyebrow', text: 'Las 13 herramientas' }));
+    menu.appendChild(el('div', { class: 'head eyebrow', text: 'All 13 tools' }));
     NV.tools.forEach(function (t) {
       menu.appendChild(el('a', { href: '#/' + t.slug, html: t.name + '<small>' + t.tagline + '</small>' }));
     });
@@ -515,7 +515,7 @@
     document.addEventListener('click', function () { picker.classList.remove('open'); });
     picker.appendChild(btn); picker.appendChild(menu);
 
-    var theme = el('button', { class: 'iconbtn', type: 'button', title: 'Cambiar tema', html: NV.svg('<circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>') });
+    var theme = el('button', { class: 'iconbtn', type: 'button', title: 'Switch theme', html: NV.svg('<circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>') });
     theme.addEventListener('click', function () {
       var cur = document.documentElement.getAttribute('data-theme');
       var next = cur === 'dark' ? 'light' : cur === 'light' ? '' : (matchMedia('(prefers-color-scheme: dark)').matches ? 'light' : 'dark');
@@ -526,7 +526,7 @@
     var bar = el('header', { class: 'topbar' }, [
       el('a', { class: 'brand', href: '#/' }, [
         el('span', { class: 'mark', html: LOGO }),
-        el('span', {}, [el('b', { text: 'Taller Libre' }), el('br'), el('span', { text: 'herramientas dtf' })])
+        el('span', {}, [el('b', { text: 'Open Press' }), el('br'), el('span', { text: 'dtf tools' })])
       ]),
       el('nav', { class: 'topnav' }, [picker, theme])
     ]);
@@ -538,35 +538,35 @@
     return el('footer', { class: 'foot' }, [el('div', { class: 'wrap' }, [
       el('div', { class: 'cols' }, [
         el('div', {}, [
-          el('div', { class: 'eyebrow', text: 'Taller Libre' }),
-          el('p', { text: 'Suite de herramientas para impresión DTF, serigrafía y vinil. Gratis, sin cuenta y sin límites.' })
+          el('div', { class: 'eyebrow', text: 'Open Press' }),
+          el('p', { text: 'A tool suite for DTF printing, screen printing and cut vinyl. Free, no account, no limits.' })
         ]),
         el('div', {}, [
-          el('div', { class: 'eyebrow', text: 'Privacidad' }),
-          el('p', { text: 'No hay servidor. Tus archivos se procesan en tu navegador y nunca se suben a ningún lado.' })
+          el('div', { class: 'eyebrow', text: 'Privacy' }),
+          el('p', { text: 'There is no server. Your files are processed in your browser and never uploaded anywhere.' })
         ]),
         el('div', {}, [
-          el('div', { class: 'eyebrow', text: 'Independiente' }),
-          el('p', { text: 'Proyecto propio y sin afiliación con ninguna tienda o suite comercial.' })
+          el('div', { class: 'eyebrow', text: 'Independent' }),
+          el('p', { text: 'Our own project, with no affiliation to any store or commercial suite.' })
         ])
       ])
     ])]);
   };
 
-  /* ---------------- portada ---------------- */
+  /* ---------------- home ---------------- */
   function lobby(app) {
     var hero = el('section', { class: 'hero' });
     var cv = el('canvas');
     hero.appendChild(cv);
     hero.appendChild(el('div', { class: 'wrap' }, [el('div', { class: 'hero-in' }, [
-      el('div', { class: 'eyebrow', text: 'Taller digital · 13 herramientas' }),
-      el('h1', { html: 'Todo el taller<br><em>DTF</em> en el navegador' }),
-      el('p', { text: 'Quita fondos, limpia contornos, genera semitonos, vectoriza, arma hojas de impresión y calcula precios. Sin cuenta, sin marcas de agua y sin subir un solo archivo.' }),
+      el('div', { class: 'eyebrow', text: 'Digital workshop · 13 tools' }),
+      el('h1', { html: 'The whole <em>DTF</em> shop<br>in your browser' }),
+      el('p', { text: 'Knock out backgrounds, clean up contours, build halftones, vectorize, gang up print sheets and price the job. No account, no watermarks, and not one file uploaded.' }),
       el('div', { class: 'badges' }, [
-        el('span', { class: 'badge hot', text: 'Gratis siempre' }),
-        el('span', { class: 'badge', text: 'Sin registro' }),
-        el('span', { class: 'badge', text: 'Funciona sin conexión' }),
-        el('span', { class: 'badge', text: 'Tus archivos no se suben' })
+        el('span', { class: 'badge hot', text: 'Free forever' }),
+        el('span', { class: 'badge', text: 'No sign-up' }),
+        el('span', { class: 'badge', text: 'Works offline' }),
+        el('span', { class: 'badge', text: 'Your files stay put' })
       ])
     ])]));
     app.appendChild(hero);
@@ -579,7 +579,7 @@
     Object.keys(groups).forEach(function (g) {
       wrap.appendChild(el('div', { class: 'sheet-head' }, [
         el('h2', { text: g }),
-        el('span', { class: 'eyebrow', text: groups[g].length + ' herramientas' })
+        el('span', { class: 'eyebrow', text: groups[g].length + ' tools' })
       ]));
       var grid = el('div', { class: 'grid' });
       groups[g].forEach(function (t) {
@@ -597,7 +597,7 @@
     app.appendChild(NV.footer());
   }
 
-  /* Trama de puntos: el motivo del oficio, dibujado en canvas. */
+  /* Dot screen: the motif of the trade, drawn on canvas. */
   function halftoneHero(cv, host) {
     var ctx = cv.getContext('2d'), raf = 0, t0 = performance.now();
     var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -612,7 +612,7 @@
       var ease = 1 - Math.pow(1 - e, 3);
       ctx.clearRect(0, 0, w, h);
       var cell = 15, ang = -Math.PI / 8, cs = Math.cos(ang), sn = Math.sin(ang);
-      var accent = getComputedStyle(document.documentElement).getPropertyValue('--registro').trim() || '#FF2D7E';
+      var accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#FF2D7E';
       var span = Math.ceil(Math.max(w, h) / cell) + 6;
       for (var i = -span; i < span; i++) for (var j = -span; j < span; j++) {
         var x = (i * cs - j * sn) * cell + w * 0.72;
@@ -636,7 +636,7 @@
     addEventListener('resize', function () { size(); cancelAnimationFrame(raf); t0 = performance.now() - 1200; draw(performance.now()); });
   }
 
-  /* ---------------- enrutado ---------------- */
+  /* ---------------- routing ---------------- */
   function route() {
     var app = document.getElementById('app');
     app.innerHTML = '';
@@ -645,11 +645,11 @@
     var t = NV.byId[slug];
     scrollTo(0, 0);
     if (!slug || !t) {
-      document.title = 'Taller Libre — Herramientas DTF gratis';
+      document.title = 'Open Press — free DTF tools';
       lobby(app);
       return;
     }
-    document.title = t.name + ' — Taller Libre';
+    document.title = t.name + ' — Open Press';
     if (t.kind === 'custom') t.render(app);
     else NV.imageTool(t, app);
   }

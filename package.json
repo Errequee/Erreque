@@ -1,7 +1,7 @@
 {
-  "name": "taller-libre",
+  "name": "open-press",
   "version": "1.0.0",
-  "description": "Suite gratuita de herramientas DTF que corre entera en el navegador.",
+  "description": "A free DTF tool suite that runs entirely in the browser.",
   "private": true,
   "scripts": {
     "build": "python3 build.py",

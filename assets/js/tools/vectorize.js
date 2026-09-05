@@ -1,4 +1,4 @@
-/* Vectorizador: cuantiza el color, traza contornos reales y separa por capas. */
+/* Vectorize: quantizes the colour, traces real contours and splits into layers. */
 (function () {
   'use strict';
   var WORK = 1400;
@@ -22,24 +22,24 @@
     var w = work.width, h = work.height, n = w * h, i;
     var pal, map;
 
-    if (p.modo === 'silueta') {
-      pal = [IM.rgb(p.tinta)];
+    if (p.mode === 'silhouette') {
+      pal = [IM.rgb(p.ink)];
       map = new Int32Array(n);
       var d = work.data;
       for (i = 0; i < n; i++) {
         var lum = (0.2126 * d[i * 4] + 0.7152 * d[i * 4 + 1] + 0.0722 * d[i * 4 + 2]);
-        var on = d[i * 4 + 3] > 128 && (p.invertir ? lum > p.umbral : lum < p.umbral);
+        var on = d[i * 4 + 3] > 128 && (p.invert ? lum > p.threshold : lum < p.threshold);
         map[i] = on ? 0 : -1;
       }
     } else {
-      var q = IM.quantize(work, p.colores, 10);
+      var q = IM.quantize(work, p.colors, 10);
       pal = q.palette; map = q.map;
-      if (p.sinFondo) {                                  // el fondo claro no es una tinta
-        var fuera = {};
+      if (p.dropWhite) {                                 // a light background is not an ink
+        var out = {};
         pal.forEach(function (col, k) {
-          if (IM.colorDistance(col[0], col[1], col[2], 255, 255, 255) < 22) fuera[k] = 1;
+          if (IM.colorDistance(col[0], col[1], col[2], 255, 255, 255) < 22) out[k] = 1;
         });
-        for (i = 0; i < n; i++) if (fuera[map[i]]) map[i] = -1;
+        for (i = 0; i < n; i++) if (out[map[i]]) map[i] = -1;
       }
     }
 
@@ -51,10 +51,10 @@
       var loops = IM.traceMask(mask, w, h), paths = [];
       loops.forEach(function (loop) {
         var pts = IM.dropCollinear(loop);
-        if (area(pts) < p.minima) return;
-        pts = IM.rdp(pts, p.detalle);
+        if (area(pts) < p.minArea) return;
+        pts = IM.rdp(pts, p.detail);
         if (pts.length < 3) return;
-        paths.push(IM.pathData(pts, p.suavizado, 2));
+        paths.push(IM.pathData(pts, p.smooth, 2));
       });
       if (paths.length) layers.push({ color: IM.hex(col), d: paths.join(' '), px: count });
     });
@@ -78,33 +78,33 @@
     var s = '<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="' + W +
       '" height="' + H + '" viewBox="0 0 ' + v.w + ' ' + v.h + '" shape-rendering="geometricPrecision">\n';
     (layers || v.layers).forEach(function (L, i) {
-      s += '  <g id="tinta-' + (i + 1) + '" data-color="' + L.color + '">' +
+      s += '  <g id="ink-' + (i + 1) + '" data-color="' + L.color + '">' +
         '<path fill="' + L.color + '" fill-rule="evenodd" d="' + L.d + '"/></g>\n';
     });
     return s + '</svg>\n';
   }
 
   NV.register({
-    slug: 'vectorizador',
-    name: 'Vectorizar y separar colores',
-    group: 'Preparación del arte',
-    tagline: 'De píxeles a curvas SVG, con una capa por tinta lista para separar.',
+    slug: 'vectorize',
+    name: 'Vectorize and split colours',
+    group: 'Artwork prep',
+    tagline: 'From pixels to SVG curves, with one layer per ink ready to separate.',
     icon: NV.svg('<path d="M5 19c4-1 5-9 9-11 2-1 4 0 5 2"/><rect x="2" y="17" width="4" height="4"/><rect x="18" y="5" width="4" height="4"/>'),
-    intro: 'Traza el contorno exacto de cada color y lo entrega como SVG editable. La separación por capas te sirve para serigrafía, vinil de corte o para recolorear sin perder filo.',
+    intro: 'Traces the exact contour of every colour and hands it back as an editable SVG. The layer split is what you need for screen printing, cut vinyl, or recolouring without losing edge quality.',
     manual: true,
     previewMax: 1400,
     controls: [
-      { k: 'seg', id: 'modo', label: 'Modo', def: 'color', heavy: true, opts: [['color', 'Por colores'], ['silueta', 'Silueta a una tinta']] },
-      { k: 'range', id: 'colores', label: 'Número de tintas', min: 2, max: 24, step: 1, def: 8, unit: '', heavy: true, show: function (p) { return p.modo === 'color'; } },
-      { k: 'range', id: 'umbral', label: 'Umbral de la silueta', min: 10, max: 245, step: 5, def: 128, unit: '', heavy: true, show: function (p) { return p.modo === 'silueta'; } },
-      { k: 'check', id: 'invertir', label: 'Invertir la silueta', def: false, heavy: true, show: function (p) { return p.modo === 'silueta'; } },
-      { k: 'color', id: 'tinta', label: 'Color de la tinta', def: '#111111', heavy: true, show: function (p) { return p.modo === 'silueta'; } },
-      { k: 'check', id: 'sinFondo', label: 'Descartar el fondo blanco', def: true, heavy: true, show: function (p) { return p.modo === 'color'; } },
-      { k: 'group', label: 'Trazo' },
-      { k: 'range', id: 'detalle', label: 'Simplificar curvas', min: 0, max: 6, step: 0.1, def: 1, unit: ' px', dec: 1, heavy: true },
-      { k: 'range', id: 'suavizado', label: 'Suavizado', min: 0, max: 1, step: 0.05, def: 0.5, unit: '', dec: 2, heavy: true },
-      { k: 'range', id: 'minima', label: 'Descartar manchas menores a', min: 0, max: 400, step: 5, def: 24, unit: ' px²', heavy: true },
-      { k: 'note', text: 'Pulsa Procesar después de mover los controles: el trazado es la parte pesada.' }
+      { k: 'seg', id: 'mode', label: 'Mode', def: 'color', heavy: true, opts: [['color', 'By colour'], ['silhouette', 'One-ink silhouette']] },
+      { k: 'range', id: 'colors', label: 'Number of inks', min: 2, max: 24, step: 1, def: 8, unit: '', heavy: true, show: function (p) { return p.mode === 'color'; } },
+      { k: 'check', id: 'dropWhite', label: 'Discard the white background', def: true, heavy: true, show: function (p) { return p.mode === 'color'; } },
+      { k: 'range', id: 'threshold', label: 'Silhouette threshold', min: 10, max: 245, step: 5, def: 128, unit: '', heavy: true, show: function (p) { return p.mode === 'silhouette'; } },
+      { k: 'check', id: 'invert', label: 'Invert the silhouette', def: false, heavy: true, show: function (p) { return p.mode === 'silhouette'; } },
+      { k: 'color', id: 'ink', label: 'Ink colour', def: '#111111', heavy: true, show: function (p) { return p.mode === 'silhouette'; } },
+      { k: 'group', label: 'Tracing' },
+      { k: 'range', id: 'detail', label: 'Simplify curves', min: 0, max: 6, step: 0.1, def: 1, unit: ' px', dec: 1, heavy: true },
+      { k: 'range', id: 'smooth', label: 'Smoothing', min: 0, max: 1, step: 0.05, def: 0.5, unit: '', dec: 2, heavy: true },
+      { k: 'range', id: 'minArea', label: 'Discard blobs smaller than', min: 0, max: 400, step: 5, def: 24, unit: ' px²', heavy: true },
+      { k: 'note', text: 'Press Run after moving the controls: tracing is the heavy part.' }
     ],
     process: function (c) {
       var v = vectorize(c.src, c.p);
@@ -113,7 +113,7 @@
     },
     exports: [
       {
-        label: 'Descargar SVG', ext: 'svg',
+        label: 'Download SVG', ext: 'svg',
         make: function (api, done) {
           var v = api.state.custom.vec || vectorize(api.src, api.params);
           var txt = svgText(v, api.src.width, api.src.height);
@@ -122,7 +122,7 @@
         }
       },
       {
-        label: 'Descargar PNG', ext: 'png', secondary: true,
+        label: 'Download PNG', ext: 'png', secondary: true,
         make: function (api, done) {
           var v = api.state.custom.vec || vectorize(api.src, api.params);
           var id = raster(v, api.src.width, api.src.height);
@@ -130,26 +130,26 @@
         }
       },
       {
-        label: 'Separación por tintas (ZIP)', ext: 'zip', secondary: true,
+        label: 'Ink separation (ZIP)', ext: 'zip', secondary: true,
         make: function (api, done) {
           var v = api.state.custom.vec || vectorize(api.src, api.params);
           var W = api.src.width, H = api.src.height, files = [], jobs = [];
           v.layers.forEach(function (L, i) {
-            var nom = 'tinta-' + ('0' + (i + 1)).slice(-2) + '-' + L.color.replace('#', '');
-            files.push({ name: nom + '.svg', blob: new Blob([svgText(v, W, H, [L])], { type: 'image/svg+xml' }) });
+            var name = 'ink-' + ('0' + (i + 1)).slice(-2) + '-' + L.color.replace('#', '');
+            files.push({ name: name + '.svg', blob: new Blob([svgText(v, W, H, [L])], { type: 'image/svg+xml' }) });
             var cv = document.createElement('canvas'); cv.width = W; cv.height = H;
             var ctx = cv.getContext('2d');
             ctx.scale(W / v.w, H / v.h);
             ctx.fillStyle = L.color;
             ctx.fill(new Path2D(L.d), 'evenodd');
-            jobs.push(NV.blobOf(cv).then(function (b) { files.push({ name: nom + '.png', blob: b }); }));
+            jobs.push(NV.blobOf(cv).then(function (b) { files.push({ name: name + '.png', blob: b }); }));
           });
-          files.push({ name: 'completo.svg', blob: new Blob([svgText(v, W, H)], { type: 'image/svg+xml' }) });
+          files.push({ name: 'combined.svg', blob: new Blob([svgText(v, W, H)], { type: 'image/svg+xml' }) });
           Promise.all(jobs).then(function () {
             return NV.zip(files);
           }).then(function (z) {
-            NV.download(z, api.name + '-separacion.zip');
-            NV.toast(v.layers.length + ' tintas separadas.', 'ok');
+            NV.download(z, api.name + '-separation.zip');
+            NV.toast(v.layers.length + ' inks separated.', 'ok');
             done();
           });
         }

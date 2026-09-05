@@ -1,9 +1,9 @@
-/* Mockups: coloca el diseño sobre la prenda y respeta la caída de la tela. */
+/* Mockups: place the artwork on the garment and let the fabric drape show through. */
 (function () {
   'use strict';
   var el = NV.el, W = 1200, H = 1400;
 
-  /* Silueta de camiseta como Path2D: sirve de relleno y de recorte para sombras. */
+  /* Tee silhouette as a Path2D: it fills the shirt and clips the shading. */
   function teePath() {
     var d = new Path2D();
     d.moveTo(600, 239);
@@ -69,7 +69,7 @@
     ctx.strokeRect(250, 380, 700, 800);
   }
 
-  /* Sombra de caída: se aplica solo dentro de la prenda. */
+  /* Drape shading: applied inside the garment only. */
   function shade(ctx) {
     var g = ctx.createRadialGradient(600, 500, 120, 600, 700, 780);
     g.addColorStop(0, 'rgba(255,255,255,.14)');
@@ -105,16 +105,16 @@
   NV.register({
     slug: 'mockups',
     name: 'Mockups',
-    group: 'Producción',
-    tagline: 'Prueba el diseño sobre camiseta o tote, o sobre tu propia foto.',
+    group: 'Production',
+    tagline: 'Try the artwork on a tee or a tote, or on a photo of your own.',
     icon: NV.svg('<path d="M8 3 5 5 3 9l3 2v10h12V11l3-2-2-4-3-2a4 4 0 0 1-8 0z"/>'),
     kind: 'custom',
     render: function (host) {
       var t = this;
       var parts = NV.bench(host, t);
       var p = {
-        prenda: 'camiseta', colorPrenda: '#f2f0eb', fondo: '#e8e3d8',
-        tam: 42, x: 50, y: 40, rot: 0, opacidad: 96, tela: true, guia: true
+        garment: 'tee', garmentColor: '#f2f0eb', background: '#e8e3d8',
+        size: 42, x: 50, y: 40, rot: 0, opacity: 96, fabric: true, guide: true
       };
       var design = null, photo = null;
 
@@ -122,49 +122,49 @@
       var cv = el('canvas', { width: W, height: H, style: 'max-width:100%;max-height:78vh;box-shadow:0 20px 60px -34px #000;cursor:move;border-radius:4px' });
       wrap.appendChild(cv);
       parts.stage.appendChild(wrap);
-      var info = el('div', { class: 'meta', text: 'Arrastra el diseño para colocarlo' });
+      var info = el('div', { class: 'meta', text: 'Drag the artwork to place it' });
       parts.stage.appendChild(info);
 
       function zone() {
-        if (p.prenda === 'tote') return { x: 320, y: 470, w: 560, h: 600 };
-        if (p.prenda === 'foto') return { x: W * 0.2, y: H * 0.2, w: W * 0.6, h: H * 0.6 };
+        if (p.garment === 'tote') return { x: 320, y: 470, w: 560, h: 600 };
+        if (p.garment === 'photo') return { x: W * 0.2, y: H * 0.2, w: W * 0.6, h: H * 0.6 };
         return { x: 390, y: 310, w: 420, h: 545 };
       }
 
       function render() {
         var ctx = cv.getContext('2d');
         ctx.clearRect(0, 0, W, H);
-        ctx.fillStyle = p.fondo;
+        ctx.fillStyle = p.background;
         ctx.fillRect(0, 0, W, H);
 
         var garment = null;
-        if (p.prenda === 'foto' && photo) {
+        if (p.garment === 'photo' && photo) {
           var k = Math.max(W / photo.width, H / photo.height);
           ctx.drawImage(photo, (W - photo.width * k) / 2, (H - photo.height * k) / 2, photo.width * k, photo.height * k);
-        } else if (p.prenda === 'tote') {
+        } else if (p.garment === 'tote') {
           garment = totePath();
           toteDetails(ctx);
-          ctx.fillStyle = p.colorPrenda;
+          ctx.fillStyle = p.garmentColor;
           ctx.fill(garment);
         } else {
           garment = teePath();
           ctx.save();
           ctx.shadowColor = 'rgba(0,0,0,.28)';
           ctx.shadowBlur = 40; ctx.shadowOffsetY = 14;
-          ctx.fillStyle = p.colorPrenda;
+          ctx.fillStyle = p.garmentColor;
           ctx.fill(garment);
           ctx.restore();
         }
 
         var z = zone();
         ctx.save();
-        if (garment) ctx.clip(garment);            // el arte y la sombra no salen de la prenda
+        if (garment) ctx.clip(garment);            // artwork and shading stay on the garment
         if (design) {
-          var maxw = z.w * (p.tam / 100);
+          var maxw = z.w * (p.size / 100);
           var dw = maxw, dh = maxw * design.height / design.width;
           var cx = z.x + z.w * (p.x / 100), cy = z.y + z.h * (p.y / 100);
           ctx.save();
-          ctx.globalAlpha = p.opacidad / 100;
+          ctx.globalAlpha = p.opacity / 100;
           ctx.translate(cx, cy);
           ctx.rotate(p.rot * Math.PI / 180);
           ctx.drawImage(design, -dw / 2, -dh / 2, dw, dh);
@@ -173,7 +173,7 @@
         if (garment) {
           ctx.globalCompositeOperation = 'multiply';
           shade(ctx);
-          if (p.tela) {
+          if (p.fabric) {
             ctx.globalCompositeOperation = 'overlay';
             ctx.globalAlpha = 0.2;
             ctx.fillStyle = ctx.createPattern(weave(), 'repeat');
@@ -182,8 +182,8 @@
         }
         ctx.restore();
 
-        if (p.prenda === 'camiseta' && garment) teeDetails(ctx);
-        if (p.guia) {
+        if (p.garment === 'tee' && garment) teeDetails(ctx);
+        if (p.guide) {
           ctx.strokeStyle = 'rgba(255,45,126,.75)';
           ctx.setLineDash([10, 8]);
           ctx.lineWidth = 2;
@@ -208,7 +208,7 @@
       cv.addEventListener('pointerup', function () { drag = null; });
       cv.addEventListener('wheel', function (e) {
         e.preventDefault();
-        p.tam = IM.clamp(p.tam + (e.deltaY < 0 ? 2 : -2), 5, 130);
+        p.size = IM.clamp(p.size + (e.deltaY < 0 ? 2 : -2), 5, 130);
         ui.sync(); render();
       }, { passive: false });
 
@@ -220,38 +220,38 @@
       var pIn = el('input', { type: 'file', accept: 'image/*', style: 'display:none' });
       pIn.addEventListener('change', function () {
         if (!pIn.files[0]) return;
-        NV.loadImage(pIn.files[0]).then(function (img) { photo = img; p.prenda = 'foto'; ui.sync(); render(); });
+        NV.loadImage(pIn.files[0]).then(function (img) { photo = img; p.garment = 'photo'; ui.sync(); render(); });
       });
 
-      parts.body.appendChild(el('button', { class: 'btn primary wide', text: 'Cargar diseño', onclick: function () { dIn.click(); } }));
+      parts.body.appendChild(el('button', { class: 'btn primary wide', text: 'Load artwork', onclick: function () { dIn.click(); } }));
       parts.body.appendChild(dIn); parts.body.appendChild(pIn);
 
       var ui = NV.controls(parts.body, [
-        { k: 'seg', id: 'prenda', label: 'Soporte', def: 'camiseta', opts: [['camiseta', 'Camiseta'], ['tote', 'Tote'], ['foto', 'Mi foto']] },
-        { k: 'button', label: 'Cargar foto de prenda', act: function () { pIn.click(); }, },
-        { k: 'color', id: 'colorPrenda', label: 'Color de la prenda', def: '#f2f0eb', show: function (q) { return q.prenda !== 'foto'; } },
-        { k: 'color', id: 'fondo', label: 'Color del fondo', def: '#e8e3d8', show: function (q) { return q.prenda !== 'foto'; } },
-        { k: 'group', label: 'Colocación' },
-        { k: 'range', id: 'tam', label: 'Tamaño', min: 5, max: 130, step: 1, def: 42, unit: ' %' },
-        { k: 'range', id: 'x', label: 'Posición horizontal', min: -30, max: 130, step: 0.5, def: 50, unit: ' %', dec: 0 },
-        { k: 'range', id: 'y', label: 'Posición vertical', min: -30, max: 130, step: 0.5, def: 40, unit: ' %', dec: 0 },
-        { k: 'range', id: 'rot', label: 'Rotación', min: -45, max: 45, step: 1, def: 0, unit: '°' },
-        { k: 'range', id: 'opacidad', label: 'Opacidad', min: 20, max: 100, step: 1, def: 96, unit: ' %' },
-        { k: 'group', label: 'Realismo' },
-        { k: 'check', id: 'tela', label: 'Textura de tela', def: true },
-        { k: 'check', id: 'guia', label: 'Mostrar la zona de impresión', def: true }
+        { k: 'seg', id: 'garment', label: 'Surface', def: 'tee', opts: [['tee', 'T-shirt'], ['tote', 'Tote'], ['photo', 'My photo']] },
+        { k: 'button', label: 'Load a garment photo', act: function () { pIn.click(); }, },
+        { k: 'color', id: 'garmentColor', label: 'Garment colour', def: '#f2f0eb', show: function (q) { return q.garment !== 'photo'; } },
+        { k: 'color', id: 'background', label: 'Background colour', def: '#e8e3d8', show: function (q) { return q.garment !== 'photo'; } },
+        { k: 'group', label: 'Placement' },
+        { k: 'range', id: 'size', label: 'Size', min: 5, max: 130, step: 1, def: 42, unit: ' %' },
+        { k: 'range', id: 'x', label: 'Horizontal position', min: -30, max: 130, step: 0.5, def: 50, unit: ' %', dec: 0 },
+        { k: 'range', id: 'y', label: 'Vertical position', min: -30, max: 130, step: 0.5, def: 40, unit: ' %', dec: 0 },
+        { k: 'range', id: 'rot', label: 'Rotation', min: -45, max: 45, step: 1, def: 0, unit: '°' },
+        { k: 'range', id: 'opacity', label: 'Opacity', min: 20, max: 100, step: 1, def: 96, unit: ' %' },
+        { k: 'group', label: 'Realism' },
+        { k: 'check', id: 'fabric', label: 'Fabric texture', def: true },
+        { k: 'check', id: 'guide', label: 'Show the print area', def: true }
       ], p, function () { render(); });
       ui.sync();
-      parts.body.appendChild(el('p', { class: 'hint', text: 'Arrastra sobre el lienzo para mover y usa la rueda para escalar. La zona punteada es el área imprimible sugerida.' }));
+      parts.body.appendChild(el('p', { class: 'hint', text: 'Drag on the canvas to move it and scroll to scale. The dashed area is the suggested print zone.' }));
 
       parts.foot.appendChild(el('button', {
-        class: 'btn primary wide', text: 'Descargar mockup',
+        class: 'btn primary wide', text: 'Download mockup',
         onclick: function () {
-          if (!design) return NV.toast('Carga primero un diseño.', 'bad');
-          var g = p.guia; p.guia = false; render();
+          if (!design) return NV.toast('Load an artwork first.', 'bad');
+          var g = p.guide; p.guide = false; render();
           NV.blobOf(cv).then(function (b) {
-            NV.download(b, 'mockup-' + p.prenda + '.png');
-            p.guia = g; render();
+            NV.download(b, 'mockup-' + p.garment + '.png');
+            p.guide = g; render();
           });
         }
       }));

@@ -1,4 +1,4 @@
-/* Hojas de impresión (gang sheet): acomoda los diseños y aprovecha el film. */
+/* Print sheets (gang sheets): lay several designs out on the roll and use the film well. */
 (function () {
   'use strict';
   var el = NV.el, CM = 2.54;
@@ -24,10 +24,10 @@
   }
 
   function draw(cv, st, packed, forExport) {
-    var pxcm = forExport ? st.dpi / CM : cv.width / st.ancho;
+    var pxcm = forExport ? st.dpi / CM : cv.width / st.width;
     var ctx = cv.getContext('2d');
-    ctx.fillStyle = forExport && !st.fondo ? 'rgba(0,0,0,0)' : (forExport ? st.color : '#ffffff');
-    if (forExport && !st.fondo) ctx.clearRect(0, 0, cv.width, cv.height);
+    ctx.fillStyle = forExport && !st.background ? 'rgba(0,0,0,0)' : (forExport ? st.color : '#ffffff');
+    if (forExport && !st.background) ctx.clearRect(0, 0, cv.width, cv.height);
     else ctx.fillRect(0, 0, cv.width, cv.height);
     packed.places.forEach(function (p) {
       ctx.save();
@@ -48,23 +48,23 @@
     if (!forExport) {
       ctx.strokeStyle = 'rgba(120,120,120,.5)';
       ctx.setLineDash([6, 5]);
-      ctx.strokeRect(st.margen * pxcm, st.margen * pxcm,
-        (st.ancho - st.margen * 2) * pxcm, cv.height - st.margen * 2 * pxcm);
+      ctx.strokeRect(st.margin * pxcm, st.margin * pxcm,
+        (st.width - st.margin * 2) * pxcm, cv.height - st.margin * 2 * pxcm);
       ctx.setLineDash([]);
     }
   }
 
   NV.register({
-    slug: 'plantillas',
-    name: 'Hojas de impresión',
-    group: 'Producción',
-    tagline: 'Acomoda varios diseños en el rollo, mide el metraje y exporta a los DPI reales.',
+    slug: 'gang-sheets',
+    name: 'Print sheets',
+    group: 'Production',
+    tagline: 'Gang several designs onto the roll, measure the run and export at real DPI.',
     icon: NV.svg('<path d="M3 4h18v16H3z"/><path d="M3 10h9v10M12 4v6h9"/>'),
     kind: 'custom',
     render: function (host) {
       var t = this;
       var parts = NV.bench(host, t);
-      var st = { ancho: 58, dpi: 300, gap: 0.5, margen: 0.5, fondo: false, color: '#ffffff' };
+      var st = { width: 58, dpi: 300, gap: 0.5, margin: 0.5, background: false, color: '#ffffff' };
       var items = [], packed = { places: [], length: 1 };
 
       var wrap = el('div', { style: 'flex:1;overflow:auto;padding:22px;display:flex;justify-content:center;align-items:flex-start' });
@@ -91,7 +91,7 @@
       function renderList() {
         listBox.innerHTML = '';
         if (!items.length) {
-          listBox.appendChild(el('p', { class: 'hint', text: 'Aún no hay diseños. Añade PNG con fondo transparente y define el ancho de cada uno en centímetros.' }));
+          listBox.appendChild(el('p', { class: 'hint', text: 'No designs yet. Add PNGs with a transparent background and set the width of each one in centimetres.' }));
           return;
         }
         items.forEach(function (it, i) {
@@ -104,88 +104,88 @@
           top.appendChild(th);
           top.appendChild(el('div', { style: 'flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px', text: it.name }));
           top.appendChild(el('button', {
-            class: 'btn ghost', style: 'padding:4px 9px', text: '✕', title: 'Quitar',
+            class: 'btn ghost', style: 'padding:4px 9px', text: '✕', title: 'Remove',
             onclick: function () { items.splice(i, 1); renderList(); update(); }
           }));
           row.appendChild(top);
 
           var g = el('div', { class: 'row' });
-          var wIn = el('input', { type: 'number', value: it.cm, min: 1, max: 200, step: 0.5, title: 'Ancho en cm' });
-          var qIn = el('input', { type: 'number', value: it.qty, min: 1, max: 200, step: 1, title: 'Cantidad' });
+          var wIn = el('input', { type: 'number', value: it.cm, min: 1, max: 200, step: 0.5, title: 'Width in cm' });
+          var qIn = el('input', { type: 'number', value: it.qty, min: 1, max: 200, step: 1, title: 'Quantity' });
           wIn.addEventListener('input', function () { it.cm = Math.max(0.5, +wIn.value || 1); update(); });
           qIn.addEventListener('input', function () { it.qty = Math.max(1, Math.min(200, +qIn.value || 1)); update(); });
-          g.appendChild(el('label', { class: 'field' }, [el('span', { class: 'flabel', html: '<span>Ancho</span><b>cm</b>' }), wIn]));
-          g.appendChild(el('label', { class: 'field' }, [el('span', { class: 'flabel', html: '<span>Cantidad</span><b>pzas</b>' }), qIn]));
+          g.appendChild(el('label', { class: 'field' }, [el('span', { class: 'flabel', html: '<span>Width</span><b>cm</b>' }), wIn]));
+          g.appendChild(el('label', { class: 'field' }, [el('span', { class: 'flabel', html: '<span>Quantity</span><b>pcs</b>' }), qIn]));
           row.appendChild(g);
 
           var rc = el('input', { type: 'checkbox' });
           rc.checked = it.rot;
           rc.addEventListener('change', function () { it.rot = rc.checked; update(); });
-          row.appendChild(el('label', { class: 'check' }, [rc, el('span', { text: 'Puede girar 90°' })]));
+          row.appendChild(el('label', { class: 'check' }, [rc, el('span', { text: 'May rotate 90°' })]));
           listBox.appendChild(row);
         });
       }
 
       function update() {
-        packed = pack(items, st.ancho, st.gap, st.margen);
-        var largo = Math.max(st.margen * 2 + 1, packed.length);
-        var pxcm = 900 / st.ancho;
-        cv.width = Math.round(st.ancho * pxcm);
-        cv.height = Math.max(40, Math.round(largo * pxcm));
+        packed = pack(items, st.width, st.gap, st.margin);
+        var length = Math.max(st.margin * 2 + 1, packed.length);
+        var pxcm = 900 / st.width;
+        cv.width = Math.round(st.width * pxcm);
+        cv.height = Math.max(40, Math.round(length * pxcm));
         cv.style.width = Math.min(900, cv.width) + 'px';
         draw(cv, st, packed, false);
-        var areaUsada = packed.places.reduce(function (a, p) { return a + p.w * p.h; }, 0);
-        var areaHoja = st.ancho * largo;
-        info.textContent = packed.places.length + ' piezas · ' + largo.toFixed(1) + ' cm de largo (' +
-          (largo / 100).toFixed(2) + ' m) · aprovechado ' + Math.round(areaUsada / areaHoja * 100) + ' %';
+        var used = packed.places.reduce(function (a, p) { return a + p.w * p.h; }, 0);
+        var sheet = st.width * length;
+        info.textContent = packed.places.length + ' pieces · ' + length.toFixed(1) + ' cm long (' +
+          (length / 100).toFixed(2) + ' m) · ' + Math.round(used / sheet * 100) + ' % used';
       }
 
       NV.controls(parts.body, [
-        { k: 'select', id: 'ancho', label: 'Ancho del rollo', def: '58', opts: [['30', '30 cm'], ['33', '33 cm'], ['40', '40 cm'], ['55', '55 cm'], ['58', '58 cm'], ['60', '60 cm'], ['62', '62 cm']] },
-        { k: 'num', id: 'dpi', label: 'Resolución de salida', unit: 'DPI', def: 300, min: 100, max: 720, step: 10 },
-        { k: 'range', id: 'gap', label: 'Separación entre piezas', min: 0, max: 4, step: 0.1, def: 0.5, unit: ' cm', dec: 1 },
-        { k: 'range', id: 'margen', label: 'Margen del rollo', min: 0, max: 4, step: 0.1, def: 0.5, unit: ' cm', dec: 1 },
-        { k: 'check', id: 'fondo', label: 'Exportar con fondo de color', def: false },
-        { k: 'color', id: 'color', label: 'Color del fondo', def: '#ffffff', show: function (p) { return p.fondo; } }
-      ], st, function () { st.ancho = +st.ancho; update(); }).sync();
+        { k: 'select', id: 'width', label: 'Roll width', def: '58', opts: [['30', '30 cm'], ['33', '33 cm'], ['40', '40 cm'], ['55', '55 cm'], ['58', '58 cm'], ['60', '60 cm'], ['62', '62 cm']] },
+        { k: 'num', id: 'dpi', label: 'Output resolution', unit: 'DPI', def: 300, min: 100, max: 720, step: 10 },
+        { k: 'range', id: 'gap', label: 'Gap between pieces', min: 0, max: 4, step: 0.1, def: 0.5, unit: ' cm', dec: 1 },
+        { k: 'range', id: 'margin', label: 'Roll margin', min: 0, max: 4, step: 0.1, def: 0.5, unit: ' cm', dec: 1 },
+        { k: 'check', id: 'background', label: 'Export with a solid background', def: false },
+        { k: 'color', id: 'color', label: 'Background colour', def: '#ffffff', show: function (p) { return p.background; } }
+      ], st, function () { st.width = +st.width; update(); }).sync();
 
       parts.body.appendChild(el('div', { class: 'sep' }));
-      parts.body.appendChild(el('div', { class: 'group-t', text: 'Diseños en la hoja' }));
-      parts.body.appendChild(el('button', { class: 'btn wide', text: 'Añadir diseños', onclick: function () { input.click(); } }));
+      parts.body.appendChild(el('div', { class: 'group-t', text: 'Designs on the sheet' }));
+      parts.body.appendChild(el('button', { class: 'btn wide', text: 'Add designs', onclick: function () { input.click(); } }));
       parts.body.appendChild(input);
       parts.body.appendChild(listBox);
-      parts.body.appendChild(el('p', { class: 'hint', text: 'El acomodo usa estanterías por altura, igual que un RIP: ordena de mayor a menor y rellena cada fila.' }));
+      parts.body.appendChild(el('p', { class: 'hint', text: 'The layout uses shelves by height, the same way a RIP does: sort tallest first and fill each row.' }));
 
       parts.foot.appendChild(el('button', {
-        class: 'btn primary wide', text: 'Descargar hoja PNG',
+        class: 'btn primary wide', text: 'Download sheet PNG',
         onclick: function () {
-          if (!items.length) return NV.toast('Añade al menos un diseño.', 'bad');
-          var largo = packed.length, pxcm = st.dpi / CM;
-          var W = Math.round(st.ancho * pxcm), H = Math.round(largo * pxcm);
-          if (W * H > 160e6) return NV.toast('La hoja es enorme a ' + st.dpi + ' DPI. Baja los DPI o divide el pedido.', 'bad');
+          if (!items.length) return NV.toast('Add at least one design.', 'bad');
+          var length = packed.length, pxcm = st.dpi / CM;
+          var W = Math.round(st.width * pxcm), H = Math.round(length * pxcm);
+          if (W * H > 160e6) return NV.toast('That sheet is enormous at ' + st.dpi + ' DPI. Lower the DPI or split the order.', 'bad');
           var out = document.createElement('canvas');
           out.width = W; out.height = H;
           draw(out, st, packed, true);
           NV.blobOf(out).then(function (b) { return NV.pngWithDpi(b, st.dpi); })
             .then(function (b) {
-              NV.download(b, 'hoja-' + st.ancho + 'cm-' + largo.toFixed(0) + 'cm.png');
-              NV.toast('Hoja de ' + W + ' × ' + H + ' px lista.', 'ok');
+              NV.download(b, 'sheet-' + st.width + 'cm-' + length.toFixed(0) + 'cm.png');
+              NV.toast('Sheet of ' + W + ' × ' + H + ' px ready.', 'ok');
             });
         }
       }));
       parts.foot.appendChild(el('button', {
-        class: 'btn ghost wide', text: 'Descargar lista (CSV)',
+        class: 'btn ghost wide', text: 'Download list (CSV)',
         onclick: function () {
-          var rows = [['Diseño', 'Ancho cm', 'Alto cm', 'Cantidad', 'Área cm2']];
+          var rows = [['Design', 'Width cm', 'Height cm', 'Quantity', 'Area cm2']];
           items.forEach(function (it) {
             var h = it.cm * it.img.height / it.img.width;
             rows.push([it.name, it.cm.toFixed(1), h.toFixed(1), it.qty, (it.cm * h * it.qty).toFixed(1)]);
           });
           rows.push([]);
-          rows.push(['Largo total cm', packed.length.toFixed(1)]);
-          rows.push(['Ancho rollo cm', st.ancho]);
+          rows.push(['Total length cm', packed.length.toFixed(1)]);
+          rows.push(['Roll width cm', st.width]);
           var csv = rows.map(function (r) { return r.join(','); }).join('\n');
-          NV.download(new Blob([csv], { type: 'text/csv' }), 'hoja-de-impresion.csv');
+          NV.download(new Blob([csv], { type: 'text/csv' }), 'print-sheet.csv');
         }
       }));
 

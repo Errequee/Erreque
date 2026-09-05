@@ -1,26 +1,26 @@
-/* Semitonos: trama de puntos y desvanecidos para DTF y serigrafía. */
+/* Halftones: dot screens and fades for DTF and screen printing. */
 (function () {
   'use strict';
 
   var ANG = { c: 15, m: 75, y: 0, k: 45 };
 
   function shapePath(ctx, x, y, r, shape) {
-    if (shape === 'circulo') { ctx.moveTo(x + r, y); ctx.arc(x, y, r, 0, 6.2832); return; }
-    if (shape === 'cuadro') { ctx.rect(x - r * 0.886, y - r * 0.886, r * 1.772, r * 1.772); return; }
-    if (shape === 'rombo') {
+    if (shape === 'circle') { ctx.moveTo(x + r, y); ctx.arc(x, y, r, 0, 6.2832); return; }
+    if (shape === 'square') { ctx.rect(x - r * 0.886, y - r * 0.886, r * 1.772, r * 1.772); return; }
+    if (shape === 'diamond') {
       var d = r * 1.25;
       ctx.moveTo(x, y - d); ctx.lineTo(x + d, y); ctx.lineTo(x, y + d); ctx.lineTo(x - d, y); ctx.closePath();
       return;
     }
-    if (shape === 'cruz') {
+    if (shape === 'cross') {
       var a = r * 1.3, b = r * 0.42;
       ctx.rect(x - a, y - b, a * 2, b * 2); ctx.rect(x - b, y - a, b * 2, a * 2);
       return;
     }
-    ctx.rect(x - r * 1.6, y - r * 0.9, r * 3.2, r * 1.8);   // línea
+    ctx.rect(x - r * 1.6, y - r * 0.9, r * 3.2, r * 1.8);   // line
   }
 
-  /* Cobertura media de una celda: luminancia y alfa del original. */
+  /* Average coverage of one cell: luminance and alpha from the source. */
   function sampler(id) {
     var w = id.width, h = id.height, p = id.data;
     return function (cx, cy, half) {
@@ -43,17 +43,17 @@
 
   function ramp(p, x, y, w, h) {
     var t;
-    if (p.dir === 'abajo') t = y / h;
-    else if (p.dir === 'arriba') t = 1 - y / h;
-    else if (p.dir === 'derecha') t = x / w;
-    else if (p.dir === 'izquierda') t = 1 - x / w;
+    if (p.dir === 'down') t = y / h;
+    else if (p.dir === 'up') t = 1 - y / h;
+    else if (p.dir === 'right') t = x / w;
+    else if (p.dir === 'left') t = 1 - x / w;
     else {
       var dx = (x - w / 2) / (w / 2), dy = (y - h / 2) / (h / 2);
       t = Math.min(1, Math.sqrt(dx * dx + dy * dy));
     }
-    var ini = p.inicio / 100, fin = p.fin / 100;
-    if (fin <= ini) fin = ini + 0.001;
-    return IM.clamp((t - ini) / (fin - ini), 0, 1);
+    var start = p.start / 100, end = p.end / 100;
+    if (end <= start) end = start + 0.001;
+    return IM.clamp((t - start) / (end - start), 0, 1);
   }
 
   function pass(ctx, src, p, cellPx, angleDeg, color, chan) {
@@ -70,54 +70,54 @@
       var s = smp(x, y, cellPx / 2);
       if (!s || s.a < 0.02) continue;
       var cover = 1;
-      if (p.modo === 'tono' || p.modo === 'ambos') {
+      if (p.mode === 'tone' || p.mode === 'both') {
         cover = chan ? chan(s) : (1 - s.lum / Math.max(0.001, s.a));
         cover = IM.clamp(cover, 0, 1) * s.a;
       } else cover = s.a;
-      if (p.modo === 'fade' || p.modo === 'ambos') cover *= (1 - ramp(p, x, y, w, h));
+      if (p.mode === 'fade' || p.mode === 'both') cover *= (1 - ramp(p, x, y, w, h));
       if (cover <= 0.004) continue;
-      var r = 0.708 * cellPx * Math.sqrt(cover) * (p.grosor / 100);
-      if (p.color === 'original') {
+      var r = 0.708 * cellPx * Math.sqrt(cover) * (p.weight / 100);
+      if (p.ink === 'original') {
         ctx.fill(); ctx.beginPath();
         ctx.fillStyle = 'rgb(' + (s.r | 0) + ',' + (s.g | 0) + ',' + (s.b | 0) + ')';
-        shapePath(ctx, x, y, r, p.forma);
+        shapePath(ctx, x, y, r, p.shape);
         ctx.fill(); ctx.beginPath();
         continue;
       }
-      shapePath(ctx, x, y, r, p.forma);
+      shapePath(ctx, x, y, r, p.shape);
     }
     ctx.fill();
   }
 
   NV.register({
-    slug: 'semitonos',
-    name: 'Semitonos y desvanecidos',
-    group: 'Efectos de impresión',
-    tagline: 'Trama de puntos con ángulo y forma, y degradados que se disuelven en puntos.',
+    slug: 'halftones',
+    name: 'Halftones and fades',
+    group: 'Print effects',
+    tagline: 'Dot screens with angle and shape, and gradients that dissolve into dots.',
     icon: NV.svg('<circle cx="6" cy="6" r="3"/><circle cx="17" cy="6" r="2.2"/><circle cx="6" cy="17" r="2.2"/><circle cx="17" cy="17" r="1.2"/>'),
-    intro: 'El desvanecido en puntos es la forma correcta de degradar en DTF: la impresora no imprime alfa parcial, pero sí puntos sólidos cada vez más chicos.',
+    intro: 'A dot fade is the right way to make a gradient in DTF: the printer cannot print partial alpha, but it can print solid dots that get smaller.',
     debounce: 160,
     controls: [
-      { k: 'seg', id: 'modo', label: 'Qué hacer', def: 'fade', opts: [['fade', 'Desvanecer'], ['tono', 'Tramar tonos'], ['ambos', 'Ambos']] },
-      { k: 'range', id: 'celda', label: 'Tamaño de punto', min: 2, max: 40, step: 0.5, def: 8, unit: ' px', dec: 1, scale: true },
-      { k: 'range', id: 'grosor', label: 'Grosor del punto', min: 40, max: 160, step: 1, def: 100, unit: ' %' },
-      { k: 'select', id: 'forma', label: 'Forma', def: 'circulo', opts: [['circulo', 'Círculo'], ['cuadro', 'Cuadrado'], ['rombo', 'Rombo'], ['cruz', 'Cruz'], ['linea', 'Línea']] },
-      { k: 'range', id: 'angulo', label: 'Ángulo de trama', min: 0, max: 90, step: 1, def: 45, unit: '°' },
-      { k: 'group', label: 'Desvanecido', show: function (p) { return p.modo !== 'tono'; } },
-      { k: 'select', id: 'dir', label: 'Dirección', def: 'abajo', show: function (p) { return p.modo !== 'tono'; }, opts: [['abajo', 'Hacia abajo'], ['arriba', 'Hacia arriba'], ['derecha', 'Hacia la derecha'], ['izquierda', 'Hacia la izquierda'], ['centro', 'Desde el centro']] },
-      { k: 'range', id: 'inicio', label: 'Empieza a desvanecer', min: 0, max: 100, step: 1, def: 35, unit: ' %', show: function (p) { return p.modo !== 'tono'; } },
-      { k: 'range', id: 'fin', label: 'Desaparece por completo', min: 0, max: 100, step: 1, def: 95, unit: ' %', show: function (p) { return p.modo !== 'tono'; } },
-      { k: 'group', label: 'Color' },
-      { k: 'seg', id: 'color', label: 'Tinta del punto', def: 'original', opts: [['original', 'Original'], ['solido', 'Un color'], ['cmyk', 'CMYK']] },
-      { k: 'color', id: 'tinta', label: 'Color de tinta', def: '#111111', show: function (p) { return p.color === 'solido'; } },
-      { k: 'note', text: 'CMYK separa en cuatro tramas con los ángulos clásicos (C 15°, M 75°, Y 0°, K 45°) para evitar muaré.', show: function (p) { return p.color === 'cmyk'; } }
+      { k: 'seg', id: 'mode', label: 'What to do', def: 'fade', opts: [['fade', 'Fade out'], ['tone', 'Screen tones'], ['both', 'Both']] },
+      { k: 'range', id: 'cell', label: 'Dot size', min: 2, max: 40, step: 0.5, def: 8, unit: ' px', dec: 1, scale: true },
+      { k: 'range', id: 'weight', label: 'Dot weight', min: 40, max: 160, step: 1, def: 100, unit: ' %' },
+      { k: 'select', id: 'shape', label: 'Shape', def: 'circle', opts: [['circle', 'Circle'], ['square', 'Square'], ['diamond', 'Diamond'], ['cross', 'Cross'], ['line', 'Line']] },
+      { k: 'range', id: 'angle', label: 'Screen angle', min: 0, max: 90, step: 1, def: 45, unit: '°' },
+      { k: 'group', label: 'Fade', show: function (p) { return p.mode !== 'tone'; } },
+      { k: 'select', id: 'dir', label: 'Direction', def: 'down', show: function (p) { return p.mode !== 'tone'; }, opts: [['down', 'Downward'], ['up', 'Upward'], ['right', 'To the right'], ['left', 'To the left'], ['center', 'Out from the centre']] },
+      { k: 'range', id: 'start', label: 'Fade starts at', min: 0, max: 100, step: 1, def: 35, unit: ' %', show: function (p) { return p.mode !== 'tone'; } },
+      { k: 'range', id: 'end', label: 'Fully gone at', min: 0, max: 100, step: 1, def: 95, unit: ' %', show: function (p) { return p.mode !== 'tone'; } },
+      { k: 'group', label: 'Colour' },
+      { k: 'seg', id: 'ink', label: 'Dot ink', def: 'original', opts: [['original', 'Original'], ['solid', 'One colour'], ['cmyk', 'CMYK']] },
+      { k: 'color', id: 'tint', label: 'Ink colour', def: '#111111', show: function (p) { return p.ink === 'solid'; } },
+      { k: 'note', text: 'CMYK splits into four screens at the classic angles (C 15°, M 75°, Y 0°, K 45°) to avoid moiré.', show: function (p) { return p.ink === 'cmyk'; } }
     ],
     process: function (c) {
       var src = c.src, w = src.width, h = src.height, p = c.p;
       var cv = document.createElement('canvas'); cv.width = w; cv.height = h;
       var ctx = cv.getContext('2d');
-      var cell = Math.max(1.2, p.celda);
-      if (p.color === 'cmyk') {
+      var cell = Math.max(1.2, p.cell);
+      if (p.ink === 'cmyk') {
         ctx.globalCompositeOperation = 'source-over';
         var chans = [
           ['c', '#00AEEF', function (s) { return IM.clamp(1 - s.r / 255, 0, 1); }],
@@ -127,12 +127,12 @@
         ];
         ctx.globalAlpha = 0.9;
         chans.forEach(function (ch) {
-          var pp = Object.assign({}, p, { modo: p.modo === 'fade' ? 'ambos' : p.modo });
+          var pp = Object.assign({}, p, { mode: p.mode === 'fade' ? 'both' : p.mode });
           pass(ctx, src, pp, cell, ANG[ch[0]], ch[1], ch[2]);
         });
         ctx.globalAlpha = 1;
       } else {
-        pass(ctx, src, p, cell, p.angulo, p.color === 'solido' ? p.tinta : '#000');
+        pass(ctx, src, p, cell, p.angle, p.ink === 'solid' ? p.tint : '#000');
       }
       return ctx.getImageData(0, 0, w, h);
     }

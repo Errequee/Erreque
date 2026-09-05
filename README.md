@@ -1,141 +1,139 @@
-# Taller Libre — herramientas DTF gratis
+# Open Press — free DTF tools
 
-Suite de 13 herramientas para impresión DTF, serigrafía y vinil de corte. Corre entera
-en el navegador: sin cuenta, sin suscripción, sin marcas de agua y sin subir archivos a
-ningún servidor. No hay backend porque no hace falta — todo el proceso de imagen ocurre
-en tu equipo con Canvas y JavaScript.
+Thirteen tools for DTF printing, screen printing and cut vinyl. The whole thing runs in
+the browser: no account, no subscription, no watermarks and no files sent to any server.
+There is no backend because none is needed — every image operation happens on your own
+machine with Canvas and JavaScript.
 
-## Las herramientas
+## The tools
 
-**Limpieza de recortes**
+**Cutout cleanup**
 
-| Herramienta | Qué hace |
+| Tool | What it does |
 |---|---|
-| Eliminar fondos | Varita por color (tolerancia y zona conectada) más pinceles de borrar y restaurar. |
-| Reducir bordes | Contrae o expande el contorno con precisión subpíxel, quita el halo del recorte y limpia motas y huecos. |
-| Quitar semitransparencias | Convierte el alfa parcial —que la impresora no puede imprimir— en sólido o transparente. Incluye diagnóstico en magenta. |
+| Remove background | Colour wand (tolerance and connected-area) plus erase and restore brushes. |
+| Reduce edges | Shrinks or grows the contour with sub-pixel precision, kills the halo a cutout leaves, and clears specks and holes. |
+| Remove semi-transparency | Turns partial alpha — which the printer cannot reproduce — into solid or clear. Includes a magenta inspector. |
 
-**Preparación del arte**
+**Artwork prep**
 
-| Herramienta | Qué hace |
+| Tool | What it does |
 |---|---|
-| Mejorar y ampliar | Remuestreo progresivo hasta 4×, máscara de enfoque, mediana para ruido de JPG y ajuste de color. |
-| Vectorizar y separar colores | Cuantiza con k-medias, traza el contorno real de cada tinta y exporta SVG, PNG y un ZIP con la separación por capas. |
-| Redimensionar | Tamaño en cm o pulgadas con DPI grabados en el PNG (chunk `pHYs`), y encuadre ajustar/rellenar/estirar. |
-| Conversor de formatos | PNG, JPG y WEBP con calidad, límite de tamaño y aplanado de fondo. |
+| Enhance and upscale | Progressive resampling up to 4×, unsharp mask, median for JPG noise, and colour adjustment. |
+| Vectorize and split colours | k-means quantization, traces the real contour of each ink, exports SVG, PNG and a ZIP with the ink separation. |
+| Resize | Size in cm or inches with the DPI written into the PNG (`pHYs` chunk), and fit / fill / stretch framing. |
+| Format converter | PNG, JPG and WEBP with quality, size cap and background flattening. |
 
-**Efectos de impresión**
+**Print effects**
 
-| Herramienta | Qué hace |
+| Tool | What it does |
 |---|---|
-| Semitonos y desvanecidos | Trama de puntos con ángulo, forma y grosor; degradados que se disuelven en puntos sólidos; separación CMYK con los ángulos clásicos. |
-| Marcos y grunge | Desgaste con ruido fractal (todo el diseño o solo el contorno), textura sucia y marcos. |
+| Halftones and fades | Dot screens with angle, shape and weight; gradients that dissolve into solid dots; CMYK separation at the classic angles. |
+| Frames and grunge | Distress from fractal noise (whole artwork or contour only), dirty texture and frames. |
 
-**Producción**
+**Production**
 
-| Herramienta | Qué hace |
+| Tool | What it does |
 |---|---|
-| Hojas de impresión | Acomoda varios diseños en el rollo por estanterías de altura, mide el metraje y exporta el PNG a los DPI reales. |
-| Mockups | Camiseta y tote dibujados por código, o tu propia foto, con sombra y textura de tela recortadas a la prenda. |
-| Calculadora de precios | Costo real por pieza (film, tinta, polvo, mano de obra, merma) y precio de venta. Guarda tus valores. |
-| Medidas estándar | Tamaños por talla, colocaciones, referencia de plancha y conversor de cm a píxeles. |
+| Print sheets | Gangs several designs onto the roll with shelf packing, measures the run and exports the PNG at real DPI. |
+| Mockups | A tee and a tote drawn in code, or your own photo, with shading and fabric texture clipped to the garment. |
+| Pricing calculator | Real cost per piece (film, ink, powder, labour, waste) and selling price. Remembers your numbers. |
+| Standard sizes | Print sizes by garment size, placements, a pressing reference and a centimetres-to-pixels converter. |
 
-## Cómo usarlo
+## How to use it
 
-Abre `index.html`. Nada más — funciona desde el disco (`file://`) y sin conexión.
+Open `index.html`. That's it — it works straight off the disk (`file://`) and offline.
 
-Para publicarlo, sube el repositorio a cualquier hosting estático (GitHub Pages,
-Netlify, Cloudflare Pages) o levántalo en local:
+To publish it, push the repository to any static host (GitHub Pages, Netlify, Cloudflare
+Pages) or serve it locally:
 
 ```sh
 npm run serve      # http://localhost:8080
 ```
 
-También hay versiones de un solo archivo:
+There are also single-file builds:
 
 ```sh
-npm run build                  # dist/taller-libre.html — HTML completo, para USB o WhatsApp
-python3 build.py --artifact    # dist/artifact.html — sin <html>/<head>/<body>, para incrustar
+npm run build                  # dist/open-press.html — complete HTML, for a USB stick or a chat
+python3 build.py --artifact    # dist/artifact.html — no <html>/<head>/<body>, for embedding
 ```
 
-En un visor incrustado el navegador bloquea los enlaces de descarga, así que `NV.download`
-pide al anfitrión que guarde el archivo (`claude.use('downloads')`) y cae al enlace normal
-cuando eso no existe. En esa vista el ZIP de separación por tintas no está permitido: la
-herramienta lo avisa y pide abrir el sitio completo.
+Embedded viewers block download links, so `NV.download` asks the host to save the file
+(`claude.use('downloads')`) and falls back to a plain anchor when that isn't available. In
+that view the ink-separation ZIP isn't an allowed format: the tool says so and points you
+at the full site.
 
-## Cómo está hecho
+## How it's built
 
-Sin dependencias, sin compilación, sin frameworks. JavaScript clásico con un espacio
-de nombres global, por eso funciona igual servido que abierto desde el disco.
+No dependencies, no build step, no frameworks. Classic JavaScript with one global
+namespace, which is why it behaves the same served over HTTP or opened from disk.
 
 ```
-index.html               cascarón: fuentes, estilos y orden de carga
-assets/css/app.css       sistema visual y los tres estados de tema (claro, oscuro, del sistema)
-assets/js/imglib.js      proceso de imagen: distancia euclídea exacta, desenfoque de caja,
-                         k-medias, trazado de contornos, ruido fractal
-assets/js/core.js        registro de herramientas, enrutado por hash, visor con zoom y
-                         comparación, controles, exportación, ZIP y DPI en PNG
-assets/js/tools/*.js     una herramienta por archivo
-build.py                 empaqueta todo en un solo HTML
-test/smoke.js            prueba de humo en Chromium
+index.html               shell: fonts, styles and load order
+assets/css/app.css       visual system and the three theme states (light, dark, system)
+assets/js/imglib.js      image processing: exact euclidean distance transform, box blur,
+                         k-means, contour tracing, fractal noise
+assets/js/core.js        tool registry, hash routing, viewer with zoom and compare,
+                         controls, exporting, ZIP and PNG DPI
+assets/js/tools/*.js     one tool per file
+build.py                 bundles everything into a single HTML file
+test/smoke.js            Chromium smoke test
 ```
 
-Algunas decisiones que vale la pena conocer:
+A few decisions worth knowing about:
 
-- **Contraer el contorno usa un campo de distancia con signo**, no una erosión por
-  vecinos. Sale del algoritmo exacto de Felzenszwalb y Huttenlocher, así que admite
-  radios fraccionarios y bordes suaves sin escalones.
-- **El desvanecido en puntos** calcula el radio como `0,708 × celda × √cobertura`. Con
-  cobertura 1 los círculos cubren exactamente la celda, así que la zona sólida queda
-  sólida de verdad y la transición no deja alfa parcial.
-- **La vista previa trabaja a 1500 px como máximo** y escala los parámetros que están en
-  píxeles. La descarga siempre se calcula a resolución completa.
-- **El vectorizador traza las aristas reales del píxel** y encadena bucles cerrados, con
-  regla `evenodd` para que los huecos salgan bien sin lógica aparte.
+- **Shrinking the contour uses a signed distance field**, not neighbour erosion. It comes
+  from the exact Felzenszwalb–Huttenlocher algorithm, so fractional radii and soft edges
+  work without stair-stepping.
+- **The dot fade** computes the radius as `0.708 × cell × √coverage`. At full coverage the
+  circles tile the cell exactly, so solid areas stay genuinely solid and the transition
+  never leaves partial alpha behind.
+- **The preview works at 1500 px maximum** and scales any parameter expressed in pixels.
+  The download always recomputes at full resolution.
+- **The vectorizer traces the real pixel edges** and chains closed loops, using the
+  `evenodd` rule so holes come out right with no separate logic.
 
-### Añadir una herramienta
+### Adding a tool
 
-Crea `assets/js/tools/mi-herramienta.js`, regístrala y añade la etiqueta `<script>` en
-`index.html`. Para una herramienta que transforma una imagen basta con declarar los
-controles y una función `process`:
+Create `assets/js/tools/my-tool.js`, register it, and add the `<script>` tag in
+`index.html`. For a tool that transforms an image, declaring the controls and a `process`
+function is enough:
 
 ```js
 NV.register({
-  slug: 'mi-herramienta',
-  name: 'Mi herramienta',
-  group: 'Efectos de impresión',
-  tagline: 'Lo que hace, en una línea.',
+  slug: 'my-tool',
+  name: 'My tool',
+  group: 'Print effects',
+  tagline: 'What it does, in one line.',
   icon: NV.svg('<circle cx="12" cy="12" r="8"/>'),
   controls: [
-    { k: 'range', id: 'fuerza', label: 'Fuerza', min: 0, max: 100, step: 1, def: 50, unit: ' %' }
+    { k: 'range', id: 'strength', label: 'Strength', min: 0, max: 100, step: 1, def: 50, unit: ' %' }
   ],
   process: function (c) {
-    return IM.adjust(c.src, { contrast: c.p.fuerza });
+    return IM.adjust(c.src, { contrast: c.p.strength });
   }
 });
 ```
 
-El resto —zona de carga, visor, comparación, descarga— lo pone el núcleo. Para algo que
-no encaje en «entra una imagen, sale una imagen», usa `kind: 'custom'` y `render(host)`.
+The core supplies the rest — drop zone, viewer, compare, download. For anything that
+doesn't fit "an image goes in, an image comes out", use `kind: 'custom'` and `render(host)`.
 
-## Pruebas
+## Tests
 
 ```sh
 npm install
 npm test
 ```
 
-Abre las 13 herramientas en Chromium, carga imágenes de prueba generadas al vuelo, mueve
-todos los deslizadores, alterna los segmentos y las casillas, y falla si aparece
-cualquier error de consola.
+Opens all 13 tools in Chromium, loads test images generated on the fly, moves every
+slider, toggles the segments and checkboxes, and fails on any console error.
 
-## Privacidad
+## Privacy
 
-No hay servidor, ni analítica, ni peticiones de red salvo las fuentes de Google (que
-caen a las del sistema si no hay conexión). Los archivos que abres no salen de tu
-navegador.
+There is no server, no analytics, and no network requests apart from Google Fonts (which
+falls back to system faces offline). The files you open never leave your browser.
 
-## Independencia
+## Independence
 
-Proyecto propio, sin afiliación ni relación con ninguna tienda o suite comercial. Las
-herramientas se escribieron desde cero.
+Our own project, with no affiliation to or relationship with any store or commercial
+suite. The tools were written from scratch.

@@ -1,6 +1,6 @@
-/* Prueba de humo: abre las 13 herramientas en Chromium, carga una imagen,
-   mueve todos los controles y comprueba que no salte ningún error.
-   Uso: npm test   (necesita playwright y un Chromium instalado) */
+/* Smoke test: opens all 13 tools in Chromium, loads an image, moves every
+   control and fails if anything errors.
+   Usage: npm test   (needs playwright and an installed Chromium) */
 const { chromium } = require('playwright');
 const { execFileSync } = require('child_process');
 const path = require('path');
@@ -15,8 +15,8 @@ if (!fs.existsSync(path.join(SP, 'test.png'))) {
   execFileSync('python3', [path.join(__dirname, 'fixtures.py')], { cwd: SP });
 }
 
-const IMAGE_TOOLS = ['eliminar-fondos','reducir-bordes','semitransparencias','mejorador','vectorizador','redimensionar','conversor','semitonos','marcos-grunge'];
-const CUSTOM_TOOLS = ['plantillas','mockups','calculadora','medidas'];
+const IMAGE_TOOLS = ['remove-background','reduce-edges','semi-transparency','enhance','vectorize','resize','convert','halftones','frames-grunge'];
+const CUSTOM_TOOLS = ['gang-sheets','mockups','pricing','sizing'];
 
 (async () => {
   const browser = await chromium.launch(CHROME ? { executablePath: CHROME } : {});
@@ -25,7 +25,7 @@ const CUSTOM_TOOLS = ['plantillas','mockups','calculadora','medidas'];
   page.on('pageerror', e => errors.push('PAGEERROR: ' + e.message));
   page.on('console', m => {
     if (m.type() !== 'error') return;
-    if (/fonts\.g(oogleapis|static)/.test(m.text() + m.location().url)) return;   // sin red, las fuentes caen al respaldo
+    if (/fonts\.g(oogleapis|static)/.test(m.text() + m.location().url)) return;   // offline, fonts fall back
     errors.push('CONSOLE: ' + m.text());
   });
 
@@ -35,12 +35,12 @@ const CUSTOM_TOOLS = ['plantillas','mockups','calculadora','medidas'];
   await page.goto(SITE);
   await page.waitForTimeout(400);
 
-  // --- portada ---
+  // --- home ---
   const cards = await page.$$eval('.card', n => n.length);
-  console.log('LOBBY');
-  cards === 13 ? ok(`${cards} herramientas listadas`) : fail(`se esperaban 13 tarjetas, hay ${cards}`);
+  console.log('HOME');
+  cards === 13 ? ok(`${cards} tools listed`) : fail(`expected 13 cards, found ${cards}`);
   const groups = await page.$$eval('.sheet-head h2', n => n.map(x => x.textContent));
-  ok('grupos: ' + groups.join(' | '));
+  ok('groups: ' + groups.join(' | '));
 
   async function loadImage(file) {
     await page.setInputFiles('.stage input[type=file]', path.join(SP, file));
@@ -66,18 +66,16 @@ const CUSTOM_TOOLS = ['plantillas','mockups','calculadora','medidas'];
     const before = errors.length;
     await page.goto(SITE + '#/' + slug);
     await page.waitForTimeout(300);
-    await loadImage(slug === 'reducir-bordes' || slug === 'semitransparencias' ? 'recorte.png' : 'test.png');
-    if (await page.$('.rail-foot .btn')) {
-      const manual = await page.$('text=Procesar');
-      if (manual) { await manual.click(); await page.waitForTimeout(2500); }
-    }
+    await loadImage(slug === 'reduce-edges' || slug === 'semi-transparency' ? 'cutout.png' : 'test.png');
+    const manual = await page.$('.rail-foot button:text-is("Run")');
+    if (manual) { await manual.click(); await page.waitForTimeout(2500); }
     await page.waitForTimeout(500);
     const s = await resultStats();
-    if (!s) { fail('no hay lienzo de resultado'); continue; }
-    if (s.opaque + s.semi === 0) fail('resultado vacío (todo transparente)');
-    else ok(`salida ${s.w}×${s.h} · ${Math.round((s.opaque+s.semi)/s.total*100)}% con píxeles`);
+    if (!s) { fail('no result canvas'); continue; }
+    if (s.opaque + s.semi === 0) fail('empty result (fully transparent)');
+    else ok(`output ${s.w}×${s.h} · ${Math.round((s.opaque+s.semi)/s.total*100)}% has pixels`);
 
-    // mover todos los deslizadores a un extremo y otro
+    // push every slider towards one end
     const ranges = await page.$$('.rail-body input[type=range]');
     for (const r of ranges.slice(0, 6)) {
       const box = await r.boundingBox();
@@ -87,10 +85,10 @@ const CUSTOM_TOOLS = ['plantillas','mockups','calculadora','medidas'];
     }
     await page.waitForTimeout(900);
     const s2 = await resultStats();
-    if (!s2) fail('el lienzo desapareció al mover controles');
-    else ok(`tras mover controles: ${s2.w}×${s2.h}`);
+    if (!s2) fail('the canvas vanished when controls moved');
+    else ok(`after moving controls: ${s2.w}×${s2.h}`);
 
-    // alternar cada segmento y casilla
+    // toggle every segment and checkbox
     const segs = await page.$$('.rail-body .seg button');
     for (const b of segs) { await b.click().catch(()=>{}); await page.waitForTimeout(260); }
     const checks = await page.$$('.rail-body .check input');
@@ -98,7 +96,7 @@ const CUSTOM_TOOLS = ['plantillas','mockups','calculadora','medidas'];
     await page.waitForTimeout(700);
     const news = errors.slice(before);
     if (news.length) news.forEach(e => fail(e));
-    else ok('sin errores de consola');
+    else ok('no console errors');
   }
 
   for (const slug of CUSTOM_TOOLS) {
@@ -106,13 +104,13 @@ const CUSTOM_TOOLS = ['plantillas','mockups','calculadora','medidas'];
     const before = errors.length;
     await page.goto(SITE + '#/' + slug);
     await page.waitForTimeout(500);
-    if (slug === 'plantillas') {
-      await page.setInputFiles('.rail-body input[type=file]', [path.join(SP,'test.png'), path.join(SP,'recorte.png')]);
+    if (slug === 'gang-sheets') {
+      await page.setInputFiles('.rail-body input[type=file]', [path.join(SP,'test.png'), path.join(SP,'cutout.png')]);
       await page.waitForTimeout(800);
       const meta = await page.textContent('.meta');
-      ok('hoja: ' + meta);
+      ok('sheet: ' + meta);
       const rows = await page.$$eval('.rail-body input[type=number]', n => n.length);
-      ok(rows + ' campos numéricos en la lista');
+      ok(rows + ' number fields in the list');
       const cvs = await page.evaluate(() => {
         const c = document.querySelector('.stage canvas');
         const d = c.getContext('2d').getImageData(0,0,c.width,c.height).data;
@@ -120,10 +118,10 @@ const CUSTOM_TOOLS = ['plantillas','mockups','calculadora','medidas'];
         for (let i=0;i<d.length;i+=4) if (d[i]<245||d[i+1]<245||d[i+2]<245) nonwhite++;
         return { w:c.width, h:c.height, nonwhite };
       });
-      cvs.nonwhite > 1000 ? ok(`lienzo ${cvs.w}×${cvs.h} con arte colocado`) : fail('la hoja salió vacía');
+      cvs.nonwhite > 1000 ? ok(`canvas ${cvs.w}×${cvs.h} with artwork placed`) : fail('the sheet came out empty');
     }
     if (slug === 'mockups') {
-      await page.setInputFiles('.rail-body input[type=file]', path.join(SP,'recorte.png'));
+      await page.setInputFiles('.rail-body input[type=file]', path.join(SP,'cutout.png'));
       await page.waitForTimeout(700);
       const segs = await page.$$('.rail-body .seg button');
       for (const b of segs) { await b.click().catch(()=>{}); await page.waitForTimeout(300); }
@@ -134,27 +132,27 @@ const CUSTOM_TOOLS = ['plantillas','mockups','calculadora','medidas'];
         for (let i=0;i<d.length;i+=4) if (d[i]>150 && d[i+1]<160 && d[i+2]<90) ink++;
         return { w:c.width, h:c.height, ink };
       });
-      ok(`mockup ${cvs.w}×${cvs.h}, píxeles del diseño: ${cvs.ink}`);
+      ok(`mockup ${cvs.w}×${cvs.h}, artwork pixels: ${cvs.ink}`);
     }
-    if (slug === 'calculadora') {
+    if (slug === 'pricing') {
       const price = await page.textContent('.panelbox div[style*="38px"]');
-      ok('precio calculado: ' + price);
+      ok('price computed: ' + price);
       const inputs = await page.$$('.panelbox input[type=number]');
       await inputs[3].fill('999');
       await page.waitForTimeout(300);
       const price2 = await page.textContent('.panelbox div[style*="38px"]');
-      price2 !== price ? ok('recalcula al cambiar un insumo: ' + price2) : fail('no recalculó');
+      price2 !== price ? ok('recalculates when an input changes: ' + price2) : fail('did not recalculate');
     }
-    if (slug === 'medidas') {
+    if (slug === 'sizing') {
       const rows = await page.$$eval('tbody tr', n => n.length);
-      rows > 25 ? ok(rows + ' filas de referencia') : fail('faltan tablas: ' + rows);
+      rows > 25 ? ok(rows + ' reference rows') : fail('tables missing: ' + rows);
       const svg = await page.$('svg[viewBox="0 0 420 470"]');
-      svg ? ok('diagrama de colocación presente') : fail('falta el diagrama');
+      svg ? ok('placement diagram present') : fail('the diagram is missing');
     }
     const news = errors.slice(before);
-    if (news.length) news.forEach(e => fail(e)); else ok('sin errores de consola');
+    if (news.length) news.forEach(e => fail(e)); else ok('no console errors');
   }
 
-  console.log('\nTOTAL ERRORES: ' + errors.length);
+  console.log('\nTOTAL ERRORS: ' + errors.length);
   await browser.close();
 })();
