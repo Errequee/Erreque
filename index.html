@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Open Press — free DTF tools</title>
+<meta name="description" content="16 free tools for DTF printing, screen printing and cut vinyl: remove backgrounds, reduce edges, halftones, vectorize, rhinestones, gang sheets, mockups, a file check and a pricing calculator. Everything runs in your browser.">
+<meta name="color-scheme" content="dark light">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FF2D7E' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='6.2'/%3E%3Cpath d='M12 1.5v5M12 17.5v5M1.5 12h5M17.5 12h5'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap"></noscript>
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+<div class="ruler" aria-hidden="true"></div>
+
+<script src="assets/js/imglib.js"></script>
+<script src="assets/js/core.js"></script>
+
+<script src="assets/js/tools/guide.js"></script>
+<script src="assets/js/tools/dtf-check.js"></script>
+<script src="assets/js/tools/remove-background.js"></script>
+<script src="assets/js/tools/reduce-edges.js"></script>
+<script src="assets/js/tools/semi-transparency.js"></script>
+
+<script src="assets/js/tools/enhance.js"></script>
+<script src="assets/js/tools/vectorize.js"></script>
+<script src="assets/js/tools/resize.js"></script>
+<script src="assets/js/tools/convert.js"></script>
+
+<script src="assets/js/tools/halftones.js"></script>
+<script src="assets/js/tools/rhinestones.js"></script>
+<script src="assets/js/tools/frames-grunge.js"></script>
+
+<script src="assets/js/tools/gang-sheets.js"></script>
+<script src="assets/js/tools/mockups.js"></script>
+<script src="assets/js/tools/pricing.js"></script>
+<script src="assets/js/tools/sizing.js"></script>
+
+<noscript><div style="max-width:34em;margin:12vh auto;padding:0 24px;font:16px/1.6 system-ui,sans-serif">
+<h1 style="font-size:26px;margin:0 0 10px">JavaScript is switched off</h1>
+<p style="color:#666;margin:0">Open Press does all its image work in your browser, so it needs JavaScript.
+Turn it on for this page and reload.</p></div></noscript>
+
+<script>
+/* Boot defensively. Scripts above are inline, but some hosts (Cloudflare's
+   Rocket Loader, for one) rewrite or defer inline scripts, which can leave the
+   page blank with nothing to explain it. Wait for the globals, then say so
+   plainly if they never arrive - a visible message beats a white screen. */
+(function boot(tries) {
+  'use strict';
+  function fail(msg) {
+    document.body.innerHTML =
+      '<div style="max-width:36em;margin:12vh auto;padding:0 24px;' +
+      'font:16px/1.6 system-ui,-apple-system,sans-serif;color:#191512">' +
+      '<h1 style="font-size:26px;margin:0 0 10px">Open Press could not start</h1>' +
+      '<p style="color:#615749">' + msg + '</p>' +
+      '<p style="color:#615749">This page is one self-contained file. If you are viewing it ' +
+      'through a preview pane or an embed, try opening it in its own browser tab.</p></div>';
+  }
+  if (window.NV && window.IM) {
+    try { NV.start(); } catch (e) { fail('It loaded but failed while starting: ' + e.message); }
+    return;
+  }
+  if (tries > 120) { return fail('Its scripts did not run. Something on the host may be rewriting or blocking inline scripts.'); }
+  setTimeout(function () { boot(tries + 1); }, 50);
+})(0);
+</script>
+</body>
+</html>

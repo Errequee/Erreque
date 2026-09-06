@@ -1,0 +1,4028 @@
+<title>Open Press DTF</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap"></noscript>
+<style>
+/* Open Press — visual system */
+
+:root{
+  color-scheme: dark;
+  --ground:#13110F;
+  --sheet:#1B1815;
+  --raise:#232019;
+  --sunk:#0E0C0B;
+  --line:#342E27;
+  --line-soft:#262119;
+  --text:#F3EEE6;
+  --dim:#A99E8F;
+  --mute:#7B7266;
+  --accent:#FF2D7E;
+  --accent-soft:rgba(255,45,126,.14);
+  --on-accent:#1A0710;
+  --cyan:#2BBBD8;
+  --amber:#F2B01E;
+  --ok:#4FD08A;
+  --bad:#FF6B5C;
+  --check-a:#2A2521;
+  --check-b:#211D19;
+  --shadow:0 1px 2px rgba(0,0,0,.5), 0 12px 32px -18px rgba(0,0,0,.9);
+  --rail:340px;
+  /* The sticky bar, the ruler that sits above it, and the two together. The
+     workbench used to size itself against the bar alone and hang a ruler's
+     worth of itself off the bottom of the screen. */
+  --bar:56px;
+  --ruler:26px;
+  --chrome:calc(var(--bar) + var(--ruler));
+  --r-sm:3px; --r-md:6px; --r-lg:10px;
+  --f-display:'Archivo','Archivo Black',system-ui,sans-serif;
+  --f-body:'Instrument Sans','Segoe UI',system-ui,sans-serif;
+  --f-mono:'IBM Plex Mono','SFMono-Regular',Consolas,monospace;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    color-scheme: light;
+    --ground:#F4F0E7; --sheet:#FFFDF8; --raise:#EDE7DA; --sunk:#E4DDCE;
+    --line:#D8CFBD; --line-soft:#E6DFD1;
+    --text:#191512; --dim:#615749; --mute:#8A8073;
+    --accent:#D1005F; --accent-soft:rgba(209,0,95,.10); --on-accent:#FFF;
+    --cyan:#0B7C96; --amber:#9A6B00; --ok:#1E7B4E; --bad:#C0392B;
+    --check-a:#E8E1D3; --check-b:#F4F0E7;
+    --shadow:0 1px 2px rgba(80,66,44,.10), 0 12px 30px -20px rgba(80,66,44,.5);
+  }
+}
+:root[data-theme="light"]{
+  color-scheme: light;
+  --ground:#F4F0E7; --sheet:#FFFDF8; --raise:#EDE7DA; --sunk:#E4DDCE;
+  --line:#D8CFBD; --line-soft:#E6DFD1;
+  --text:#191512; --dim:#615749; --mute:#8A8073;
+  --accent:#D1005F; --accent-soft:rgba(209,0,95,.10); --on-accent:#FFF;
+  --cyan:#0B7C96; --amber:#9A6B00; --ok:#1E7B4E; --bad:#C0392B;
+  --check-a:#E8E1D3; --check-b:#F4F0E7;
+  --shadow:0 1px 2px rgba(80,66,44,.10), 0 12px 30px -20px rgba(80,66,44,.5);
+}
+
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+/* min-height, not height: a fixed 100% caps body's box at one viewport, and a
+   position:sticky child can only stick inside its parent's box - the top bar
+   would come unstuck the moment you scrolled past the first screenful. */
+html,body{min-height:100%}
+body{
+  margin:0; background:var(--ground); color:var(--text);
+  font-family:var(--f-body); font-size:15px; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{font-family:var(--f-display); font-weight:800; text-wrap:balance; margin:0; line-height:1.04; letter-spacing:-.015em}
+a{color:inherit}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.mono{font-family:var(--f-mono); font-variant-numeric:tabular-nums}
+.eyebrow{
+  font-family:var(--f-mono); font-size:11px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--mute);
+}
+
+/* ---------- top bar ---------- */
+.topbar{
+  position:sticky; top:0; z-index:60;
+  display:flex; align-items:center; gap:18px;
+  padding:0 18px; height:var(--bar);
+  background:color-mix(in srgb, var(--ground) 88%, transparent);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.brand{display:flex; align-items:center; gap:10px; text-decoration:none; flex:none}
+.brand .mark{width:26px;height:26px;flex:none;color:var(--accent)}
+.brand b{font-family:var(--f-display); font-weight:800; font-size:17px; letter-spacing:.01em; text-transform:uppercase}
+.brand span{font-family:var(--f-mono); font-size:10px; letter-spacing:.18em; color:var(--mute); text-transform:uppercase}
+.topnav{display:flex; align-items:center; gap:4px; margin-left:auto}
+.topnav a,.iconbtn{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:7px 11px; border-radius:var(--r-md); text-decoration:none;
+  font-size:13px; color:var(--dim); border:1px solid transparent;
+  background:none; cursor:pointer;
+}
+.topnav a:hover,.iconbtn:hover{color:var(--text); background:var(--raise)}
+.topnav a.on{color:var(--text); border-color:var(--line); background:var(--sheet)}
+.iconbtn svg{width:16px;height:16px}
+
+/* tools menu */
+.picker{position:relative}
+.picker-menu{
+  position:absolute; right:0; top:calc(100% + 8px); width:min(560px,92vw);
+  background:var(--sheet); border:1px solid var(--line); border-radius:var(--r-lg);
+  box-shadow:var(--shadow); padding:8px; display:none;
+  grid-template-columns:1fr 1fr; gap:2px; max-height:70vh; overflow:auto;
+}
+.picker.open .picker-menu{display:grid}
+.picker-menu a{
+  display:block; padding:8px 10px; border-radius:var(--r-md);
+  text-decoration:none; font-size:13.5px; line-height:1.3;
+}
+.picker-menu a small{display:block; color:var(--mute); font-size:11.5px}
+.picker-menu a:hover{background:var(--raise)}
+.picker-menu .head{grid-column:1/-1; padding:10px 10px 4px}
+
+/* ---------- home ---------- */
+.ruler{height:var(--ruler); border-bottom:1px solid var(--line); position:relative; overflow:hidden; background:var(--sunk)}
+.ruler::before{
+  content:''; position:absolute; inset:0;
+  background:
+    repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px 20px),
+    repeating-linear-gradient(90deg, color-mix(in srgb,var(--accent) 55%, transparent) 0 1px, transparent 1px 100px);
+  background-position:0 60%, 0 0;
+  background-size:auto 40%, auto 100%;
+  background-repeat:repeat-x;
+}
+.wrap{max-width:1180px; margin:0 auto; padding:0 22px}
+.hero{position:relative; padding:64px 0 40px; overflow:hidden}
+.hero canvas{position:absolute; inset:0; width:100%; height:100%; opacity:.5; pointer-events:none}
+.hero-in{position:relative; max-width:660px}
+.hero h1{font-size:clamp(38px,6.4vw,74px); text-transform:uppercase; letter-spacing:-.03em}
+.hero h1 em{font-style:normal; color:var(--accent)}
+.hero p{color:var(--dim); font-size:17px; margin:16px 0 0; max-width:52ch}
+.badges{display:flex; flex-wrap:wrap; gap:8px; margin-top:22px}
+.badge{
+  font-family:var(--f-mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase;
+  border:1px solid var(--line); border-radius:100px; padding:5px 11px; color:var(--dim);
+  background:var(--sheet);
+}
+.badge.hot{border-color:var(--accent); color:var(--accent); background:var(--accent-soft)}
+
+.sheet-head{
+  display:flex; align-items:flex-end; justify-content:space-between; gap:16px;
+  padding:34px 0 14px; border-bottom:1px solid var(--line); margin-bottom:22px;
+}
+.sheet-head h2{font-size:22px; text-transform:uppercase; letter-spacing:.02em}
+.grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(268px,1fr)); gap:14px; padding-bottom:26px}
+.card{
+  position:relative; display:flex; flex-direction:column; gap:9px;
+  padding:18px; text-decoration:none;
+  background:var(--sheet); border:1px solid var(--line); border-radius:var(--r-lg);
+  transition:transform .16s ease, border-color .16s ease, box-shadow .16s ease;
+}
+.card:hover{transform:translateY(-2px); border-color:color-mix(in srgb,var(--accent) 55%,var(--line)); box-shadow:var(--shadow)}
+.card .ico{width:30px;height:30px;color:var(--accent)}
+.card h3{font-size:16.5px; letter-spacing:0; font-weight:700}
+.card p{margin:0; color:var(--dim); font-size:13.5px; line-height:1.45}
+.card .num{
+  position:absolute; top:14px; right:16px;
+  font-family:var(--f-mono); font-size:11px; color:var(--mute);
+}
+.card::after{
+  content:''; position:absolute; left:0; top:14px; bottom:14px; width:2px;
+  background:var(--accent); opacity:0; border-radius:2px; transition:opacity .16s;
+}
+.card:hover::after{opacity:.85}
+
+/* ---------- workbench ---------- */
+.bench{display:grid; grid-template-columns:var(--rail) 1fr; height:calc(100vh - var(--chrome))}
+.rail{
+  border-right:1px solid var(--line); background:var(--sheet);
+  overflow-y:auto; display:flex; flex-direction:column;
+}
+.rail-head{padding:18px 18px 14px; border-bottom:1px solid var(--line-soft)}
+.rail-head h1{font-size:21px; text-transform:uppercase; letter-spacing:.01em}
+.rail-head p{margin:7px 0 0; color:var(--dim); font-size:13px}
+.rail-body{padding:14px 18px 18px; display:flex; flex-direction:column; gap:15px; flex:1}
+/* The foot is pinned to the bottom of the rail, so every row it grows by is a
+   row of controls pushed out of sight. The main action gets its own line and
+   the rest pack two-up. */
+.rail-foot{
+  position:sticky; bottom:0; padding:12px 18px;
+  border-top:1px solid var(--line); background:var(--sheet);
+  display:flex; flex-flow:row wrap; gap:8px;
+}
+/* .btn.wide is width:100%, which as a flex base puts every button on its own
+   row - hence the matching specificity here. */
+.rail-foot .btn.wide{flex:1 1 auto; min-width:0; width:auto; padding-left:12px; padding-right:12px}
+.rail-foot .btn.wide:first-child{flex-basis:100%}
+.stage{position:relative; background:var(--sunk); overflow:hidden; display:flex; flex-direction:column}
+
+/* Folded control sections. NV.collapseGroups builds these wherever the rail is
+   taller than the screen, so the affordance lives here beside every layout
+   that can trigger it, not only in the phone build. */
+.group-toggle{
+  display:flex; align-items:center; justify-content:space-between;
+  margin:2px 0 0; padding:12px 0; cursor:pointer;
+  border-top:1px solid var(--line-soft); user-select:none;
+}
+.group-toggle::after{
+  content:''; width:8px; height:8px; margin-right:3px;
+  border-right:1.5px solid var(--mute); border-bottom:1.5px solid var(--mute);
+  transform:rotate(45deg) translateY(-2px); transition:transform .18s ease;
+}
+.group-toggle.open::after{transform:rotate(-135deg) translateY(-1px)}
+.group-body{display:flex; flex-direction:column; gap:13px; padding-bottom:4px}
+
+
+/* controls */
+.field{display:flex; flex-direction:column; gap:7px}
+.field > label,.flabel{
+  display:flex; justify-content:space-between; align-items:baseline; gap:10px;
+  font-size:12.5px; color:var(--dim);
+}
+.flabel b{font-family:var(--f-mono); font-size:12px; color:var(--text); font-weight:500; font-variant-numeric:tabular-nums}
+.hint{font-size:11.5px; color:var(--mute); line-height:1.4; margin:0}
+.sep{height:1px; background:var(--line-soft); margin:2px 0}
+.group-t{
+  font-family:var(--f-mono); font-size:10.5px; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--mute); margin-top:4px;
+}
+input[type=range]{
+  -webkit-appearance:none; appearance:none; width:100%; height:18px; background:none; cursor:pointer;
+}
+input[type=range]::-webkit-slider-runnable-track{height:3px; background:var(--line); border-radius:3px}
+input[type=range]::-moz-range-track{height:3px; background:var(--line); border-radius:3px}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none; width:15px;height:15px;border-radius:50%;
+  background:var(--accent); margin-top:-6px; border:2px solid var(--sheet);
+}
+input[type=range]::-moz-range-thumb{
+  width:13px;height:13px;border-radius:50%;background:var(--accent);border:2px solid var(--sheet)
+}
+input[type=text],input[type=number],select,textarea{
+  width:100%; padding:8px 10px; background:var(--ground);
+  border:1px solid var(--line); border-radius:var(--r-md); font-size:13.5px;
+}
+input[type=number]{font-family:var(--f-mono); font-variant-numeric:tabular-nums}
+select{cursor:pointer}
+.seg{display:flex; background:var(--ground); border:1px solid var(--line); border-radius:var(--r-md); padding:2px; gap:2px}
+.seg button{
+  flex:1; padding:6px 4px; font-size:12.5px; border:0; border-radius:4px;
+  background:none; color:var(--dim); cursor:pointer; white-space:nowrap;
+}
+.seg button.on{background:var(--accent); color:var(--on-accent); font-weight:600}
+.seg button:hover:not(.on){color:var(--text)}
+.check{display:flex; align-items:center; gap:9px; font-size:13px; cursor:pointer; color:var(--dim)}
+.check input{accent-color:var(--accent); width:15px;height:15px; cursor:pointer}
+.check:hover{color:var(--text)}
+.row{display:flex; gap:8px} .row > *{flex:1; min-width:0}
+.swatch{
+  width:100%; height:32px; padding:0; border:1px solid var(--line);
+  border-radius:var(--r-md); background:none; cursor:pointer;
+}
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  padding:10px 14px; border-radius:var(--r-md); border:1px solid var(--line);
+  background:var(--raise); color:var(--text); font-size:13.5px; font-weight:600;
+  cursor:pointer; text-decoration:none; transition:filter .12s, border-color .12s;
+}
+.btn:hover{filter:brightness(1.12)}
+.btn:disabled{opacity:.45; cursor:not-allowed; filter:none}
+.btn.primary{background:var(--accent); color:var(--on-accent); border-color:var(--accent)}
+.btn.ghost{background:none}
+.btn.wide{width:100%}
+.btn svg{width:15px;height:15px}
+
+/* drop zone */
+.drop{
+  flex:1; margin:20px; border:1.5px dashed var(--line); border-radius:var(--r-lg);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:12px; text-align:center; padding:30px; cursor:pointer; color:var(--dim);
+  transition:border-color .15s, background .15s;
+}
+.drop:hover,.drop.over{border-color:var(--accent); background:var(--accent-soft); color:var(--text)}
+.drop svg{width:38px;height:38px; color:var(--mute)}
+.drop.over svg,.drop:hover svg{color:var(--accent)}
+.drop b{font-family:var(--f-display); font-size:18px; text-transform:uppercase}
+.drop small{font-size:12px; color:var(--mute); max-width:38ch}
+
+/* viewer */
+.viewer{flex:1; position:relative; overflow:hidden; cursor:grab}
+.viewer.drag{cursor:grabbing}
+.plate{position:absolute; left:50%; top:50%; transform-origin:0 0; will-change:transform}
+.plate{
+  background-image:
+    linear-gradient(45deg,var(--check-a) 25%,transparent 25%,transparent 75%,var(--check-a) 75%),
+    linear-gradient(45deg,var(--check-a) 25%,var(--check-b) 25%,var(--check-b) 75%,var(--check-a) 75%);
+  background-size:18px 18px; background-position:0 0,9px 9px;
+}
+.plate canvas{position:absolute; left:0; top:0; display:block; image-rendering:pixelated}
+.plate.smooth canvas{image-rendering:auto}
+.plate .divider{
+  position:absolute; top:0; bottom:0; width:1px; background:var(--accent);
+  box-shadow:0 0 0 1px rgba(0,0,0,.35); display:none;
+}
+.viewer.cmp .divider{display:block}
+.toolbar{
+  position:absolute; left:12px; bottom:12px; z-index:5; display:flex; gap:4px;
+  background:color-mix(in srgb,var(--sheet) 92%,transparent); backdrop-filter:blur(8px);
+  border:1px solid var(--line); border-radius:var(--r-md); padding:4px;
+}
+.toolbar button{
+  min-width:32px; height:30px; padding:0 9px; border:0; border-radius:4px;
+  background:none; color:var(--dim); cursor:pointer; font-size:12px;
+  font-family:var(--f-mono); display:inline-flex; align-items:center; justify-content:center;
+}
+.toolbar button:hover{background:var(--raise); color:var(--text)}
+.toolbar button.on{background:var(--accent); color:var(--on-accent)}
+.meta{
+  position:absolute; right:12px; bottom:12px; z-index:5;
+  font-family:var(--f-mono); font-size:11px; color:var(--mute);
+  background:color-mix(in srgb,var(--sheet) 92%,transparent);
+  border:1px solid var(--line); border-radius:var(--r-md); padding:6px 10px;
+}
+.busy{
+  position:absolute; inset:0; z-index:8; display:none;
+  align-items:center; justify-content:center; flex-direction:column; gap:12px;
+  background:color-mix(in srgb,var(--sunk) 72%,transparent);
+  font-family:var(--f-mono); font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--dim);
+}
+.busy.on{display:flex}
+.spin{
+  width:28px;height:28px;border:2px solid var(--line); border-top-color:var(--accent);
+  border-radius:50%; animation:sp .7s linear infinite;
+}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){
+  .spin{animation-duration:2s}
+  .card{transition:none}
+}
+
+/* reference pages */
+.doc{padding:30px 0 60px}
+.doc h2{font-size:26px; text-transform:uppercase; margin:34px 0 12px}
+.doc h3{font-size:17px; margin:22px 0 8px}
+.doc p{color:var(--dim); max-width:68ch}
+.panelbox{background:var(--sheet); border:1px solid var(--line); border-radius:var(--r-lg); padding:20px}
+table{width:100%; border-collapse:collapse; font-size:13.5px}
+th,td{text-align:left; padding:9px 12px; border-bottom:1px solid var(--line-soft)}
+th{font-family:var(--f-mono); font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--mute); font-weight:400}
+td.num,th.num{text-align:right; font-family:var(--f-mono); font-variant-numeric:tabular-nums}
+tbody tr:hover{background:var(--raise)}
+.scroll-x{overflow-x:auto}
+.pill{
+  display:inline-block; font-family:var(--f-mono); font-size:10.5px; letter-spacing:.08em;
+  text-transform:uppercase; padding:3px 8px; border-radius:100px;
+  border:1px solid var(--line); color:var(--dim);
+}
+.pill.c{color:var(--cyan); border-color:color-mix(in srgb,var(--cyan) 50%,transparent)}
+.pill.m{color:var(--accent); border-color:color-mix(in srgb,var(--accent) 50%,transparent)}
+.pill.y{color:var(--amber); border-color:color-mix(in srgb,var(--amber) 50%,transparent)}
+
+/* notices */
+.toasts{position:fixed; right:16px; bottom:16px; z-index:200; display:flex; flex-direction:column; gap:8px}
+.toast{
+  background:var(--sheet); border:1px solid var(--line); border-left:3px solid var(--accent);
+  border-radius:var(--r-md); padding:11px 15px; font-size:13px; box-shadow:var(--shadow);
+  max-width:340px; animation:in .22s ease;
+}
+.toast.ok{border-left-color:var(--ok)} .toast.bad{border-left-color:var(--bad)}
+@keyframes in{from{opacity:0; transform:translateY(6px)}}
+
+.foot{border-top:1px solid var(--line); padding:26px 0 40px; color:var(--mute); font-size:12.5px}
+.foot a{color:var(--dim)}
+.foot .cols{display:flex; gap:30px; flex-wrap:wrap; justify-content:space-between}
+
+@media (max-width:900px){
+  .bench{grid-template-columns:1fr; height:auto}
+  .rail{border-right:0; border-bottom:1px solid var(--line); max-height:none; overflow:visible; order:2}
+  /* The control rail runs far longer than a phone screen, so pin the preview
+     under the top bar: you can see what a slider is doing while you drag it. */
+  .stage{
+    order:1; height:46vh; min-height:230px;
+    position:sticky; top:var(--bar); z-index:5;
+    border-bottom:1px solid var(--line);
+  }
+  .rail-foot{position:sticky; bottom:0}
+  .picker-menu{grid-template-columns:1fr}
+}
+@media (max-width:900px) and (orientation:landscape){
+  .stage{height:62vh}
+}
+@media print{
+  .topbar,.foot,.ruler,.no-print{display:none}
+  body{background:#fff; color:#000}
+  .panelbox{border-color:#ccc}
+}
+
+</style>
+<style>
+@media (max-width:900px){
+/* Phone layer, on top of app.css: mobile.html loads it outright, and the
+   responsive build behind (max-width:900px).
+   A phone is not a small desktop. The folding rail and the pinned preview are
+   in app.css because the behaviour is shared; what is here is the sizing that
+   only makes sense under a thumb. */
+
+/* --- chrome --- */
+:root{--bar:52px; --ruler:14px}   /* --chrome follows from these */
+.topbar{padding:0 12px}
+.brand b{font-size:15px}
+.brand span{font-size:9px}
+.topnav a,.iconbtn{padding:9px 10px; min-height:42px}
+
+/* The menu is pinned to the viewport, not to the button it hangs off:
+   anchoring it to the button pushed it off the left edge on a phone. */
+.picker-menu{
+  position:fixed; left:10px; right:10px; top:calc(var(--bar) + 4px);
+  /* The bar's backdrop-filter makes it the containing block for this fixed box,
+     so `top` is measured from the bar, not the viewport - the cap has to pay for
+     the ruler above it too. svh, not dvh, so it still fits with the browser
+     chrome fully out. */
+  width:auto; max-height:calc(100svh - var(--ruler) - var(--bar) - 16px);
+  grid-template-columns:1fr; gap:0;
+}
+.picker-menu a{padding:13px 12px; border-bottom:1px solid var(--line-soft)}
+.picker-menu a:last-child{border-bottom:0}
+
+/* --- home --- */
+.hero{padding:26px 0 20px}
+.hero h1{font-size:clamp(30px,10vw,44px)}
+.hero p{font-size:15px; margin-top:12px}
+.hero canvas{opacity:.32}
+.badges{gap:6px; margin-top:16px}
+.badge{font-size:10px; padding:4px 9px}
+.wrap{padding:0 14px}
+.sheet-head{padding:24px 0 10px}
+.sheet-head h2{font-size:18px}
+.grid{grid-template-columns:1fr; gap:10px}
+.card{padding:15px}
+.card h3{font-size:16px}
+.card .num{top:12px; right:13px}
+
+/* --- workbench --- */
+.rail-head{padding:14px 14px 12px}
+.rail-head h1{font-size:18px}
+.rail-head p{font-size:12.5px}
+.rail-body{padding:12px 14px 16px; gap:13px}
+.rail-foot{padding:9px 14px calc(9px + env(safe-area-inset-bottom))}
+.rail-foot .btn.wide{min-height:46px; padding-left:10px; padding-right:10px}
+
+/* --- thumb-sized targets --- */
+input[type=range]{height:34px}
+input[type=range]::-webkit-slider-thumb{width:22px;height:22px;margin-top:-10px}
+input[type=range]::-moz-range-thumb{width:20px;height:20px}
+.seg button{min-height:42px; font-size:13px}
+.btn{min-height:48px; font-size:14.5px}
+.check{min-height:40px}
+.check input{width:19px;height:19px}
+input[type=text],input[type=number],select{min-height:44px; font-size:16px}  /* 16px stops iOS zooming on focus */
+.swatch{height:44px}
+.toolbar button{min-width:40px; height:38px}
+
+/* --- reference pages --- */
+.doc{padding:18px 0 40px}
+.doc h1{font-size:26px !important}
+.doc h2{font-size:20px; margin:24px 0 10px}
+.panelbox{padding:15px}
+table{font-size:12.5px}
+th,td{padding:8px 9px}
+.doc > div[style*="grid-template-columns"]{grid-template-columns:1fr !important}
+.panelbox[style*="sticky"]{position:static !important}
+
+}
+@media (min-width:901px){
+/* Desktop layer, on top of app.css: computer.html loads it outright, and the
+   responsive build behind (min-width:901px).
+   None of the phone compromises: a permanent side rail, a full-height stage,
+   and nothing folded away. */
+
+.bench{grid-template-columns:360px 1fr}
+.rail-body{padding:16px 20px 20px}
+.rail-head{padding:20px 20px 15px}
+.rail-foot{padding:13px 20px}
+
+/* Room to actually see the artwork. */
+.stage{min-height:calc(100vh - var(--chrome))}
+.hero{padding:76px 0 46px}
+.grid{grid-template-columns:repeat(auto-fill,minmax(272px,1fr))}
+
+/* Pointer-only affordances are safe to lean on here. */
+.card:hover{transform:translateY(-3px)}
+.picker-menu{width:min(600px,90vw)}
+
+}
+
+</style>
+<div class="ruler" aria-hidden="true"></div>
+
+<script>
+/* Image-processing primitives. Everything runs in the browser. */
+(function (root) {
+  'use strict';
+  var IM = {};
+  var INF = 1e20;
+
+  IM.clamp = function (v, a, b) { return v < a ? a : v > b ? b : v; };
+
+  IM.copy = function (id) {
+    return new ImageData(new Uint8ClampedArray(id.data), id.width, id.height);
+  };
+
+  IM.blank = function (w, h) { return new ImageData(w, h); };
+
+  IM.canvasOf = function (id) {
+    var c = document.createElement('canvas');
+    c.width = id.width; c.height = id.height;
+    c.getContext('2d').putImageData(id, 0, 0);
+    return c;
+  };
+
+  IM.dataOf = function (src, w, h) {
+    w = w || src.naturalWidth || src.width;
+    h = h || src.naturalHeight || src.height;
+    var c = document.createElement('canvas');
+    c.width = w; c.height = h;
+    var x = c.getContext('2d', { willReadFrequently: true });
+    x.drawImage(src, 0, 0, w, h);
+    return x.getImageData(0, 0, w, h);
+  };
+
+  /* Progressive rescaling: when shrinking, halving at a time preserves detail. */
+  IM.resize = function (src, w, h, smooth) {
+    w = Math.max(1, Math.round(w)); h = Math.max(1, Math.round(h));
+    var cur = src.width ? src : IM.canvasOf(src);
+    if (src instanceof ImageData) cur = IM.canvasOf(src);
+    if (smooth === false) {
+      var o = document.createElement('canvas'); o.width = w; o.height = h;
+      var oc = o.getContext('2d'); oc.imageSmoothingEnabled = false;
+      oc.drawImage(cur, 0, 0, w, h);
+      return o;
+    }
+    while (cur.width > w * 2 && cur.height > h * 2) {
+      var half = document.createElement('canvas');
+      half.width = Math.max(w, cur.width >> 1);
+      half.height = Math.max(h, cur.height >> 1);
+      var hc = half.getContext('2d');
+      hc.imageSmoothingEnabled = true; hc.imageSmoothingQuality = 'high';
+      hc.drawImage(cur, 0, 0, half.width, half.height);
+      cur = half;
+    }
+    var out = document.createElement('canvas'); out.width = w; out.height = h;
+    var ctx = out.getContext('2d');
+    ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(cur, 0, 0, w, h);
+    return out;
+  };
+
+  /* --- Exact distance transform (Felzenszwalb & Huttenlocher) --- */
+  function dt1d(f, d, v, z, idx, srcIdx, n) {
+    var k = 0, q, s;
+    v[0] = 0; z[0] = -INF; z[1] = INF;
+    for (q = 1; q < n; q++) {
+      s = ((f[q] + q * q) - (f[v[k]] + v[k] * v[k])) / (2 * q - 2 * v[k]);
+      while (s <= z[k]) {
+        k--;
+        s = ((f[q] + q * q) - (f[v[k]] + v[k] * v[k])) / (2 * q - 2 * v[k]);
+      }
+      k++; v[k] = q; z[k] = s; z[k + 1] = INF;
+    }
+    k = 0;
+    for (q = 0; q < n; q++) {
+      while (z[k + 1] < q) k++;
+      d[q] = (q - v[k]) * (q - v[k]) + f[v[k]];
+      if (idx) idx[q] = srcIdx ? srcIdx[v[k]] : v[k];
+    }
+  }
+
+  /* seeds: Uint8Array (1 = seed). Returns squared distance and, optionally, the index of the nearest seed pixel. */
+  IM.edt = function (seeds, w, h, wantIndex) {
+    var n = w * h, i, x, y;
+    var f = new Float64Array(Math.max(w, h));
+    var d = new Float64Array(Math.max(w, h));
+    var v = new Int32Array(Math.max(w, h) + 1);
+    var z = new Float64Array(Math.max(w, h) + 1);
+    var dist = new Float64Array(n);
+    var near = wantIndex ? new Int32Array(n) : null;
+    var col = wantIndex ? new Int32Array(Math.max(w, h)) : null;
+    var rowSrc = wantIndex ? new Int32Array(Math.max(w, h)) : null;
+
+    for (x = 0; x < w; x++) {
+      for (y = 0; y < h; y++) f[y] = seeds[y * w + x] ? 0 : INF;
+      dt1d(f, d, v, z, col, null, h);
+      for (y = 0; y < h; y++) {
+        dist[y * w + x] = d[y];
+        if (near) near[y * w + x] = col[y] * w + x;
+      }
+    }
+    for (y = 0; y < h; y++) {
+      for (x = 0; x < w; x++) {
+        f[x] = dist[y * w + x];
+        if (near) rowSrc[x] = near[y * w + x];
+      }
+      dt1d(f, d, v, z, col, rowSrc, w);
+      for (x = 0; x < w; x++) {
+        dist[y * w + x] = d[x];
+        if (near) near[y * w + x] = col[x];
+      }
+    }
+    return { dist: dist, near: near };
+  };
+
+  /* Signed distance field from the alpha edge. Positive = inside. */
+  IM.alphaSDF = function (id, thr) {
+    var w = id.width, h = id.height, n = w * h, p = id.data, i;
+    var inside = new Uint8Array(n), outside = new Uint8Array(n);
+    thr = thr == null ? 128 : thr;
+    for (i = 0; i < n; i++) {
+      if (p[i * 4 + 3] >= thr) inside[i] = 1; else outside[i] = 1;
+    }
+    var din = IM.edt(outside, w, h).dist;   // inside  -> distance to the outside
+    var dout = IM.edt(inside, w, h).dist;   // outside -> distance to the inside
+    var sdf = new Float32Array(n);
+    for (i = 0; i < n; i++) {
+      sdf[i] = inside[i] ? Math.sqrt(din[i]) - 0.5 : -(Math.sqrt(dout[i]) - 0.5);
+    }
+    return sdf;
+  };
+
+  /* Contracts (radius > 0) or expands (radius < 0) the alpha with a soft edge. */
+  IM.reshapeAlpha = function (id, radius, feather, thr) {
+    var w = id.width, h = id.height, n = w * h, p = id.data;
+    var sdf = IM.alphaSDF(id, thr);
+    var f = Math.max(0.02, feather);
+    var out = IM.copy(id), q = out.data, i, a;
+    for (i = 0; i < n; i++) {
+      a = IM.clamp(0.5 + (sdf[i] - radius) / f, 0, 1) * 255;
+      q[i * 4 + 3] = radius >= 0 ? Math.min(p[i * 4 + 3], a) : Math.max(p[i * 4 + 3], a);
+    }
+    return out;
+  };
+
+  /* Pushes the colour of opaque pixels outward: kills halos and makes expanding possible. */
+  IM.bleed = function (id, thr) {
+    var w = id.width, h = id.height, n = w * h, p = id.data, i;
+    thr = thr == null ? 250 : thr;
+    var solid = new Uint8Array(n), any = 0;
+    for (i = 0; i < n; i++) if (p[i * 4 + 3] >= thr) { solid[i] = 1; any = 1; }
+    if (!any) return IM.copy(id);
+    var near = IM.edt(solid, w, h, true).near;
+    var out = IM.copy(id), q = out.data, s;
+    for (i = 0; i < n; i++) {
+      if (solid[i]) continue;
+      s = near[i] * 4;
+      q[i * 4] = p[s]; q[i * 4 + 1] = p[s + 1]; q[i * 4 + 2] = p[s + 2];
+    }
+    return out;
+  };
+
+  /* Defringe: replaces edge-pixel colour with that of the nearest solid pixel. */
+  IM.defringe = function (id, amount, thr) {
+    if (amount <= 0) return IM.copy(id);
+    var bled = IM.bleed(id, thr);
+    var p = id.data, b = bled.data, n = id.width * id.height, i, a, k, t;
+    var out = IM.copy(id), q = out.data;
+    for (i = 0; i < n; i++) {
+      a = p[i * 4 + 3];
+      if (a === 0 || a >= thr) continue;
+      t = (1 - a / thr) * amount;               // the more translucent, the stronger the fix
+      for (k = 0; k < 3; k++) q[i * 4 + k] = p[i * 4 + k] * (1 - t) + b[i * 4 + k] * t;
+    }
+    return out;
+  };
+
+  /* Approximate gaussian blur (3 box passes) over a Float32 channel.
+     Buffers come from outside: on big images allocating here costs more than the filter. */
+  IM.blurChannel = function (src, w, h, r, scratch) {
+    if (r < 0.4) return src;
+    var sc = scratch || {};
+    if (!sc.a || sc.a.length !== src.length) sc.a = new Float32Array(src.length);
+    if (!sc.b || sc.b.length !== src.length) sc.b = new Float32Array(src.length);
+    var boxes = boxSizes(r, 3), a = src, b = sc.a, i, t;
+    for (i = 0; i < 3; i++) { boxBlur(a, b, w, h, (boxes[i] - 1) / 2, sc.b); t = a; a = b; b = t; }
+    return a;
+  };
+  function boxSizes(sigma, n) {
+    var wIdeal = Math.sqrt((12 * sigma * sigma / n) + 1);
+    var wl = Math.floor(wIdeal); if (wl % 2 === 0) wl--;
+    var wu = wl + 2;
+    var mIdeal = (12 * sigma * sigma - n * wl * wl - 4 * n * wl - 3 * n) / (-4 * wl - 4);
+    var m = Math.round(mIdeal), sizes = [], i;
+    for (i = 0; i < n; i++) sizes.push(i < m ? wl : wu);
+    return sizes;
+  }
+  function boxBlur(src, dst, w, h, r, mid) {
+    var i, j, x, y, sum;
+    if (!mid || mid.length !== src.length) mid = new Float32Array(src.length);
+    r = Math.max(0, Math.round(r));
+    var iarr = 1 / (r + r + 1);
+    for (y = 0; y < h; y++) {
+      var ti = y * w, li = ti, ri = ti + r;
+      var fv = src[ti], lv = src[ti + w - 1];
+      sum = (r + 1) * fv;
+      for (j = 0; j < r; j++) sum += src[ti + j];
+      for (j = 0; j <= r; j++) { sum += src[ri++] - fv; mid[ti++] = sum * iarr; }
+      for (j = r + 1; j < w - r; j++) { sum += src[ri++] - src[li++]; mid[ti++] = sum * iarr; }
+      for (j = w - r; j < w; j++) { sum += lv - src[li++]; mid[ti++] = sum * iarr; }
+    }
+    for (x = 0; x < w; x++) {
+      var ti2 = x, li2 = ti2, ri2 = ti2 + r * w;
+      var fv2 = mid[x], lv2 = mid[x + w * (h - 1)];
+      sum = (r + 1) * fv2;
+      for (j = 0; j < r; j++) sum += mid[ti2 + j * w];
+      for (j = 0; j <= r; j++) { sum += mid[ri2] - fv2; dst[ti2] = sum * iarr; ri2 += w; ti2 += w; }
+      for (j = r + 1; j < h - r; j++) { sum += mid[ri2] - mid[li2]; dst[ti2] = sum * iarr; li2 += w; ri2 += w; ti2 += w; }
+      for (j = h - r; j < h; j++) { sum += lv2 - mid[li2]; dst[ti2] = sum * iarr; li2 += w; ti2 += w; }
+    }
+    return dst;
+  }
+
+  /* Unsharp mask over luminance, respecting alpha. */
+  IM.unsharp = function (id, amount, radius, threshold) {
+    if (amount <= 0) return IM.copy(id);
+    var w = id.width, h = id.height, n = w * h, p = id.data, i, k;
+    var out = IM.copy(id), q = out.data;
+    var chan = new Float32Array(n), sc = {};
+    for (k = 0; k < 3; k++) {                     // one channel at a time: less memory on big images
+      for (i = 0; i < n; i++) chan[i] = p[i * 4 + k];
+      var bl = IM.blurChannel(chan, w, h, radius, sc);
+      for (i = 0; i < n; i++) {
+        var d = p[i * 4 + k] - bl[i];
+        if (d > -threshold && d < threshold) continue;
+        q[i * 4 + k] = IM.clamp(p[i * 4 + k] + d * amount, 0, 255);
+      }
+    }
+    return out;
+  };
+
+  IM.median3 = function (id) {
+    var w = id.width, h = id.height, p = id.data;
+    var out = IM.copy(id), q = out.data, x, y, k, i, j, buf = new Array(9);
+    for (y = 0; y < h; y++) for (x = 0; x < w; x++) {
+      for (k = 0; k < 3; k++) {
+        var c = 0;
+        for (j = -1; j <= 1; j++) for (i = -1; i <= 1; i++) {
+          var xx = IM.clamp(x + i, 0, w - 1), yy = IM.clamp(y + j, 0, h - 1);
+          buf[c++] = p[(yy * w + xx) * 4 + k];
+        }
+        buf.sort(function (a, b) { return a - b; });
+        q[(y * w + x) * 4 + k] = buf[4];
+      }
+    }
+    return out;
+  };
+
+  IM.adjust = function (id, o) {
+    var p = id.data, n = id.width * id.height, i, k, v;
+    var out = IM.copy(id), q = out.data;
+    var c = (o.contrast || 0) / 100, b = (o.brightness || 0) * 2.55, s = 1 + (o.saturation || 0) / 100;
+    var cf = (259 * (c * 255 + 255)) / (255 * (259 - c * 255));
+    for (i = 0; i < n; i++) {
+      var r = p[i * 4], g = p[i * 4 + 1], bl = p[i * 4 + 2];
+      var lum = 0.2126 * r + 0.7152 * g + 0.0722 * bl;
+      r = lum + (r - lum) * s; g = lum + (g - lum) * s; bl = lum + (bl - lum) * s;
+      var arr = [r, g, bl];
+      for (k = 0; k < 3; k++) {
+        v = cf * (arr[k] - 128) + 128 + b;
+        q[i * 4 + k] = IM.clamp(v, 0, 255);
+      }
+    }
+    return out;
+  };
+
+  /* Alpha curve: below lo -> 0, above hi -> 255. */
+  IM.alphaLevels = function (id, lo, hi, hard) {
+    var p = id.data, n = id.width * id.height, i, a;
+    var out = IM.copy(id), q = out.data;
+    var span = Math.max(1, hi - lo);
+    for (i = 0; i < n; i++) {
+      a = p[i * 4 + 3];
+      if (a <= lo) a = 0;
+      else if (a >= hi) a = 255;
+      else a = hard ? (a > (lo + hi) / 2 ? 255 : 0) : ((a - lo) / span) * 255;
+      q[i * 4 + 3] = a;
+    }
+    return out;
+  };
+
+  IM.colorDistance = function (r1, g1, b1, r2, g2, b2) {
+    var rm = (r1 + r2) / 2;
+    var dr = r1 - r2, dg = g1 - g2, db = b1 - b2;
+    return Math.sqrt((2 + rm / 256) * dr * dr + 4 * dg * dg + (2 + (255 - rm) / 256) * db * db) / 3;
+  };
+
+  /* Fill by colour proximity from seed points. Returns the background mask. */
+  IM.floodMask = function (id, seeds, tol, contiguous) {
+    var w = id.width, h = id.height, n = w * h, p = id.data;
+    var mask = new Uint8Array(n), i, s;
+    if (!contiguous) {
+      for (i = 0; i < n; i++) {
+        for (s = 0; s < seeds.length; s++) {
+          var si = seeds[s] * 4;
+          if (IM.colorDistance(p[i * 4], p[i * 4 + 1], p[i * 4 + 2], p[si], p[si + 1], p[si + 2]) <= tol) { mask[i] = 1; break; }
+        }
+      }
+      return mask;
+    }
+    var stack = [], seen = new Uint8Array(n);
+    for (s = 0; s < seeds.length; s++) { stack.push(seeds[s]); seen[seeds[s]] = 1; }
+    var refs = seeds.map(function (k) { return [p[k * 4], p[k * 4 + 1], p[k * 4 + 2]]; });
+    while (stack.length) {
+      var cur = stack.pop(), ci = cur * 4, ok = false;
+      for (s = 0; s < refs.length; s++) {
+        if (IM.colorDistance(p[ci], p[ci + 1], p[ci + 2], refs[s][0], refs[s][1], refs[s][2]) <= tol) { ok = true; break; }
+      }
+      if (!ok) continue;
+      mask[cur] = 1;
+      var x = cur % w, y = (cur / w) | 0;
+      if (x > 0 && !seen[cur - 1]) { seen[cur - 1] = 1; stack.push(cur - 1); }
+      if (x < w - 1 && !seen[cur + 1]) { seen[cur + 1] = 1; stack.push(cur + 1); }
+      if (y > 0 && !seen[cur - w]) { seen[cur - w] = 1; stack.push(cur - w); }
+      if (y < h - 1 && !seen[cur + w]) { seen[cur + w] = 1; stack.push(cur + w); }
+    }
+    return mask;
+  };
+
+  /* k-means quantization over opaque pixels. */
+  IM.quantize = function (id, k, iters) {
+    var p = id.data, n = id.width * id.height, i, j, c;
+    iters = iters || 12;
+    var idx = [], step = Math.max(1, Math.floor(n / 24000));
+    for (i = 0; i < n; i += step) if (p[i * 4 + 3] > 128) idx.push(i);
+    if (!idx.length) return { palette: [[0, 0, 0]], map: new Int32Array(n) };
+    k = Math.min(k, idx.length);
+    var cen = [], used = {};
+    cen.push([p[idx[0] * 4], p[idx[0] * 4 + 1], p[idx[0] * 4 + 2]]);
+    while (cen.length < k) {                       // k-means++ style seeding
+      var best = -1, bestD = -1;
+      for (j = 0; j < idx.length; j += Math.max(1, (idx.length / 900) | 0)) {
+        var q = idx[j] * 4, dmin = 1e9;
+        for (c = 0; c < cen.length; c++) {
+          var d = IM.colorDistance(p[q], p[q + 1], p[q + 2], cen[c][0], cen[c][1], cen[c][2]);
+          if (d < dmin) dmin = d;
+        }
+        if (dmin > bestD && !used[idx[j]]) { bestD = dmin; best = idx[j]; }
+      }
+      if (best < 0) break;
+      used[best] = 1;
+      cen.push([p[best * 4], p[best * 4 + 1], p[best * 4 + 2]]);
+    }
+    var sums = [];
+    for (var it = 0; it < iters; it++) {
+      sums = cen.map(function () { return [0, 0, 0, 0]; });
+      for (j = 0; j < idx.length; j++) {
+        var o = idx[j] * 4, bi = 0, bd = 1e9;
+        for (c = 0; c < cen.length; c++) {
+          var dd = IM.colorDistance(p[o], p[o + 1], p[o + 2], cen[c][0], cen[c][1], cen[c][2]);
+          if (dd < bd) { bd = dd; bi = c; }
+        }
+        sums[bi][0] += p[o]; sums[bi][1] += p[o + 1]; sums[bi][2] += p[o + 2]; sums[bi][3]++;
+      }
+      for (c = 0; c < cen.length; c++) if (sums[c][3]) {
+        cen[c] = [sums[c][0] / sums[c][3], sums[c][1] / sums[c][3], sums[c][2] / sums[c][3]];
+      }
+    }
+    cen = cen.map(function (v) { return [Math.round(v[0]), Math.round(v[1]), Math.round(v[2])]; });
+    var map = new Int32Array(n);
+    for (i = 0; i < n; i++) {
+      if (p[i * 4 + 3] <= 128) { map[i] = -1; continue; }
+      var o2 = i * 4, b2 = 0, d2 = 1e9;
+      for (c = 0; c < cen.length; c++) {
+        var e = IM.colorDistance(p[o2], p[o2 + 1], p[o2 + 2], cen[c][0], cen[c][1], cen[c][2]);
+        if (e < d2) { d2 = e; b2 = c; }
+      }
+      map[i] = b2;
+    }
+    return { palette: cen, map: map };
+  };
+
+  /* Exact contour of a mask: closed loops along the pixel edges. */
+  IM.traceMask = function (mask, w, h) {
+    var gw = w + 1, edges = new Map(), i, x, y;
+    function vid(x, y) { return y * gw + x; }
+    function add(x1, y1, x2, y2) {
+      var a = vid(x1, y1), b = vid(x2, y2);
+      if (!edges.has(a)) edges.set(a, []);
+      edges.get(a).push(b);
+    }
+    for (y = 0; y < h; y++) for (x = 0; x < w; x++) {
+      if (!mask[y * w + x]) continue;
+      if (y === 0 || !mask[(y - 1) * w + x]) add(x, y, x + 1, y);
+      if (x === w - 1 || !mask[y * w + x + 1]) add(x + 1, y, x + 1, y + 1);
+      if (y === h - 1 || !mask[(y + 1) * w + x]) add(x + 1, y + 1, x, y + 1);
+      if (x === 0 || !mask[y * w + x - 1]) add(x, y + 1, x, y);
+    }
+    var loops = [];
+    edges.forEach(function (list, start) {
+      while (list.length) {
+        var loop = [], cur = start, prev = -1, guard = 0;
+        while (guard++ < 4e6) {
+          var outs = edges.get(cur);
+          if (!outs || !outs.length) break;
+          var pick = 0;
+          if (outs.length > 1 && prev >= 0) {                 // untangles diagonal knots
+            var pdx = (cur % gw) - (prev % gw), pdy = ((cur / gw) | 0) - ((prev / gw) | 0);
+            var bestScore = -9;
+            for (var t = 0; t < outs.length; t++) {
+              var ndx = (outs[t] % gw) - (cur % gw), ndy = ((outs[t] / gw) | 0) - ((cur / gw) | 0);
+              var cross = pdx * ndy - pdy * ndx, dot = pdx * ndx + pdy * ndy;
+              var score = cross > 0 ? 2 : (dot > 0 ? 1 : 0);
+              if (score > bestScore) { bestScore = score; pick = t; }
+            }
+          }
+          var nxt = outs.splice(pick, 1)[0];
+          loop.push([cur % gw, (cur / gw) | 0]);
+          prev = cur; cur = nxt;
+          if (cur === start) break;
+        }
+        if (loop.length > 3) loops.push(loop);
+      }
+    });
+    return loops;
+  };
+
+  IM.dropCollinear = function (pts) {
+    var out = [], n = pts.length, i;
+    for (i = 0; i < n; i++) {
+      var a = pts[(i - 1 + n) % n], b = pts[i], c = pts[(i + 1) % n];
+      if ((b[0] - a[0]) * (c[1] - b[1]) !== (b[1] - a[1]) * (c[0] - b[0])) out.push(b);
+    }
+    return out.length > 2 ? out : pts;
+  };
+
+  IM.rdp = function (pts, eps) {
+    if (eps <= 0 || pts.length < 4) return pts;
+    function seg(p, a, b) {
+      var dx = b[0] - a[0], dy = b[1] - a[1], L = dx * dx + dy * dy;
+      var t = L ? ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / L : 0;
+      t = IM.clamp(t, 0, 1);
+      var ux = a[0] + t * dx - p[0], uy = a[1] + t * dy - p[1];
+      return Math.sqrt(ux * ux + uy * uy);
+    }
+    function walk(list) {
+      if (list.length < 3) return list;
+      var maxD = -1, idx = 0;
+      for (var i = 1; i < list.length - 1; i++) {
+        var d = seg(list[i], list[0], list[list.length - 1]);
+        if (d > maxD) { maxD = d; idx = i; }
+      }
+      if (maxD <= eps) return [list[0], list[list.length - 1]];
+      return walk(list.slice(0, idx + 1)).slice(0, -1).concat(walk(list.slice(idx)));
+    }
+    var closed = pts.concat([pts[0]]);
+    var r = walk(closed);
+    r.pop();
+    return r.length > 2 ? r : pts;
+  };
+
+  /* Closed polygon -> SVG path, straight or smoothed with Catmull-Rom. */
+  IM.pathData = function (pts, smooth, dec) {
+    var n = pts.length, i, d, f = function (v) { return +v.toFixed(dec == null ? 2 : dec); };
+    if (n < 3) return '';
+    if (!smooth) {
+      d = 'M' + f(pts[0][0]) + ' ' + f(pts[0][1]);
+      for (i = 1; i < n; i++) d += 'L' + f(pts[i][0]) + ' ' + f(pts[i][1]);
+      return d + 'Z';
+    }
+    var k = smooth / 6;
+    d = 'M' + f(pts[0][0]) + ' ' + f(pts[0][1]);
+    for (i = 0; i < n; i++) {
+      var p0 = pts[(i - 1 + n) % n], p1 = pts[i], p2 = pts[(i + 1) % n], p3 = pts[(i + 2) % n];
+      d += 'C' + f(p1[0] + (p2[0] - p0[0]) * k) + ' ' + f(p1[1] + (p2[1] - p0[1]) * k) + ',' +
+        f(p2[0] - (p3[0] - p1[0]) * k) + ' ' + f(p2[1] - (p3[1] - p1[1]) * k) + ',' +
+        f(p2[0]) + ' ' + f(p2[1]);
+    }
+    return d + 'Z';
+  };
+
+  IM.hex = function (rgb) {
+    return '#' + rgb.map(function (v) { return ('0' + IM.clamp(Math.round(v), 0, 255).toString(16)).slice(-2); }).join('');
+  };
+  IM.rgb = function (hex) {
+    var m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex.trim());
+    return m ? [parseInt(m[1], 16), parseInt(m[2], 16), parseInt(m[3], 16)] : [0, 0, 0];
+  };
+
+  /* Value noise + fbm, for grunge textures. */
+  IM.noise = function (w, h, scale, octaves, seed) {
+    var out = new Float32Array(w * h), x, y, o;
+    var rnd = mulberry(seed || 1);
+    var perm = new Float32Array(4096);
+    for (x = 0; x < 4096; x++) perm[x] = rnd();
+    function val(ix, iy) { return perm[((ix * 73856093) ^ (iy * 19349663)) & 4095]; }
+    function smooth(fx, fy) {
+      var ix = Math.floor(fx), iy = Math.floor(fy), tx = fx - ix, ty = fy - iy;
+      tx = tx * tx * (3 - 2 * tx); ty = ty * ty * (3 - 2 * ty);
+      var a = val(ix, iy), b = val(ix + 1, iy), c = val(ix, iy + 1), d = val(ix + 1, iy + 1);
+      return (a * (1 - tx) + b * tx) * (1 - ty) + (c * (1 - tx) + d * tx) * ty;
+    }
+    for (y = 0; y < h; y++) for (x = 0; x < w; x++) {
+      var amp = 1, freq = 1 / Math.max(1, scale), sum = 0, norm = 0;
+      for (o = 0; o < octaves; o++) {
+        sum += smooth(x * freq, y * freq) * amp;
+        norm += amp; amp *= 0.5; freq *= 2;
+      }
+      out[y * w + x] = sum / norm;
+    }
+    return out;
+  };
+  function mulberry(a) {
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      var t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  root.IM = IM;
+})(window);
+
+</script>
+<script>
+/* Core: tool registry, routing, workbench and exporting. */
+(function (root) {
+  'use strict';
+  var NV = { tools: [], byId: {} };
+
+  NV.register = function (t) { NV.tools.push(t); NV.byId[t.slug] = t; };
+
+  /* ---------------- helpers ---------------- */
+  function el(tag, attrs, kids) {
+    var n = document.createElement(tag), k;
+    if (attrs) for (k in attrs) {
+      if (k === 'class') n.className = attrs[k];
+      else if (k === 'html') n.innerHTML = attrs[k];
+      else if (k === 'text') n.textContent = attrs[k];
+      else if (k.slice(0, 2) === 'on') n.addEventListener(k.slice(2), attrs[k]);
+      else if (attrs[k] != null) n.setAttribute(k, attrs[k]);
+    }
+    (kids || []).forEach(function (c) { if (c) n.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+    return n;
+  }
+  NV.el = el;
+
+  NV.svg = function (d, w) {
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="' + (w || 1.6) +
+      '" stroke-linecap="round" stroke-linejoin="round">' + d + '</svg>';
+  };
+
+  NV.toast = function (msg, kind) {
+    var box = document.querySelector('.toasts') || document.body.appendChild(el('div', { class: 'toasts' }));
+    var t = el('div', { class: 'toast ' + (kind || ''), text: msg });
+    box.appendChild(t);
+    setTimeout(function () { t.style.opacity = '0'; t.style.transition = 'opacity .3s'; setTimeout(function () { t.remove(); }, 320); }, 3200);
+  };
+
+  /* Storage can throw outright, not just return null: an embedded frame, Safari
+     with cross-site tracking prevention, a browser set to block site data. None
+     of what we keep there is worth taking the whole page down for. */
+  NV.store = {
+    get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set: function (k, v) { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } },
+    del: function (k) { try { localStorage.removeItem(k); } catch (e) { /* nothing to undo */ } }
+  };
+
+  NV.fmt = function (v, d) {
+    return Number(v).toLocaleString('en-US', { minimumFractionDigits: d == null ? 2 : d, maximumFractionDigits: d == null ? 2 : d });
+  };
+
+  /* Saving. Embedded viewers block download links, so we ask the host to save the
+     file; on a normal web host a plain anchor does the job. */
+  var saver = null;
+  function saveApi() {
+    if (!saver) {
+      saver = (window.claude && typeof claude.use === 'function')
+        ? claude.use('downloads').catch(function () { return null; })
+        : Promise.resolve(null);
+    }
+    return saver;
+  }
+
+  NV.download = function (blob, name) {
+    return saveApi().then(function (d) {
+      if (!d) {
+        var u = URL.createObjectURL(blob), a = el('a', { href: u, download: name });
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(function () { URL.revokeObjectURL(u); }, 4000);
+        NV.toast('File downloaded.', 'ok');
+        return;
+      }
+      return d.save({ filename: name, data: blob }).then(function () {
+        NV.toast('File saved.', 'ok');
+      }, function (e) {
+        var code = e && e.code, ext = (name.split('.').pop() || '').toUpperCase();
+        if (code === 'declined') return;
+        if (code === 'rejected_extension' || code === 'extension_not_enabled') {
+          NV.toast('This view cannot save ' + ext + ' files. Open the full site to download it.', 'bad');
+        } else if (code === 'too_large') {
+          NV.toast('The file is over 16 MB. Lower the DPI or split the job across sheets.', 'bad');
+        } else if (code === 'rate_limited') {
+          NV.toast('A download is already waiting for confirmation. Finish it and try again.', 'bad');
+        } else {
+          NV.toast('The file could not be saved.', 'bad');
+        }
+      });
+    });
+  };
+
+  NV.blobOf = function (canvas, type, quality) {
+    return new Promise(function (res) { canvas.toBlob(res, type || 'image/png', quality); });
+  };
+
+  NV.safeName = function (s) {
+    return (s || 'artwork').replace(/\.[^.]+$/, '').replace(/[^\w\-]+/g, '-').replace(/^-|-$/g, '').slice(0, 48) || 'diseno';
+  };
+
+  var crcTable = (function () {
+    var t = new Uint32Array(256), c, n, k;
+    for (n = 0; n < 256; n++) {
+      c = n;
+      for (k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1;
+      t[n] = c >>> 0;
+    }
+    return t;
+  })();
+  function crc32(buf, start, len) {
+    var c = 0xFFFFFFFF, i;
+    start = start || 0; len = len == null ? buf.length : len;
+    for (i = start; i < start + len; i++) c = crcTable[(c ^ buf[i]) & 0xFF] ^ (c >>> 8);
+    return (c ^ 0xFFFFFFFF) >>> 0;
+  }
+
+  /* Write the physical resolution (pHYs) into a PNG: it matters when printing. */
+  NV.pngWithDpi = function (blob, dpi) {
+    return blob.arrayBuffer().then(function (buf) {
+      var src = new Uint8Array(buf);
+      if (src[0] !== 0x89 || src[1] !== 0x50) return blob;
+      var ppm = Math.round(dpi / 0.0254);
+      var chunk = new Uint8Array(21);
+      var dv = new DataView(chunk.buffer);
+      dv.setUint32(0, 9);
+      chunk.set([0x70, 0x48, 0x59, 0x73], 4);       // "pHYs"
+      dv.setUint32(8, ppm); dv.setUint32(12, ppm);
+      chunk[16] = 1;
+      dv.setUint32(17, crc32(chunk, 4, 13));
+      var at = 8 + 25;                               // after the signature and the IHDR
+      var out = new Uint8Array(src.length + chunk.length);
+      out.set(src.subarray(0, at), 0);
+      out.set(chunk, at);
+      out.set(src.subarray(at), at + chunk.length);
+      return new Blob([out], { type: 'image/png' });
+    });
+  };
+
+  /* Stored (uncompressed) ZIP: enough for PNG and SVG, already compressed. */
+  NV.zip = function (files) {
+    var enc = new TextEncoder(), parts = [], central = [], offset = 0;
+    return Promise.all(files.map(function (f) {
+      return (f.blob.arrayBuffer ? f.blob.arrayBuffer() : Promise.resolve(f.blob))
+        .then(function (b) { return { name: f.name, data: new Uint8Array(b) }; });
+    })).then(function (items) {
+      items.forEach(function (it) {
+        var nameB = enc.encode(it.name), crc = crc32(it.data);
+        var loc = new Uint8Array(30 + nameB.length), dv = new DataView(loc.buffer);
+        dv.setUint32(0, 0x04034b50, true); dv.setUint16(4, 20, true);
+        dv.setUint32(14, crc, true); dv.setUint32(18, it.data.length, true);
+        dv.setUint32(22, it.data.length, true); dv.setUint16(26, nameB.length, true);
+        loc.set(nameB, 30);
+        parts.push(loc, it.data);
+        var cen = new Uint8Array(46 + nameB.length), cv = new DataView(cen.buffer);
+        cv.setUint32(0, 0x02014b50, true); cv.setUint16(4, 20, true); cv.setUint16(6, 20, true);
+        cv.setUint32(16, crc, true); cv.setUint32(20, it.data.length, true);
+        cv.setUint32(24, it.data.length, true); cv.setUint16(28, nameB.length, true);
+        cv.setUint32(42, offset, true);
+        cen.set(nameB, 46);
+        central.push(cen);
+        offset += loc.length + it.data.length;
+      });
+      var cenSize = central.reduce(function (a, c) { return a + c.length; }, 0);
+      var end = new Uint8Array(22), ev = new DataView(end.buffer);
+      ev.setUint32(0, 0x06054b50, true);
+      ev.setUint16(8, central.length, true); ev.setUint16(10, central.length, true);
+      ev.setUint32(12, cenSize, true); ev.setUint32(16, offset, true);
+      return new Blob(parts.concat(central, [end]), { type: 'application/zip' });
+    });
+  };
+
+  NV.loadImage = function (file) {
+    return new Promise(function (res, rej) {
+      var img = new Image();
+      img.onload = function () { res(img); };
+      img.onerror = function () { rej(new Error('that image could not be read.')); };
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
+  /* ---------------- controls ---------------- */
+  NV.controls = function (host, spec, params, onChange) {
+    var nodes = [];
+    spec.forEach(function (c) {
+      var wrap = el('div', { class: c.k === 'group' ? 'group-t' : 'field' });
+      var val, lab;
+      function fire() { onChange(c); }
+
+      if (c.k === 'group') { wrap.textContent = c.label; }
+      else if (c.k === 'note') { wrap.className = ''; wrap.appendChild(el('p', { class: 'hint', text: c.text })); }
+      else if (c.k === 'range') {
+        val = el('b', { class: 'mono' });
+        lab = el('div', { class: 'flabel' }, [el('span', { text: c.label }), val]);
+        var r = el('input', { type: 'range', min: c.min, max: c.max, step: c.step, value: params[c.id] });
+        function show() { val.textContent = (+params[c.id]).toFixed(c.dec == null ? (c.step < 1 ? 1 : 0) : c.dec) + (c.unit || ''); }
+        r.addEventListener('input', function () { params[c.id] = +r.value; show(); fire(); });
+        show();
+        wrap.appendChild(lab); wrap.appendChild(r);
+        wrap.reset = function () { r.value = params[c.id]; show(); };
+      }
+      else if (c.k === 'seg') {
+        wrap.appendChild(el('div', { class: 'flabel' }, [el('span', { text: c.label })]));
+        var seg = el('div', { class: 'seg' });
+        c.opts.forEach(function (o) {
+          var b = el('button', { type: 'button', text: o[1], title: o[2] || o[1] });
+          if (params[c.id] === o[0]) b.className = 'on';
+          b.addEventListener('click', function () {
+            params[c.id] = o[0];
+            [].forEach.call(seg.children, function (x) { x.className = ''; });
+            b.className = 'on'; fire();
+          });
+          seg.appendChild(b);
+        });
+        wrap.appendChild(seg);
+      }
+      else if (c.k === 'select') {
+        wrap.appendChild(el('div', { class: 'flabel' }, [el('span', { text: c.label })]));
+        var s = el('select');
+        c.opts.forEach(function (o) { s.appendChild(el('option', { value: o[0], text: o[1] })); });
+        s.value = params[c.id];
+        s.addEventListener('change', function () { params[c.id] = s.value; fire(); });
+        wrap.appendChild(s);
+      }
+      else if (c.k === 'check') {
+        var cb = el('input', { type: 'checkbox' });
+        cb.checked = !!params[c.id];
+        cb.addEventListener('change', function () { params[c.id] = cb.checked; fire(); });
+        wrap.className = '';
+        wrap.appendChild(el('label', { class: 'check' }, [cb, el('span', { text: c.label })]));
+      }
+      else if (c.k === 'color') {
+        wrap.appendChild(el('div', { class: 'flabel' }, [el('span', { text: c.label })]));
+        var cp = el('input', { type: 'color', class: 'swatch', value: params[c.id] });
+        cp.addEventListener('input', function () { params[c.id] = cp.value; fire(); });
+        wrap.appendChild(cp);
+      }
+      else if (c.k === 'num') {
+        wrap.appendChild(el('div', { class: 'flabel' }, [el('span', { text: c.label }), el('b', { text: c.unit || '' })]));
+        var nu = el('input', { type: 'number', min: c.min, max: c.max, step: c.step, value: params[c.id] });
+        nu.addEventListener('input', function () { params[c.id] = nu.value === '' ? '' : +nu.value; fire(); });
+        wrap.appendChild(nu);
+        wrap.reset = function () { nu.value = params[c.id]; };
+      }
+      else if (c.k === 'button') {
+        wrap.className = '';
+        wrap.appendChild(el('button', { class: 'btn wide ' + (c.style || 'ghost'), type: 'button', text: c.label, onclick: function () { c.act(); } }));
+      }
+      host.appendChild(wrap);
+      nodes.push({ c: c, node: wrap });
+    });
+    /* Every rail goes through here - imageTool's and the ones the bigger tools
+       assemble themselves - so this is the one place the folding has to live. */
+    if (NV.variant === 'mobile' && host.classList.contains('rail-body')) NV.collapseGroups(host);
+    return {
+      sync: function () {
+        nodes.forEach(function (n) {
+          if (n.c.show) n.node.style.display = n.c.show(params) ? '' : 'none';
+          if (n.node.reset) n.node.reset();
+        });
+      }
+    };
+  };
+
+  NV.defaults = function (spec) {
+    var p = {};
+    spec.forEach(function (c) { if (c.id) p[c.id] = c.def; });
+    return p;
+  };
+
+  /* Which build is running. The chooser sends people to the right one; the
+     responsive build has no flag to read and asks the same 900 px breakpoint the
+     stylesheet switches on, so the folding and the layout never disagree. */
+  NV.variant = (function () {
+    var v = window.NV_VARIANT;
+    if (v !== 'mobile' && v !== 'computer') {
+      v = matchMedia('(max-width: 900px)').matches ? 'mobile' : 'computer';
+    }
+    document.documentElement.setAttribute('data-variant', v);
+    return v;
+  })();
+
+  /* On a phone the control rail runs well past a screenful - the rhinestone tool
+     wants 1469 px of it - so every section after the first folds away, and a tap
+     on its heading brings it back. */
+  NV.collapseGroups = function (body) {
+    var groups = [], cur = null;
+    [].slice.call(body.children).forEach(function (node) {
+      if (node.classList.contains('group-toggle')) { cur = null; }  /* already folded */
+      else if (node.classList.contains('group-t')) { cur = { head: node, items: [] }; groups.push(cur); }
+      else if (cur) cur.items.push(node);
+    });
+    groups.forEach(function (g, i) {
+      if (!g.items.length) return;
+      var box = el('div', { class: 'group-body' });
+      g.items.forEach(function (it) { box.appendChild(it); });
+      g.head.parentNode.insertBefore(box, g.head.nextSibling);
+      g.head.className = 'group-t group-toggle';
+      g.head.setAttribute('role', 'button');
+      g.head.setAttribute('tabindex', '0');
+      function set(open) {
+        g.head.classList.toggle('open', open);
+        box.hidden = !open;
+        g.head.setAttribute('aria-expanded', open ? 'true' : 'false');
+      }
+      set(i === 0);  /* first section open, so the tool is usable on arrival */
+      function toggle() { set(box.hidden); }
+      g.head.addEventListener('click', toggle);
+      g.head.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+      });
+    });
+  };
+
+  /* ---------------- viewer ---------------- */
+  NV.viewer = function (stage) {
+    var view = el('div', { class: 'viewer' });
+    var plate = el('div', { class: 'plate' });
+    var base = el('canvas'), top = el('canvas', { class: 'top' });
+    var div = el('div', { class: 'divider' }, [el('div', { style: 'position:absolute;left:-9px;top:0;bottom:0;width:19px;cursor:ew-resize' })]);
+    plate.appendChild(base); plate.appendChild(top); plate.appendChild(div);
+    view.appendChild(plate);
+    var busy = el('div', { class: 'busy' }, [el('div', { class: 'spin' }), el('span', { text: 'Working' })]);
+    var meta = el('div', { class: 'meta' });
+    var bar = el('div', { class: 'toolbar' });
+    var st = { s: 1, tx: 0, ty: 0, split: 0, cmp: false, w: 0, h: 0 };
+
+    function apply() {
+      plate.style.transform = 'translate(-50%,-50%) translate(' + st.tx + 'px,' + st.ty + 'px) scale(' + st.s + ')';
+      div.style.left = (st.w * st.split / 100) + 'px';
+      /* The original only shows left of the divider; otherwise the result covers
+         everything and transparent areas reveal the checkerboard, not the old image. */
+      base.style.clipPath = 'inset(0 ' + (100 - st.split) + '% 0 0)';
+      top.style.clipPath = 'inset(0 0 0 ' + st.split + '%)';
+      plate.classList.toggle('smooth', st.s < 1);
+      zoomLabel.textContent = Math.round(st.s * 100) + '%';
+    }
+    function fit() {
+      var r = view.getBoundingClientRect();
+      if (!st.w) return;
+      st.s = Math.min((r.width - 48) / st.w, (r.height - 48) / st.h, 1);
+      st.tx = st.ty = 0; apply();
+    }
+    function zoom(k, mx, my) {
+      var r = view.getBoundingClientRect();
+      var cx = mx == null ? 0 : mx - r.left - r.width / 2;
+      var cy = my == null ? 0 : my - r.top - r.height / 2;
+      var ns = Math.min(32, Math.max(0.02, st.s * k));
+      k = ns / st.s;
+      st.tx = cx - k * (cx - st.tx); st.ty = cy - k * (cy - st.ty);
+      st.s = ns; apply();
+    }
+
+    var zoomLabel = el('button', { type: 'button', text: '100%', title: 'Fit to window', onclick: fit });
+    var cmpBtn = el('button', { type: 'button', text: 'Compare', title: 'Show the original on the left' });
+    cmpBtn.addEventListener('click', function () {
+      st.cmp = !st.cmp; st.split = st.cmp ? 50 : 0;
+      view.classList.toggle('cmp', st.cmp); cmpBtn.classList.toggle('on', st.cmp); apply();
+    });
+    bar.appendChild(el('button', { type: 'button', text: '−', title: 'Zoom out', onclick: function () { zoom(1 / 1.25); } }));
+    bar.appendChild(zoomLabel);
+    bar.appendChild(el('button', { type: 'button', text: '+', title: 'Zoom in', onclick: function () { zoom(1.25); } }));
+    bar.appendChild(el('button', { type: 'button', text: '1:1', title: 'Actual size', onclick: function () { st.s = 1; st.tx = st.ty = 0; apply(); } }));
+    bar.appendChild(cmpBtn);
+
+    view.addEventListener('wheel', function (e) { e.preventDefault(); zoom(e.deltaY < 0 ? 1.12 : 1 / 1.12, e.clientX, e.clientY); }, { passive: false });
+
+    var drag = null;
+    div.addEventListener('pointerdown', function (e) {
+      e.stopPropagation(); drag = { mode: 'split' }; div.setPointerCapture(e.pointerId);
+    });
+    view.addEventListener('pointerdown', function (e) {
+      if (view.dataset.lock === '1') return;
+      drag = { mode: 'pan', x: e.clientX, y: e.clientY, tx: st.tx, ty: st.ty };
+      view.classList.add('drag'); view.setPointerCapture(e.pointerId);
+    });
+    window.addEventListener('pointermove', function (e) {
+      if (!drag) return;
+      if (drag.mode === 'pan') { st.tx = drag.tx + (e.clientX - drag.x); st.ty = drag.ty + (e.clientY - drag.y); apply(); }
+      else {
+        var r = plate.getBoundingClientRect();
+        st.split = Math.max(0, Math.min(100, ((e.clientX - r.left) / r.width) * 100)); apply();
+      }
+    });
+    window.addEventListener('pointerup', function () { drag = null; view.classList.remove('drag'); });
+
+    stage.appendChild(view); stage.appendChild(bar); stage.appendChild(meta); stage.appendChild(busy);
+
+    return {
+      view: view, plate: plate, base: base, top: top,
+      busy: function (on) { busy.classList.toggle('on', !!on); },
+      meta: function (txt) { meta.textContent = txt; },
+      size: function (w, h) {
+        st.w = w; st.h = h;
+        [base, top].forEach(function (c) { c.width = w; c.height = h; c.style.width = w + 'px'; c.style.height = h + 'px'; });
+        plate.style.width = w + 'px'; plate.style.height = h + 'px';
+        plate.style.marginLeft = 0; plate.style.marginTop = 0;
+      },
+      fit: fit, apply: apply,
+      /* base = original (left), top = result */
+      paintBase: function (src) { paint(base, src); },
+      paintTop: function (src) { paint(top, src); }
+    };
+    function paint(cv, src) {
+      var cx = cv.getContext('2d');
+      cx.clearRect(0, 0, cv.width, cv.height);
+      if (!src) return;
+      if (src instanceof ImageData) cx.putImageData(src, 0, 0);
+      else cx.drawImage(src, 0, 0, cv.width, cv.height);
+    }
+  };
+
+  /* ---------------- image workbench ---------------- */
+  /* Shared layout: control rail on the left, work surface on the right. */
+  NV.bench = function (host, t) {
+    var bench = el('div', { class: 'bench' });
+    var rail = el('div', { class: 'rail' });
+    var stage = el('div', { class: 'stage' });
+    bench.appendChild(rail); bench.appendChild(stage);
+    host.appendChild(bench);
+    var head = el('div', { class: 'rail-head' }, [el('h1', { text: t.name }), el('p', { text: t.tagline })]);
+    var body = el('div', { class: 'rail-body' });
+    var foot = el('div', { class: 'rail-foot' });
+    rail.appendChild(head); rail.appendChild(body); rail.appendChild(foot);
+    return { bench: bench, rail: rail, stage: stage, body: body, foot: foot };
+  };
+
+  NV.imageTool = function (t, host) {
+    var parts = NV.bench(host, t);
+    var stage = parts.stage, body = parts.body, foot = parts.foot;
+
+    var params = NV.defaults(t.controls || []);
+    var state = { file: null, img: null, full: null, prev: null, k: 1, out: null, custom: {} };
+    var vw = null, ui = null, timer = null;
+    var PREV = t.previewMax || 1500;
+
+    var drop = el('div', { class: 'drop' }, [
+      el('div', { html: NV.svg('<path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>') }),
+      el('b', { text: 'Drop your artwork here' }),
+      el('small', { text: 'PNG, JPG or WEBP. Nothing leaves your computer: it all runs in this browser.' })
+    ]);
+    var input = el('input', { type: 'file', accept: t.accept || 'image/*', style: 'display:none' });
+    drop.addEventListener('click', function () { input.click(); });
+    input.addEventListener('change', function () { if (input.files[0]) load(input.files[0]); });
+    ['dragover', 'dragenter'].forEach(function (ev) {
+      drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add('over'); });
+    });
+    ['dragleave', 'drop'].forEach(function (ev) {
+      drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove('over'); });
+    });
+    drop.addEventListener('drop', function (e) {
+      var f = e.dataTransfer.files[0]; if (f) load(f);
+    });
+    stage.appendChild(drop); stage.appendChild(input);
+    body.appendChild(el('p', { class: 'hint', text: t.help || 'Load an image to get started.' }));
+
+    function load(file) {
+      NV.loadImage(file).then(function (img) {
+        state.file = file; state.img = img;
+        state.full = IM.dataOf(img);
+        var m = Math.max(state.full.width, state.full.height);
+        state.k = m > PREV ? PREV / m : 1;
+        state.prev = state.k < 1
+          ? IM.dataOf(IM.resize(img, state.full.width * state.k, state.full.height * state.k), Math.round(state.full.width * state.k), Math.round(state.full.height * state.k))
+          : state.full;
+        drop.remove(); build();
+      }).catch(function (e) { NV.toast(e.message, 'bad'); });
+    }
+
+    function build() {
+      body.innerHTML = ''; foot.innerHTML = '';
+      vw = NV.viewer(stage);
+      var api = {
+        params: params, state: state, viewer: vw,
+        get src() { return state.full; },
+        get out() { return state.out; },
+        rerun: schedule, toast: NV.toast,
+        name: NV.safeName(state.file && state.file.name)
+      };
+      if (t.intro) body.appendChild(el('p', { class: 'hint', text: t.intro }));
+      ui = NV.controls(body, t.controls || [], params, function (c) {
+        if (t.onControl) t.onControl(c, params, state);
+        ui.sync();
+        if (c && c.heavy && t.manual) return;
+        schedule();
+      });
+      ui.sync();
+
+      if (t.manual) {
+        foot.appendChild(el('button', { class: 'btn primary wide', text: 'Run', onclick: function () { schedule(true); } }));
+      }
+      (t.exports || [{ label: 'Download PNG', ext: 'png' }]).forEach(function (ex) {
+        foot.appendChild(el('button', {
+          class: 'btn ' + (ex.secondary ? 'ghost' : 'primary') + ' wide',
+          /* A wrapped label costs the foot a whole row, so the packed secondary
+             buttons always take the short name and a phone takes it throughout. */
+          text: ex.short && (ex.secondary || NV.variant === 'mobile') ? ex.short : ex.label,
+          onclick: function () { doExport(ex, api); }
+        }));
+      });
+      /* On a phone the foot is pinned to the screen, so it holds downloads only:
+         starting over goes to the end of the rail, out of thumb range of the
+         download button it would otherwise sit beside. */
+      var swap = el('button', {
+        class: 'btn ghost wide', text: NV.variant === 'mobile' ? 'Use a different image' : 'Change image',
+        onclick: function () { stage.innerHTML = ''; stage.appendChild(drop); stage.appendChild(input); body.innerHTML = ''; foot.innerHTML = ''; state.out = null; }
+      });
+      (NV.variant === 'mobile' ? body : foot).appendChild(swap);
+
+      vw.size(state.prev.width, state.prev.height);
+      vw.paintBase(state.prev);
+      requestAnimationFrame(vw.fit);
+      if (t.setup) t.setup(api, stage, vw);
+      schedule(false, true);
+    }
+
+    function schedule(force, first) {
+      clearTimeout(timer);
+      timer = setTimeout(function () { run(first); }, first ? 0 : (t.debounce || 90));
+    }
+
+    function run() {
+      if (!state.prev) return;
+      vw.busy(true);
+      setTimeout(function () {
+        try {
+          var scaled = scaleParams(state.k);
+          var res = t.process({ src: state.prev, p: scaled, k: state.k, preview: true, state: state });
+          state.out = res;
+          vw.size(res.width || state.prev.width, res.height || state.prev.height);
+          vw.paintBase(state.prev);
+          vw.paintTop(res);
+          vw.meta(state.full.width + ' × ' + state.full.height + ' px' + (state.k < 1 ? '  ·  preview ' + Math.round(state.k * 100) + '%' : ''));
+        } catch (e) {
+          NV.toast('Processing failed: ' + e.message, 'bad');
+          if (window.console) console.error(e);
+        }
+        vw.busy(false);
+      }, 12);
+    }
+
+    function scaleParams(k) {
+      var o = {}, id;
+      for (id in params) o[id] = params[id];
+      if (k < 1) (t.controls || []).forEach(function (c) {
+        if (c.scale && o[c.id] != null) o[c.id] = o[c.id] * (c.scale === 2 ? k * k : k);
+      });
+      return o;
+    }
+
+    function doExport(ex, api) {
+      vw.busy(true);
+      setTimeout(function () {
+        try {
+          if (ex.make) { ex.make(api, finish); return; }
+          var res = t.process({ src: state.full, p: params, k: 1, preview: false, state: state });
+          var cv = res instanceof ImageData ? IM.canvasOf(res) : res;
+          var type = ex.type || 'image/png';
+          NV.blobOf(cv, type, ex.quality)
+            .then(function (b) { return (type === 'image/png' && params.dpi) ? NV.pngWithDpi(b, params.dpi) : b; })
+            .then(function (b) { NV.download(b, api.name + '-' + t.slug + '.' + (ex.ext || 'png')); finish(); });
+        } catch (e) { NV.toast('Export failed: ' + e.message, 'bad'); vw.busy(false); }
+      }, 12);
+      function finish() { vw.busy(false); }
+    }
+  };
+
+  /* ---------------- site chrome ---------------- */
+  var LOGO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">' +
+    '<circle cx="12" cy="12" r="6.2"/><path d="M12 1.5v5M12 17.5v5M1.5 12h5M17.5 12h5"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/></svg>';
+
+  function chrome() {
+    var picker = el('div', { class: 'picker' });
+    var btn = el('button', {
+      class: 'iconbtn', type: 'button',
+      html: NV.svg('<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>') + '<span>Tools</span>'
+    });
+    var menu = el('div', { class: 'picker-menu' });
+    menu.appendChild(el('div', { class: 'head eyebrow', text: 'All 16 tools' }));
+    NV.tools.forEach(function (t) {
+      menu.appendChild(el('a', { href: '#/' + t.slug, html: t.name + '<small>' + t.tagline + '</small>' }));
+    });
+    btn.addEventListener('click', function (e) { e.stopPropagation(); picker.classList.toggle('open'); });
+    document.addEventListener('click', function () { picker.classList.remove('open'); });
+    picker.appendChild(btn); picker.appendChild(menu);
+
+    var theme = el('button', { class: 'iconbtn', type: 'button', title: 'Switch theme', html: NV.svg('<circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>') });
+    theme.addEventListener('click', function () {
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : cur === 'light' ? '' : (matchMedia('(prefers-color-scheme: dark)').matches ? 'light' : 'dark');
+      if (next) { document.documentElement.setAttribute('data-theme', next); NV.store.set('nv-theme', next); }
+      else { document.documentElement.removeAttribute('data-theme'); NV.store.del('nv-theme'); }
+    });
+
+    var bar = el('header', { class: 'topbar' }, [
+      el('a', { class: 'brand', href: '#/' }, [
+        el('span', { class: 'mark', html: LOGO }),
+        el('span', {}, [el('b', { text: 'Open Press' }), el('br'), el('span', { text: 'dtf tools' })])
+      ]),
+      el('nav', { class: 'topnav' }, [picker, theme])
+    ]);
+    document.body.appendChild(bar);
+    document.body.appendChild(el('main', { id: 'app' }));
+  }
+
+  NV.footer = function () {
+    return el('footer', { class: 'foot' }, [el('div', { class: 'wrap' }, [
+      el('div', { class: 'cols' }, [
+        el('div', {}, [
+          el('div', { class: 'eyebrow', text: 'Open Press' }),
+          el('p', { text: 'A tool suite for DTF printing, screen printing and cut vinyl. Free, no account, no limits.' })
+        ]),
+        el('div', {}, [
+          el('div', { class: 'eyebrow', text: 'Privacy' }),
+          el('p', { text: 'There is no server. Your files are processed in your browser and never uploaded anywhere.' })
+        ]),
+        el('div', {}, [
+          el('div', { class: 'eyebrow', text: 'Independent' }),
+          el('p', { text: 'Our own project, with no affiliation to any store or commercial suite.' })
+        ])
+      ])
+    ])]);
+  };
+
+  /* ---------------- home ---------------- */
+  function lobby(app) {
+    var hero = el('section', { class: 'hero' });
+    var cv = el('canvas');
+    hero.appendChild(cv);
+    hero.appendChild(el('div', { class: 'wrap' }, [el('div', { class: 'hero-in' }, [
+      el('div', { class: 'eyebrow', text: 'Digital workshop · 16 tools' }),
+      el('h1', { html: 'The whole <em>DTF</em> shop<br>in your browser' }),
+      el('p', { text: 'Check a file before it costs you film, knock out backgrounds, clean up contours, build halftones and rhinestone layouts, vectorize, gang up print sheets and price the job. No account, no watermarks, and not one file uploaded.' }),
+      el('div', { class: 'badges' }, [
+        el('span', { class: 'badge hot', text: 'Free forever' }),
+        el('span', { class: 'badge', text: 'No sign-up' }),
+        el('span', { class: 'badge', text: 'Works offline' }),
+        el('span', { class: 'badge', text: 'Your files stay put' })
+      ])
+    ])]));
+    app.appendChild(hero);
+    halftoneHero(cv, hero);
+
+    var wrap = el('div', { class: 'wrap' });
+    var groups = {};
+    NV.tools.forEach(function (t) { (groups[t.group] = groups[t.group] || []).push(t); });
+    var n = 0;
+    Object.keys(groups).forEach(function (g) {
+      wrap.appendChild(el('div', { class: 'sheet-head' }, [
+        el('h2', { text: g }),
+        el('span', { class: 'eyebrow', text: groups[g].length + ' tools' })
+      ]));
+      var grid = el('div', { class: 'grid' });
+      groups[g].forEach(function (t) {
+        n++;
+        grid.appendChild(el('a', { class: 'card', href: '#/' + t.slug }, [
+          el('span', { class: 'num mono', text: ('0' + n).slice(-2) }),
+          el('span', { class: 'ico', html: t.icon }),
+          el('h3', { text: t.name }),
+          el('p', { text: t.tagline })
+        ]));
+      });
+      wrap.appendChild(grid);
+    });
+    app.appendChild(wrap);
+    app.appendChild(NV.footer());
+  }
+
+  /* Dot screen: the motif of the trade, drawn on canvas. */
+  function halftoneHero(cv, host) {
+    var ctx = cv.getContext('2d'), raf = 0, t0 = performance.now();
+    var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function size() {
+      var r = host.getBoundingClientRect(), d = Math.min(2, devicePixelRatio || 1);
+      cv.width = r.width * d; cv.height = r.height * d;
+      ctx.setTransform(d, 0, 0, d, 0, 0);
+    }
+    function draw(now) {
+      var r = host.getBoundingClientRect(), w = r.width, h = r.height;
+      var e = Math.max(0, Math.min(1, (now - t0) / 1100));
+      var ease = 1 - Math.pow(1 - e, 3);
+      ctx.clearRect(0, 0, w, h);
+      var cell = 15, ang = -Math.PI / 8, cs = Math.cos(ang), sn = Math.sin(ang);
+      var accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#FF2D7E';
+      var span = Math.ceil(Math.max(w, h) / cell) + 6;
+      for (var i = -span; i < span; i++) for (var j = -span; j < span; j++) {
+        var x = (i * cs - j * sn) * cell + w * 0.72;
+        var y = (i * sn + j * cs) * cell + h * 0.45;
+        if (x < -20 || x > w + 20 || y < -20 || y > h + 20) continue;
+        var dx = (x - w * 0.78) / (w * 0.42), dy = (y - h * 0.5) / (h * 0.75);
+        var d = Math.sqrt(dx * dx + dy * dy);
+        var cover = Math.max(0, 1 - d);
+        if (cover <= 0.01) continue;
+        var rad = Math.max(0, cell * 0.52 * Math.sqrt(cover) * (reduce ? 1 : ease));
+        ctx.beginPath();
+        ctx.arc(x, y, rad, 0, 6.2832);
+        ctx.fillStyle = accent;
+        ctx.globalAlpha = 0.10 + cover * 0.30;
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      if (!reduce && e < 1) raf = requestAnimationFrame(draw);
+    }
+    size(); draw(performance.now());
+    addEventListener('resize', function () { size(); cancelAnimationFrame(raf); t0 = performance.now() - 1200; draw(performance.now()); });
+  }
+
+  /* ---------------- routing ---------------- */
+  function route() {
+    var app = document.getElementById('app');
+    app.innerHTML = '';
+    document.querySelector('.picker').classList.remove('open');
+    var slug = (location.hash || '#/').replace(/^#\/?/, '').split('?')[0];
+    var t = NV.byId[slug];
+    scrollTo(0, 0);
+    if (!slug || !t) {
+      document.title = 'Open Press — free DTF tools';
+      lobby(app);
+      return;
+    }
+    document.title = t.name + ' — Open Press';
+    if (t.kind === 'custom') t.render(app);
+    else NV.imageTool(t, app);
+  }
+
+  NV.start = function () {
+    var saved = NV.store.get('nv-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+    chrome();
+    addEventListener('hashchange', route);
+    route();
+  };
+
+  root.NV = NV;
+})(window);
+
+</script>
+
+<script>
+/* Workshop guide: the order to work in, and what each tool is actually for. */
+(function () {
+  'use strict';
+  var el = NV.el;
+
+  var STEPS = [
+    ['Start from the biggest file you have',
+     'Everything downstream inherits the resolution you begin with. A 600 px logo blown up to 28 cm will look soft no matter what you do to it. Check what you have before you spend time on it.',
+     'dtf-check', 'Run the file check'],
+    ['Knock the background out',
+     'Flat backgrounds — white, chroma, studio — come off with the wand in a click or two. Then fix the leftovers by hand with the brushes rather than fighting the tolerance slider.',
+     'remove-background', 'Open the background remover'],
+    ['Clean the contour',
+     'A cutout leaves a rim of pixels from the old background. Shrink by 1–2 px with defringe on and the halo goes. This is the step most people skip, and it is the one that shows on the shirt.',
+     'reduce-edges', 'Open the edge tool'],
+    ['Kill the partial alpha',
+     'White ink prints solid or not at all. Soft shadows, glows and feathered edges come out grey and dirty. Push them to solid or clear before printing, not after.',
+     'semi-transparency', 'Open the alpha tool'],
+    ['Size it in centimetres, not pixels',
+     'Set the real print size and the DPI together. The PNG carries the resolution in its header, so the RIP places it correctly instead of guessing.',
+     'resize', 'Open the resizer'],
+    ['Gang it onto the roll',
+     'Film is sold by the metre, so the money is made here. Pack the sheet by height, set a small gap and read the run length before you print.',
+     'gang-sheets', 'Open print sheets'],
+    ['Price it from your own numbers',
+     'Cost per piece comes from the roll price, ink, powder, labour minutes and waste. Work it out once for your shop and quote from that, not from what someone else charges.',
+     'pricing', 'Open the calculator']
+  ];
+
+  var MISTAKES = [
+    ['Printing a JPG', 'JPG has no transparency, so the background prints as a rectangle. It also adds blocky artefacts around hard edges. Work in PNG from the start.'],
+    ['Gradients that fade to nothing', 'A gradient fading to transparent is partial alpha, which is exactly what the printer cannot do. Use a dot fade instead — solid dots that get smaller read as a fade to the eye and print cleanly.'],
+    ['Hairlines under half a millimetre', 'Thin strokes lift off the film or disappear under the press. Thicken them or print the design larger.'],
+    ['Trusting the screen for colour', 'Film sits a little flatter than a backlit monitor. A small lift in vibrance and contrast usually lands closer to what you saw.'],
+    ['Skipping the test press', 'Every film and every fabric behaves differently. One test on the same garment costs a few pesos; a bad run costs the whole order.']
+  ];
+
+  NV.register({
+    slug: 'guide',
+    name: 'Workshop guide',
+    group: 'Cutout cleanup',
+    tagline: 'The order to work in, what each tool fixes and the mistakes that cost film.',
+    icon: NV.svg('<path d="M4 4.5A1.5 1.5 0 0 1 5.5 3H19v18H5.5A1.5 1.5 0 0 1 4 19.5z"/><path d="M8 7.5h7M8 11h7M8 14.5h4"/>'),
+    kind: 'custom',
+    render: function (host) {
+      var t = this;
+      var wrap = el('div', { class: 'wrap doc' });
+      wrap.appendChild(el('div', { class: 'eyebrow', text: 'Start here' }));
+      wrap.appendChild(el('h1', { style: 'font-size:34px;text-transform:uppercase;margin:8px 0 10px', text: t.name }));
+      wrap.appendChild(el('p', { text: 'Every tool here does one job. Run them in this order and the file that reaches the printer is already right. Nothing is locked, nothing expires, and no file you open ever leaves your browser.' }));
+
+      wrap.appendChild(el('h2', { text: 'The order to work in' }));
+      var steps = el('div', { style: 'display:flex;flex-direction:column;gap:2px;margin-top:6px' });
+      STEPS.forEach(function (s, i) {
+        var row = el('div', {
+          style: 'display:grid;grid-template-columns:44px 1fr;gap:16px;padding:16px 0;border-top:1px solid var(--line-soft)'
+        });
+        row.appendChild(el('div', {
+          class: 'mono',
+          style: 'font-size:13px;color:var(--accent);padding-top:2px',
+          text: ('0' + (i + 1)).slice(-2)
+        }));
+        var right = el('div', {});
+        right.appendChild(el('h3', { style: 'margin:0 0 6px', text: s[0] }));
+        right.appendChild(el('p', { style: 'margin:0 0 10px', text: s[1] }));
+        right.appendChild(el('a', { class: 'btn', href: '#/' + s[2], text: s[3] + ' →' }));
+        row.appendChild(right);
+        steps.appendChild(row);
+      });
+      wrap.appendChild(steps);
+
+      wrap.appendChild(el('h2', { text: 'What costs people film' }));
+      var m = el('div', { style: 'display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:8px' });
+      MISTAKES.forEach(function (x) {
+        m.appendChild(el('div', { class: 'panelbox' }, [
+          el('h3', { style: 'margin:0 0 7px;font-size:15.5px', text: x[0] }),
+          el('p', { style: 'margin:0;font-size:13.5px', text: x[1] })
+        ]));
+      });
+      wrap.appendChild(m);
+
+      wrap.appendChild(el('h2', { text: 'The rest of the bench' }));
+      wrap.appendChild(el('p', { text: 'Not every job needs every tool. These are the ones you reach for when a particular problem shows up.' }));
+      var grid = el('div', { class: 'grid', style: 'padding-top:8px' });
+      ['enhance', 'vectorize', 'halftones', 'rhinestones', 'frames-grunge', 'convert', 'mockups', 'sizing'].forEach(function (slug) {
+        var tool = NV.byId[slug];
+        if (!tool) return;
+        grid.appendChild(el('a', { class: 'card', href: '#/' + slug }, [
+          el('span', { class: 'ico', html: tool.icon }),
+          el('h3', { text: tool.name }),
+          el('p', { text: tool.tagline })
+        ]));
+      });
+      wrap.appendChild(grid);
+
+      host.appendChild(wrap);
+      host.appendChild(NV.footer());
+    }
+  });
+})();
+
+</script>
+<script>
+/* DTF check: audits a file for print readiness and fixes what it finds. */
+(function () {
+  'use strict';
+  var el = NV.el, CM = 2.54;
+
+  function analyse(src, full, p) {
+    var d = src.data, n = src.width * src.height, i;
+    var semi = 0, opaque = 0, clear = 0, sat = 0, lum = 0, white = 0, satN = 0;
+    for (i = 0; i < n; i++) {
+      var a = d[i * 4 + 3];
+      if (a < 8) { clear++; continue; }
+      if (a < 248) semi++;
+      opaque++;
+      var r = d[i * 4], g = d[i * 4 + 1], b = d[i * 4 + 2];
+      var mx = Math.max(r, g, b), mn = Math.min(r, g, b);
+      sat += mx ? (mx - mn) / mx : 0;
+      lum += (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+      if (mx > 244 && mn > 236) white++;
+      satN++;
+    }
+    /* Corners tell you whether a background was ever removed. */
+    var w = src.width, h = src.height;
+    var corners = [0, w - 1, (h - 1) * w, h * w - 1].map(function (k) { return d[k * 4 + 3]; });
+    var cornerOpaque = corners.filter(function (a) { return a > 200; }).length;
+
+    var dpi = full.width / (p.printWidthCm / CM);
+    var printHeightCm = full.height / dpi * CM;
+
+    /* Thinnest strokes: how much of the art sits within half a millimetre of an edge. */
+    var sdf = IM.alphaSDF(src, 128);
+    var pxPerMm = src.width / (p.printWidthCm * 10);
+    var thinPx = 0.35 * pxPerMm;
+    var thin = 0;
+    for (i = 0; i < n; i++) if (sdf[i] > 0 && sdf[i] < thinPx) thin++;
+
+    /* The analysis runs on the preview, so scale counts back to the real file. */
+    var k2 = (full.width * full.height) / n;
+    return {
+      n: n, semi: semi, semiFull: Math.round(semi * k2), opaque: opaque, clear: clear,
+      semiPct: opaque ? semi / opaque * 100 : 0,
+      coverage: clear < n ? (n - clear) / n * 100 : 0,
+      sat: satN ? sat / satN * 100 : 0,
+      lum: satN ? lum / satN * 100 : 0,
+      whitePct: opaque ? white / opaque * 100 : 0,
+      thinPct: opaque ? thin / opaque * 100 : 0,
+      cornerOpaque: cornerOpaque, hasAlpha: clear > n * 0.005,
+      dpi: dpi, printHeightCm: printHeightCm,
+      fullW: full.width, fullH: full.height
+    };
+  }
+
+  function verdicts(a, p) {
+    var v = [];
+    v.push({
+      n: '01', t: 'Semi-transparency',
+      grade: a.semiPct < 0.5 ? 'good' : a.semiPct < 3 ? 'ok' : 'bad',
+      text: a.semiPct < 0.5
+        ? 'Only ' + NV.fmt(a.semiPct, 2) + ' % of the artwork has partial alpha. Nothing to fix.'
+        : NV.fmt(a.semiFull, 0) + ' px are semi-transparent (' + NV.fmt(a.semiPct, 1) +
+          ' %). White ink cannot print partial alpha, so these come out dirty or grey at the edges.'
+    });
+    v.push({
+      n: '02', t: 'Background',
+      grade: !a.hasAlpha ? 'bad' : a.cornerOpaque > 0 ? 'ok' : 'good',
+      text: !a.hasAlpha
+        ? 'The file has no transparency at all. The background will print as a solid rectangle.'
+        : a.cornerOpaque > 0
+          ? a.cornerOpaque + ' of 4 corners are still opaque. Check that no background is left behind.'
+          : 'Transparent background, corners clear. Ready for DTF.'
+    });
+    v.push({
+      n: '03', t: 'Resolution',
+      grade: a.dpi >= 290 ? 'good' : a.dpi >= 180 ? 'ok' : 'bad',
+      text: NV.fmt(a.dpi, 0) + ' DPI · ' + a.fullW + ' × ' + a.fullH + ' px at ' +
+        NV.fmt(p.printWidthCm, 1) + ' × ' + NV.fmt(a.printHeightCm, 1) + ' cm. ' +
+        (a.dpi >= 290 ? 'Optimal for DTF.'
+          : a.dpi >= 180 ? 'Usable, but the edges will soften. Upscale if you can.'
+            : 'Too low: this will print visibly pixelated. Upscale or print smaller.')
+    });
+    v.push({
+      n: '04', t: 'Colour',
+      grade: a.sat >= 30 ? 'good' : a.sat >= 18 ? 'ok' : 'bad',
+      text: 'Average saturation ' + NV.fmt(a.sat, 0) + ' %, brightness ' + NV.fmt(a.lum, 0) + ' %. ' +
+        (a.sat >= 30 ? 'Colour has enough punch for film.'
+          : 'DTF lays down a little flatter than the screen. A touch of vibrance and contrast helps.')
+    });
+    v.push({
+      n: '05', t: 'Fine detail',
+      grade: a.thinPct < 4 ? 'good' : a.thinPct < 12 ? 'ok' : 'bad',
+      text: NV.fmt(a.thinPct, 1) + ' % of the artwork sits within 0.35 mm of an edge. ' +
+        (a.thinPct < 4 ? 'Strokes are thick enough to transfer cleanly.'
+          : 'There are hairlines this thin. They tend to lift off the film or vanish under the press — thicken them or print larger.')
+    });
+    v.push({
+      n: '06', t: 'White ink and film',
+      grade: 'info',
+      text: 'The art covers ' + NV.fmt(a.coverage, 0) + ' % of the canvas' +
+        (a.whitePct > 12 ? ', and ' + NV.fmt(a.whitePct, 0) + ' % of it is near-white — that area leans on the white underbase, so keep the press firm.' : '.')
+    });
+    return v;
+  }
+
+  var GRADE = {
+    good: ['Good', 'var(--ok)'], ok: ['Check', 'var(--amber)'],
+    bad: ['Fix', 'var(--bad)'], info: ['Note', 'var(--dim)']
+  };
+
+  NV.register({
+    slug: 'dtf-check',
+    name: 'DTF file check',
+    group: 'Cutout cleanup',
+    tagline: 'Audit a file before it costs you film: alpha, background, DPI, colour and hairlines.',
+    icon: NV.svg('<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/><path d="M11 8v3.5M11 14.5v.01"/>'),
+    intro: 'Six checks on the file you are about to send to the printer. Anything it flags, it can also fix here — then download the corrected PNG.',
+    debounce: 260,
+    controls: [
+      { k: 'num', id: 'printWidthCm', label: 'Print it at this width', unit: 'cm', def: 28, min: 1, max: 300, step: 0.5 },
+      { k: 'note', text: 'Every verdict below is measured against that width. Change it and the report re-runs.' },
+      { k: 'group', label: 'Fixes' },
+      { k: 'check', id: 'fixSemi', label: 'Correct semi-transparency', def: false },
+      { k: 'range', id: 'semiLo', label: 'Erase below', min: 0, max: 254, step: 1, def: 40, unit: ' alpha', show: function (p) { return p.fixSemi; } },
+      { k: 'range', id: 'semiHi', label: 'Solidify above', min: 1, max: 255, step: 1, def: 190, unit: ' alpha', show: function (p) { return p.fixSemi; } },
+      { k: 'check', id: 'fixHalo', label: 'Remove the edge halo', def: false },
+      { k: 'check', id: 'fixColor', label: 'Lift colour for film', def: false },
+      { k: 'range', id: 'vibrance', label: 'Vibrance', min: 0, max: 60, step: 1, def: 18, unit: '', show: function (p) { return p.fixColor; } },
+      { k: 'range', id: 'contrast', label: 'Contrast', min: 0, max: 40, step: 1, def: 10, unit: '', show: function (p) { return p.fixColor; } },
+      { k: 'note', text: 'With no fixes ticked the preview is your untouched file, so you can compare against the report.' }
+    ],
+    setup: function (api) {
+      var box = el('div', { style: 'display:flex;flex-direction:column;gap:9px' });
+      var body = document.querySelector('.rail-body');
+      body.insertBefore(box, body.querySelector('.group-t'));
+      api.state.custom.report = box;
+    },
+    process: function (c) {
+      var a = analyse(c.src, c.state.full, c.p);
+      var box = c.state.custom.report;
+      if (box) {
+        box.innerHTML = '';
+        box.appendChild(el('div', { class: 'group-t', style: 'margin:0', text: 'Report' }));
+        verdicts(a, c.p).forEach(function (v) {
+          var g = GRADE[v.grade];
+          var card = el('div', {
+            style: 'border:1px solid var(--line);border-left:3px solid ' + g[1] +
+              ';border-radius:6px;padding:9px 11px;display:flex;flex-direction:column;gap:4px'
+          });
+          card.appendChild(el('div', { style: 'display:flex;justify-content:space-between;align-items:baseline;gap:8px' }, [
+            el('span', { style: 'font-size:13px;font-weight:600', text: v.n + '  ' + v.t }),
+            el('span', {
+              class: 'mono',
+              style: 'font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:' + g[1],
+              text: g[0]
+            })
+          ]));
+          card.appendChild(el('p', { class: 'hint', style: 'margin:0', text: v.text }));
+          box.appendChild(card);
+        });
+      }
+
+      var out = IM.copy(c.src), p = c.p;
+      if (p.fixSemi) out = IM.alphaLevels(out, p.semiLo, Math.max(p.semiLo + 1, p.semiHi), false);
+      if (p.fixHalo) { out = IM.defringe(out, 0.8, 250); out = IM.reshapeAlpha(out, 0.75, 0.8, 128); }
+      if (p.fixColor) out = IM.adjust(out, { contrast: p.contrast, saturation: p.vibrance, brightness: 0 });
+      return out;
+    },
+    exports: [
+      { label: 'Download corrected PNG', short: 'Corrected PNG', ext: 'png' },
+      {
+        label: 'Save the report (TXT)', short: 'Report (TXT)', ext: 'txt', secondary: true,
+        make: function (api, done) {
+          var a = analyse(api.src, api.state.full, api.params);
+          var lines = ['DTF file check — ' + api.name,
+            'Printed at ' + api.params.printWidthCm + ' cm wide', ''];
+          verdicts(a, api.params).forEach(function (v) {
+            lines.push('[' + GRADE[v.grade][0].toUpperCase() + '] ' + v.n + ' ' + v.t);
+            lines.push('    ' + v.text, '');
+          });
+          NV.download(new Blob([lines.join('\n')], { type: 'text/plain' }), api.name + '-dtf-check.txt');
+          done();
+        }
+      }
+    ]
+  });
+})();
+
+</script>
+<script>
+/* Remove background: a colour wand plus erase and restore brushes. */
+(function () {
+  'use strict';
+
+  function autoAlpha(src, seeds, p) {
+    var w = src.width, h = src.height, n = w * h, i;
+    var out = new Float32Array(n);
+    var list = seeds.map(function (s) {
+      return IM.clamp(Math.round(s[1] * (h - 1)), 0, h - 1) * w + IM.clamp(Math.round(s[0] * (w - 1)), 0, w - 1);
+    });
+    if (!list.length) { out.fill(1); return out; }
+    var mask = IM.floodMask(src, list, p.tolerance, p.contiguous);
+    for (i = 0; i < n; i++) out[i] = mask[i] ? 0 : 1;
+    return out;
+  }
+
+  function paintCursor(view) {
+    var c = NV.el('div', {
+      style: 'position:absolute;border:1px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.6);border-radius:50%;pointer-events:none;display:none;z-index:6;mix-blend-mode:difference'
+    });
+    view.appendChild(c);
+    return c;
+  }
+
+  NV.register({
+    slug: 'remove-background',
+    name: 'Remove background',
+    group: 'Cutout cleanup',
+    tagline: 'A colour wand, a brush to erase and a brush to bring back what it ate.',
+    icon: NV.svg('<path d="M13 3 3 13l5 5 10-10z"/><path d="m14 8 5 5"/><path d="M18 20h4"/><path d="M8 18 5 21"/>'),
+    intro: 'Click the background to knock it out, then fix the rest by hand with the brushes. Best on flat backgrounds: white, chroma and studio shots.',
+    debounce: 60,
+    controls: [
+      { k: 'seg', id: 'tool', label: 'Tool', def: 'wand', opts: [['wand', 'Wand'], ['erase', 'Erase'], ['restore', 'Restore']] },
+      { k: 'note', text: 'Click the background to mark it. Every click adds another reference colour.', show: function (p) { return p.tool === 'wand'; } },
+      { k: 'note', text: 'Paint over the image. Hold Alt to pan the canvas.', show: function (p) { return p.tool !== 'wand'; } },
+      { k: 'range', id: 'tolerance', label: 'Tolerance', min: 1, max: 120, step: 1, def: 26, unit: '' },
+      { k: 'check', id: 'contiguous', label: 'Connected area only', def: true },
+      { k: 'range', id: 'brush', label: 'Brush size', min: 4, max: 400, step: 2, def: 60, unit: ' px', show: function (p) { return p.tool !== 'wand'; } },
+      { k: 'range', id: 'hardness', label: 'Brush hardness', min: 0, max: 100, step: 5, def: 80, unit: ' %', show: function (p) { return p.tool !== 'wand'; } },
+      { k: 'group', label: 'Cutout finish' },
+      { k: 'range', id: 'feather', label: 'Soften edge', min: 0, max: 4, step: 0.1, def: 0.8, unit: ' px', dec: 1, scale: true },
+      { k: 'range', id: 'shrink', label: 'Shrink contour', min: -3, max: 4, step: 0.25, def: 0.75, unit: ' px', dec: 2, scale: true },
+      { k: 'range', id: 'defringe', label: 'Defringe (removes halo)', min: 0, max: 100, step: 1, def: 75, unit: ' %' },
+      { k: 'check', id: 'inspect', label: 'Show the cutout on a warning background', def: false }
+    ],
+    setup: function (api, stage, vw) {
+      var st = api.state, p = api.params;
+      st.custom = { seeds: [], cache: {} };
+      ['full', 'prev'].forEach(function (key) {
+        var s = st[key], c = document.createElement('canvas');
+        c.width = s.width; c.height = s.height;
+        st.custom[key + 'Mask'] = c;
+      });
+      /* Starting seeds: the four corners are usually background. */
+      st.custom.seeds = [[0.004, 0.004], [0.996, 0.004], [0.004, 0.996], [0.996, 0.996]];
+
+      var cursor = paintCursor(vw.view), last = null, drawing = false;
+
+      function toImage(e) {
+        var r = vw.base.getBoundingClientRect();
+        return {
+          x: (e.clientX - r.left) / r.width,
+          y: (e.clientY - r.top) / r.height,
+          scale: r.width / vw.base.width
+        };
+      }
+      function stroke(a, b) {
+        var col = p.tool === 'erase' ? 'rgba(255,0,0,' : 'rgba(0,255,0,';
+        ['full', 'prev'].forEach(function (key) {
+          var cv = st.custom[key + 'Mask'], ctx = cv.getContext('2d');
+          var rad = p.brush / 2 * (cv.width / st.full.width);
+          var g = ctx.createRadialGradient(b.x * cv.width, b.y * cv.height, rad * (p.hardness / 100),
+            b.x * cv.width, b.y * cv.height, Math.max(0.6, rad));
+          g.addColorStop(0, col + '1)'); g.addColorStop(1, col + '0)');
+          ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+          if (a) {
+            ctx.strokeStyle = col + '1)';
+            ctx.lineWidth = rad * 2 * (0.35 + 0.65 * p.hardness / 100);
+            ctx.beginPath();
+            ctx.moveTo(a.x * cv.width, a.y * cv.height);
+            ctx.lineTo(b.x * cv.width, b.y * cv.height);
+            ctx.stroke();
+          }
+          ctx.fillStyle = g;
+          ctx.beginPath();
+          ctx.arc(b.x * cv.width, b.y * cv.height, Math.max(0.6, rad), 0, 6.2832);
+          ctx.fill();
+        });
+      }
+
+      vw.view.addEventListener('pointerdown', function (e) {
+        var m = toImage(e);
+        if (m.x < 0 || m.x > 1 || m.y < 0 || m.y > 1) return;
+        if (p.tool === 'wand') {
+          if (e.shiftKey) st.custom.seeds = [];
+          st.custom.seeds.push([m.x, m.y]);
+          st.custom.cache = {};
+          api.rerun();
+          return;
+        }
+        if (e.altKey) return;
+        drawing = true; last = m; stroke(null, m); api.rerun();
+      });
+      window.addEventListener('pointermove', function (e) {
+        var m = toImage(e);
+        if (p.tool !== 'wand') {
+          var r = vw.base.getBoundingClientRect();
+          var d = p.brush * (r.width / vw.base.width) * (st.full.width / vw.base.width);
+          var vr = vw.view.getBoundingClientRect();
+          cursor.style.display = 'block';
+          cursor.style.width = cursor.style.height = d + 'px';
+          cursor.style.left = (e.clientX - vr.left - d / 2) + 'px';
+          cursor.style.top = (e.clientY - vr.top - d / 2) + 'px';
+        } else cursor.style.display = 'none';
+        if (!drawing) return;
+        stroke(last, m); last = m; api.rerun();
+      });
+      window.addEventListener('pointerup', function () { drawing = false; last = null; });
+      vw.view.addEventListener('pointerleave', function () { cursor.style.display = 'none'; });
+      function lock() {
+        vw.view.dataset.lock = (p.tool !== 'wand' && !window.__nvAlt) ? '1' : '0';
+      }
+      window.addEventListener('keydown', function (e) { if (e.key === 'Alt') { window.__nvAlt = 1; lock(); } });
+      window.addEventListener('keyup', function (e) { if (e.key === 'Alt') { window.__nvAlt = 0; lock(); } });
+      setInterval(lock, 250);
+
+      api.reset = function () {
+        st.custom.seeds = []; st.custom.cache = {};
+        ['full', 'prev'].forEach(function (key) {
+          var c = st.custom[key + 'Mask'];
+          c.getContext('2d').clearRect(0, 0, c.width, c.height);
+        });
+        api.rerun();
+      };
+      var railFoot = document.querySelector('.rail-foot');
+      railFoot.insertBefore(NV.el('button', {
+        class: 'btn ghost wide', text: 'Start over', onclick: function () { api.reset(); NV.toast('Cutout reset.'); }
+      }), railFoot.firstChild);
+    },
+    process: function (c) {
+      var st = c.state, src = c.src, n = src.width * src.height, i;
+      var key = (c.preview ? 'p' : 'f') + '|' + c.p.tolerance + '|' + c.p.contiguous + '|' + st.custom.seeds.length;
+      var alpha = st.custom.cache[key];
+      if (!alpha) { alpha = autoAlpha(src, st.custom.seeds, c.p); st.custom.cache = {}; st.custom.cache[key] = alpha; }
+
+      var mc = st.custom[(c.preview ? 'prev' : 'full') + 'Mask'];
+      var md = mc.getContext('2d').getImageData(0, 0, mc.width, mc.height).data;
+      var out = IM.copy(src), q = out.data, p0 = src.data;
+      for (i = 0; i < n; i++) {
+        var a = alpha[i];
+        var er = md[i * 4] / 255, keep = md[i * 4 + 1] / 255;
+        a = a * (1 - er);
+        if (keep > 0) a = Math.max(a, keep);
+        q[i * 4 + 3] = p0[i * 4 + 3] * a;
+      }
+      if (c.p.defringe > 0) out = IM.defringe(out, c.p.defringe / 100, 250);
+      if (Math.abs(c.p.shrink) > 0.001 || c.p.feather > 0.05) out = IM.reshapeAlpha(out, c.p.shrink, c.p.feather, 128);
+      if (c.p.inspect) {
+        var v = out.data;
+        for (i = 0; i < n; i++) {
+          var al = v[i * 4 + 3] / 255;
+          v[i * 4] = v[i * 4] * al + 255 * (1 - al) * 0.18 + 40 * (1 - al);
+          v[i * 4 + 1] = v[i * 4 + 1] * al + 12 * (1 - al);
+          v[i * 4 + 2] = v[i * 4 + 2] * al + 70 * (1 - al);
+          v[i * 4 + 3] = 255;
+        }
+      }
+      return out;
+    }
+  });
+})();
+
+</script>
+<script>
+/* Reduce edges: contracts the contour and removes the halo left by a cutout. */
+(function () {
+  'use strict';
+
+  /* Connected-component labelling over a binary mask. */
+  function components(mask, w, h) {
+    var lab = new Int32Array(w * h).fill(-1), sizes = [], stack = [], i, n = w * h;
+    for (i = 0; i < n; i++) {
+      if (!mask[i] || lab[i] >= 0) continue;
+      var id = sizes.length, count = 0;
+      stack.push(i); lab[i] = id;
+      while (stack.length) {
+        var c = stack.pop(); count++;
+        var x = c % w, y = (c / w) | 0;
+        if (x > 0 && mask[c - 1] && lab[c - 1] < 0) { lab[c - 1] = id; stack.push(c - 1); }
+        if (x < w - 1 && mask[c + 1] && lab[c + 1] < 0) { lab[c + 1] = id; stack.push(c + 1); }
+        if (y > 0 && mask[c - w] && lab[c - w] < 0) { lab[c - w] = id; stack.push(c - w); }
+        if (y < h - 1 && mask[c + w] && lab[c + w] < 0) { lab[c + w] = id; stack.push(c + w); }
+      }
+      sizes.push(count);
+    }
+    return { lab: lab, sizes: sizes };
+  }
+
+  function clean(id, specks, holes, thr) {
+    var w = id.width, h = id.height, n = w * h, p = id.data, i;
+    var out = IM.copy(id), q = out.data;
+    if (specks > 0) {
+      var solid = new Uint8Array(n);
+      for (i = 0; i < n; i++) solid[i] = p[i * 4 + 3] >= thr ? 1 : 0;
+      var cs = components(solid, w, h);
+      for (i = 0; i < n; i++) if (cs.lab[i] >= 0 && cs.sizes[cs.lab[i]] < specks) q[i * 4 + 3] = 0;
+    }
+    if (holes > 0) {
+      var empty = new Uint8Array(n);
+      for (i = 0; i < n; i++) empty[i] = q[i * 4 + 3] < thr ? 1 : 0;
+      var ch = components(empty, w, h);
+      var edge = {};
+      for (i = 0; i < w; i++) { if (ch.lab[i] >= 0) edge[ch.lab[i]] = 1; if (ch.lab[(h - 1) * w + i] >= 0) edge[ch.lab[(h - 1) * w + i]] = 1; }
+      for (i = 0; i < h; i++) { if (ch.lab[i * w] >= 0) edge[ch.lab[i * w]] = 1; if (ch.lab[i * w + w - 1] >= 0) edge[ch.lab[i * w + w - 1]] = 1; }
+      var bled = IM.bleed(out, thr).data;
+      for (i = 0; i < n; i++) {
+        var L = ch.lab[i];
+        if (L >= 0 && !edge[L] && ch.sizes[L] < holes) {
+          q[i * 4] = bled[i * 4]; q[i * 4 + 1] = bled[i * 4 + 1]; q[i * 4 + 2] = bled[i * 4 + 2];
+          q[i * 4 + 3] = 255;
+        }
+      }
+    }
+    return out;
+  }
+
+  NV.register({
+    slug: 'reduce-edges',
+    name: 'Reduce edges',
+    group: 'Cutout cleanup',
+    tagline: 'Shrink the contour, kill the halo and clear the specks a cutout leaves behind.',
+    icon: NV.svg('<path d="M4 4h16v16H4z" stroke-dasharray="3 3"/><path d="M8 8h8v8H8z"/><path d="m9.5 12 2 2 3.5-4"/>'),
+    intro: 'A cutout leaves a rim of pixels from the old background. Shrink by 1 or 2 pixels and apply defringe: the halo goes without eating into the artwork.',
+    controls: [
+      { k: 'range', id: 'radius', label: 'Shrink contour', min: -6, max: 6, step: 0.25, def: 1, unit: ' px', dec: 2, scale: true },
+      { k: 'note', text: 'Negative values grow the artwork instead of trimming it.' },
+      { k: 'range', id: 'feather', label: 'Edge softness', min: 0, max: 4, step: 0.1, def: 1, unit: ' px', dec: 1, scale: true },
+      { k: 'range', id: 'defringe', label: 'Defringe (removes halo)', min: 0, max: 100, step: 1, def: 70, unit: ' %' },
+      { k: 'group', label: 'Cleanup' },
+      { k: 'range', id: 'specks', label: 'Erase specks smaller than', min: 0, max: 400, step: 5, def: 0, unit: ' px²', scale: 2 },
+      { k: 'range', id: 'holes', label: 'Fill holes smaller than', min: 0, max: 400, step: 5, def: 0, unit: ' px²', scale: 2 },
+      { k: 'group', label: 'Fine tuning' },
+      { k: 'range', id: 'threshold', label: 'Edge threshold', min: 8, max: 240, step: 2, def: 128, unit: '' },
+      { k: 'note', text: 'Raise the threshold if the contour carries a lot of partial transparency.' }
+    ],
+    process: function (c) {
+      var out = c.src;
+      if (c.p.specks > 0 || c.p.holes > 0) out = clean(out, c.p.specks, c.p.holes, c.p.threshold);
+      if (c.p.defringe > 0) out = IM.defringe(out, c.p.defringe / 100, 250);
+      if (c.p.radius < 0) out = IM.bleed(out, c.p.threshold);
+      if (Math.abs(c.p.radius) > 0.001 || c.p.feather > 0.05) out = IM.reshapeAlpha(out, c.p.radius, c.p.feather, c.p.threshold);
+      return out === c.src ? IM.copy(c.src) : out;
+    }
+  });
+})();
+
+</script>
+<script>
+/* Semi-transparency: turns partial alpha into fully solid or fully clear. */
+(function () {
+  'use strict';
+
+  function heat(id, lo, hi) {
+    var out = IM.copy(id), q = out.data, p = id.data, n = id.width * id.height, i, a;
+    for (i = 0; i < n; i++) {
+      a = p[i * 4 + 3];
+      if (a > lo && a < hi) { q[i * 4] = 255; q[i * 4 + 1] = 45; q[i * 4 + 2] = 126; q[i * 4 + 3] = 255; }
+      else if (a >= hi) { q[i * 4] = q[i * 4 + 1] = q[i * 4 + 2] = 40; q[i * 4 + 3] = 60; }
+    }
+    return out;
+  }
+
+  NV.register({
+    slug: 'semi-transparency',
+    name: 'Remove semi-transparency',
+    group: 'Cutout cleanup',
+    tagline: 'Find the partial alpha your printer cannot reproduce and make it solid.',
+    icon: NV.svg('<path d="M3 3h8v8H3z"/><path d="M13 13h8v8h-8z"/><path d="M13 3h8v8h-8z" stroke-dasharray="2 2"/><path d="M3 13h8v8H3z" stroke-dasharray="2 2"/>'),
+    intro: 'White ink cannot print half-tones of alpha: they come out dirty or with grey edges. Here you decide what stays solid and what disappears.',
+    controls: [
+      { k: 'seg', id: 'mode', label: 'Mode', def: 'range', opts: [['range', 'By range'], ['hard', 'Hard cut'], ['solid', 'All solid']] },
+      { k: 'range', id: 'lo', label: 'Erase below', min: 0, max: 254, step: 1, def: 40, unit: ' alpha', show: function (p) { return p.mode !== 'solid'; } },
+      { k: 'range', id: 'hi', label: 'Solidify above', min: 1, max: 255, step: 1, def: 200, unit: ' alpha', show: function (p) { return p.mode === 'range'; } },
+      { k: 'note', text: 'In hard cut everything in between snaps to solid or clear, with no gradient.', show: function (p) { return p.mode === 'hard'; } },
+      { k: 'note', text: 'In all solid any pixel with some alpha goes to 100 %. Handy for silhouettes and white underbases.', show: function (p) { return p.mode === 'solid'; } },
+      { k: 'group', label: 'Finish' },
+      { k: 'range', id: 'defringe', label: 'Contour defringe', min: 0, max: 100, step: 1, def: 60, unit: ' %' },
+      { k: 'range', id: 'radius', label: 'Shrink contour', min: -3, max: 3, step: 0.25, def: 0, unit: ' px', dec: 2, scale: true },
+      { k: 'check', id: 'inspect', label: 'Show semi-transparent areas in magenta', def: false },
+      { k: 'note', text: 'The inspector paints every pixel with partial alpha in magenta. Turn it off to see the real result.' }
+    ],
+    process: function (c) {
+      var p = c.p, lo = p.lo, hi = p.hi;
+      if (p.mode === 'solid') { lo = 0; hi = 1; }
+      else if (p.mode === 'hard') { hi = Math.max(lo + 1, lo + 2); }
+      if (p.inspect) return heat(c.src, 8, 248);
+      var out = IM.alphaLevels(c.src, lo, hi, p.mode === 'hard');
+      if (p.defringe > 0) out = IM.defringe(out, p.defringe / 100, 250);
+      if (Math.abs(p.radius) > 0.001) out = IM.reshapeAlpha(out, p.radius, 0.8, 128);
+      return out;
+    }
+  });
+})();
+
+</script>
+
+<script>
+/* Enhance: upscales and restores bite with local filters. */
+(function () {
+  'use strict';
+  NV.register({
+    slug: 'enhance',
+    name: 'Enhance and upscale',
+    group: 'Artwork prep',
+    tagline: 'Upscale up to 4×, bring back the bite and drop the noise on small images.',
+    icon: NV.svg('<path d="M4 9V4h5M20 15v5h-5M4 15v5h5M20 9V4h-5"/><circle cx="12" cy="12" r="2.5"/>'),
+    intro: 'This works with local filters: progressive resampling, an unsharp mask and a median. It will not invent detail that was never there, but it does rescue a pixelated image for print.',
+    debounce: 220,
+    controls: [
+      { k: 'seg', id: 'scale', label: 'Upscale', def: 2, opts: [[1, '1×'], [2, '2×'], [3, '3×'], [4, '4×']] },
+      { k: 'range', id: 'sharpen', label: 'Sharpness', min: 0, max: 200, step: 5, def: 70, unit: ' %' },
+      { k: 'range', id: 'radius', label: 'Sharpen radius', min: 0.4, max: 4, step: 0.1, def: 1.1, unit: ' px', dec: 1 },
+      { k: 'range', id: 'threshold', label: 'Protect flat areas', min: 0, max: 30, step: 1, def: 4, unit: '' },
+      { k: 'group', label: 'Cleanup' },
+      { k: 'check', id: 'denoise', label: 'Reduce noise and JPG artefacts', def: false },
+      { k: 'group', label: 'Colour' },
+      { k: 'range', id: 'contrast', label: 'Contrast', min: -50, max: 80, step: 1, def: 8, unit: '' },
+      { k: 'range', id: 'saturation', label: 'Saturation', min: -100, max: 100, step: 1, def: 10, unit: '' },
+      { k: 'range', id: 'brightness', label: 'Brightness', min: -40, max: 40, step: 1, def: 0, unit: '' },
+      { k: 'note', text: 'Tip: for DTF, upscale first and sharpen last, with a low radius. The preview is quick; a full-resolution download can take a few seconds on big images.' }
+    ],
+    process: function (c) {
+      var s = +c.p.scale, src = c.src;
+      if (!c.preview && src.width * s * src.height * s > 80e6) {
+        throw new Error('the output would be ' + Math.round(src.width * s * src.height * s / 1e6) +
+          ' MP and will not fit in memory. Lower the upscale or crop the image first.');
+      }
+      var out = s > 1
+        ? IM.dataOf(IM.resize(src, src.width * s, src.height * s), Math.round(src.width * s), Math.round(src.height * s))
+        : IM.copy(src);
+      if (c.p.denoise) out = IM.median3(out);
+      if (c.p.sharpen > 0) out = IM.unsharp(out, c.p.sharpen / 100, c.p.radius * (s > 1 ? s * 0.6 : 1), c.p.threshold);
+      if (c.p.contrast || c.p.saturation || c.p.brightness) {
+        out = IM.adjust(out, { contrast: c.p.contrast, saturation: c.p.saturation, brightness: c.p.brightness });
+      }
+      return out;
+    }
+  });
+})();
+
+</script>
+<script>
+/* Vectorize: quantizes the colour, traces real contours and splits into layers. */
+(function () {
+  'use strict';
+  var WORK = 1400;
+
+  function area(pts) {
+    var a = 0, n = pts.length, i;
+    for (i = 0; i < n; i++) {
+      var j = (i + 1) % n;
+      a += pts[i][0] * pts[j][1] - pts[j][0] * pts[i][1];
+    }
+    return Math.abs(a) / 2;
+  }
+
+  function vectorize(src, p) {
+    var work = src;
+    if (Math.max(src.width, src.height) > WORK) {
+      var k = WORK / Math.max(src.width, src.height);
+      work = IM.dataOf(IM.resize(src, src.width * k, src.height * k),
+        Math.round(src.width * k), Math.round(src.height * k));
+    }
+    var w = work.width, h = work.height, n = w * h, i;
+    var pal, map;
+
+    if (p.mode === 'silhouette') {
+      pal = [IM.rgb(p.ink)];
+      map = new Int32Array(n);
+      var d = work.data;
+      for (i = 0; i < n; i++) {
+        var lum = (0.2126 * d[i * 4] + 0.7152 * d[i * 4 + 1] + 0.0722 * d[i * 4 + 2]);
+        var on = d[i * 4 + 3] > 128 && (p.invert ? lum > p.threshold : lum < p.threshold);
+        map[i] = on ? 0 : -1;
+      }
+    } else {
+      var q = IM.quantize(work, p.colors, 10);
+      pal = q.palette; map = q.map;
+      if (p.dropWhite) {                                 // a light background is not an ink
+        var out = {};
+        pal.forEach(function (col, k) {
+          if (IM.colorDistance(col[0], col[1], col[2], 255, 255, 255) < 22) out[k] = 1;
+        });
+        for (i = 0; i < n; i++) if (out[map[i]]) map[i] = -1;
+      }
+    }
+
+    var layers = [];
+    pal.forEach(function (col, idx) {
+      var mask = new Uint8Array(n), count = 0;
+      for (i = 0; i < n; i++) if (map[i] === idx) { mask[i] = 1; count++; }
+      if (!count) return;
+      var loops = IM.traceMask(mask, w, h), paths = [];
+      loops.forEach(function (loop) {
+        var pts = IM.dropCollinear(loop);
+        if (area(pts) < p.minArea) return;
+        pts = IM.rdp(pts, p.detail);
+        if (pts.length < 3) return;
+        paths.push(IM.pathData(pts, p.smooth, 2));
+      });
+      if (paths.length) layers.push({ color: IM.hex(col), d: paths.join(' '), px: count });
+    });
+    layers.sort(function (a, b) { return b.px - a.px; });
+    return { layers: layers, w: w, h: h };
+  }
+
+  function raster(v, W, H) {
+    var cv = document.createElement('canvas');
+    cv.width = W; cv.height = H;
+    var ctx = cv.getContext('2d');
+    ctx.scale(W / v.w, H / v.h);
+    v.layers.forEach(function (L) {
+      ctx.fillStyle = L.color;
+      ctx.fill(new Path2D(L.d), 'evenodd');
+    });
+    return ctx.getImageData(0, 0, W, H);
+  }
+
+  function svgText(v, W, H, layers) {
+    var s = '<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="' + W +
+      '" height="' + H + '" viewBox="0 0 ' + v.w + ' ' + v.h + '" shape-rendering="geometricPrecision">\n';
+    (layers || v.layers).forEach(function (L, i) {
+      s += '  <g id="ink-' + (i + 1) + '" data-color="' + L.color + '">' +
+        '<path fill="' + L.color + '" fill-rule="evenodd" d="' + L.d + '"/></g>\n';
+    });
+    return s + '</svg>\n';
+  }
+
+  NV.register({
+    slug: 'vectorize',
+    name: 'Vectorize and split colours',
+    group: 'Artwork prep',
+    tagline: 'From pixels to SVG curves, with one layer per ink ready to separate.',
+    icon: NV.svg('<path d="M5 19c4-1 5-9 9-11 2-1 4 0 5 2"/><rect x="2" y="17" width="4" height="4"/><rect x="18" y="5" width="4" height="4"/>'),
+    intro: 'Traces the exact contour of every colour and hands it back as an editable SVG. The layer split is what you need for screen printing, cut vinyl, or recolouring without losing edge quality.',
+    manual: true,
+    previewMax: 1400,
+    controls: [
+      { k: 'seg', id: 'mode', label: 'Mode', def: 'color', heavy: true, opts: [['color', 'By colour'], ['silhouette', 'One-ink silhouette']] },
+      { k: 'range', id: 'colors', label: 'Number of inks', min: 2, max: 24, step: 1, def: 8, unit: '', heavy: true, show: function (p) { return p.mode === 'color'; } },
+      { k: 'check', id: 'dropWhite', label: 'Discard the white background', def: true, heavy: true, show: function (p) { return p.mode === 'color'; } },
+      { k: 'range', id: 'threshold', label: 'Silhouette threshold', min: 10, max: 245, step: 5, def: 128, unit: '', heavy: true, show: function (p) { return p.mode === 'silhouette'; } },
+      { k: 'check', id: 'invert', label: 'Invert the silhouette', def: false, heavy: true, show: function (p) { return p.mode === 'silhouette'; } },
+      { k: 'color', id: 'ink', label: 'Ink colour', def: '#111111', heavy: true, show: function (p) { return p.mode === 'silhouette'; } },
+      { k: 'group', label: 'Tracing' },
+      { k: 'range', id: 'detail', label: 'Simplify curves', min: 0, max: 6, step: 0.1, def: 1, unit: ' px', dec: 1, heavy: true },
+      { k: 'range', id: 'smooth', label: 'Smoothing', min: 0, max: 1, step: 0.05, def: 0.5, unit: '', dec: 2, heavy: true },
+      { k: 'range', id: 'minArea', label: 'Discard blobs smaller than', min: 0, max: 400, step: 5, def: 24, unit: ' px²', heavy: true },
+      { k: 'note', text: 'Press Run after moving the controls: tracing is the heavy part.' }
+    ],
+    process: function (c) {
+      var v = vectorize(c.src, c.p);
+      c.state.custom.vec = v;
+      return raster(v, c.src.width, c.src.height);
+    },
+    exports: [
+      {
+        label: 'Download SVG', short: 'SVG', ext: 'svg',
+        make: function (api, done) {
+          var v = api.state.custom.vec || vectorize(api.src, api.params);
+          var txt = svgText(v, api.src.width, api.src.height);
+          NV.download(new Blob([txt], { type: 'image/svg+xml' }), api.name + '-vector.svg');
+          done();
+        }
+      },
+      {
+        label: 'Download PNG', short: 'PNG', ext: 'png', secondary: true,
+        make: function (api, done) {
+          var v = api.state.custom.vec || vectorize(api.src, api.params);
+          var id = raster(v, api.src.width, api.src.height);
+          NV.blobOf(IM.canvasOf(id)).then(function (b) { NV.download(b, api.name + '-vector.png'); done(); });
+        }
+      },
+      {
+        label: 'Ink separation (ZIP)', short: 'Ink ZIP', ext: 'zip', secondary: true,
+        make: function (api, done) {
+          var v = api.state.custom.vec || vectorize(api.src, api.params);
+          var W = api.src.width, H = api.src.height, files = [], jobs = [];
+          v.layers.forEach(function (L, i) {
+            var name = 'ink-' + ('0' + (i + 1)).slice(-2) + '-' + L.color.replace('#', '');
+            files.push({ name: name + '.svg', blob: new Blob([svgText(v, W, H, [L])], { type: 'image/svg+xml' }) });
+            var cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+            var ctx = cv.getContext('2d');
+            ctx.scale(W / v.w, H / v.h);
+            ctx.fillStyle = L.color;
+            ctx.fill(new Path2D(L.d), 'evenodd');
+            jobs.push(NV.blobOf(cv).then(function (b) { files.push({ name: name + '.png', blob: b }); }));
+          });
+          files.push({ name: 'combined.svg', blob: new Blob([svgText(v, W, H)], { type: 'image/svg+xml' }) });
+          Promise.all(jobs).then(function () {
+            return NV.zip(files);
+          }).then(function (z) {
+            NV.download(z, api.name + '-separation.zip');
+            NV.toast(v.layers.length + ' inks separated.', 'ok');
+            done();
+          });
+        }
+      }
+    ]
+  });
+})();
+
+</script>
+<script>
+/* Resize: real physical size, with the DPI written into the PNG. */
+(function () {
+  'use strict';
+  var CM = 2.54;
+
+  function targetPx(p) {
+    var d = Math.max(10, p.dpi || 300);
+    if (p.unit === 'px') return { w: Math.round(p.width), h: Math.round(p.height) };
+    if (p.unit === 'cm') return { w: Math.round(p.width / CM * d), h: Math.round(p.height / CM * d) };
+    return { w: Math.round(p.width * d), h: Math.round(p.height * d) };
+  }
+
+  NV.register({
+    slug: 'resize',
+    name: 'Resize',
+    group: 'Artwork prep',
+    tagline: 'Set the real size in centimetres or inches, fix the DPI and frame it without distortion.',
+    icon: NV.svg('<path d="M3 3h11v11H3z"/><path d="M10 10h11v11H10z"/>'),
+    intro: 'Type the size in centimetres or inches and the DPI: the PNG comes out with the physical resolution written in, so the RIP places it at the right size.',
+    debounce: 200,
+    controls: [
+      { k: 'seg', id: 'unit', label: 'Unit', def: 'cm', opts: [['cm', 'Centimetres'], ['in', 'Inches'], ['px', 'Pixels']] },
+      { k: 'num', id: 'width', label: 'Width', def: 20, min: 0.1, step: 0.1 },
+      { k: 'num', id: 'height', label: 'Height', def: 20, min: 0.1, step: 0.1 },
+      { k: 'check', id: 'lock', label: 'Keep proportions', def: true },
+      { k: 'num', id: 'dpi', label: 'Resolution', unit: 'DPI', def: 300, min: 30, max: 1200, step: 10 },
+      { k: 'note', text: 'For DTF and screen printing, 300 DPI at final size is the standard. Below 150 the pixels start to show.' },
+      { k: 'group', label: 'Framing' },
+      { k: 'seg', id: 'fit', label: 'How to fit', def: 'contain', opts: [['contain', 'Fit'], ['cover', 'Fill'], ['stretch', 'Stretch']] },
+      { k: 'check', id: 'flatten', label: 'Solid background instead of transparent', def: false },
+      { k: 'color', id: 'color', label: 'Background colour', def: '#ffffff', show: function (p) { return p.flatten; } }
+    ],
+    onControl: function (c, p, state) {
+      if (!state.full) return;
+      var ar = state.full.width / state.full.height;
+      if (c.id === 'unit') {
+        var d = p.dpi, wpx = state.full.width, hpx = state.full.height;
+        if (p.unit === 'px') { p.width = wpx; p.height = hpx; }
+        else if (p.unit === 'cm') { p.width = +(wpx / d * CM).toFixed(1); p.height = +(hpx / d * CM).toFixed(1); }
+        else { p.width = +(wpx / d).toFixed(2); p.height = +(hpx / d).toFixed(2); }
+        return;
+      }
+      if (!p.lock) return;
+      if (c.id === 'width') p.height = +(p.width / ar).toFixed(p.unit === 'px' ? 0 : 2);
+      else if (c.id === 'height') p.width = +(p.height * ar).toFixed(p.unit === 'px' ? 0 : 2);
+      else if (c.id === 'lock') p.height = +(p.width / ar).toFixed(p.unit === 'px' ? 0 : 2);
+    },
+    process: function (c) {
+      var t = targetPx(c.p);
+      var W = IM.clamp(t.w, 1, 20000), H = IM.clamp(t.h, 1, 20000);
+      if (c.preview) {
+        var lim = 1500, m = Math.max(W, H);
+        if (m > lim) { W = Math.max(1, Math.round(W * lim / m)); H = Math.max(1, Math.round(H * lim / m)); }
+      }
+      var cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+      var ctx = cv.getContext('2d');
+      if (c.p.flatten) { ctx.fillStyle = c.p.color; ctx.fillRect(0, 0, W, H); }
+      var sw = c.src.width, sh = c.src.height, dw = W, dh = H, dx = 0, dy = 0;
+      if (c.p.fit !== 'stretch') {
+        var k = c.p.fit === 'cover' ? Math.max(W / sw, H / sh) : Math.min(W / sw, H / sh);
+        dw = sw * k; dh = sh * k; dx = (W - dw) / 2; dy = (H - dh) / 2;
+      }
+      var pre = IM.resize(c.src, Math.max(1, Math.round(dw)), Math.max(1, Math.round(dh)));
+      ctx.drawImage(pre, dx, dy);
+      return ctx.getImageData(0, 0, W, H);
+    }
+  });
+})();
+
+</script>
+<script>
+/* Format converter with control over quality and file size. */
+(function () {
+  'use strict';
+  var TYPES = { png: 'image/png', jpeg: 'image/jpeg', webp: 'image/webp' };
+
+  function build(src, p, preview) {
+    var w = src.width, h = src.height;
+    var lim = p.capSize ? p.maxSide : 0;
+    if (preview) lim = lim ? Math.min(lim, 1500) : Math.min(Math.max(w, h), 1500);
+    if (lim && Math.max(w, h) > lim) {
+      var k = lim / Math.max(w, h);
+      w = Math.max(1, Math.round(w * k)); h = Math.max(1, Math.round(h * k));
+    }
+    var cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+    var ctx = cv.getContext('2d');
+    if (p.format === 'jpeg' || p.flatten) { ctx.fillStyle = p.color; ctx.fillRect(0, 0, w, h); }
+    ctx.drawImage(IM.resize(src, w, h), 0, 0);
+    return cv;
+  }
+
+  NV.register({
+    slug: 'convert',
+    name: 'Format converter',
+    group: 'Artwork prep',
+    tagline: 'PNG, JPG and WEBP with control over quality, weight and background.',
+    icon: NV.svg('<path d="M4 7h11l-3-3M20 17H9l3 3"/><path d="M4 7v3M20 17v-3"/>'),
+    intro: 'PNG keeps transparency; JPG weighs less but flattens the background; WEBP gives the best weight for catalogues and social media.',
+    debounce: 150,
+    controls: [
+      { k: 'seg', id: 'format', label: 'Output format', def: 'png', opts: [['png', 'PNG'], ['jpeg', 'JPG'], ['webp', 'WEBP']] },
+      { k: 'note', text: 'JPG has no transparency: the background is flattened with the colour you choose.', show: function (p) { return p.format === 'jpeg'; } },
+      { k: 'range', id: 'quality', label: 'Quality', min: 30, max: 100, step: 1, def: 92, unit: ' %', show: function (p) { return p.format !== 'png'; } },
+      { k: 'check', id: 'flatten', label: 'Flatten the background even when the format supports alpha', def: false, show: function (p) { return p.format !== 'jpeg'; } },
+      { k: 'color', id: 'color', label: 'Background colour', def: '#ffffff', show: function (p) { return p.format === 'jpeg' || p.flatten; } },
+      { k: 'group', label: 'Size' },
+      { k: 'check', id: 'capSize', label: 'Cap the longest side', def: false },
+      { k: 'num', id: 'maxSide', label: 'Maximum side', unit: 'px', def: 2000, min: 64, max: 12000, step: 50, show: function (p) { return p.capSize; } },
+      { k: 'num', id: 'dpi', label: 'DPI to write into the PNG', unit: 'DPI', def: 300, min: 30, max: 1200, step: 10, show: function (p) { return p.format === 'png'; } }
+    ],
+    process: function (c) {
+      var cv = build(c.src, c.p, c.preview);
+      return cv.getContext('2d').getImageData(0, 0, cv.width, cv.height);
+    },
+    exports: [{
+      label: 'Download file',
+      make: function (api, done) {
+        var p = api.params, cv = build(api.src, p, false);
+        NV.blobOf(cv, TYPES[p.format], p.quality / 100).then(function (b) {
+          return p.format === 'png' ? NV.pngWithDpi(b, p.dpi) : b;
+        }).then(function (b) {
+          NV.toast('Final weight: ' + (b.size / 1024 > 1024 ? (b.size / 1048576).toFixed(2) + ' MB' : Math.round(b.size / 1024) + ' KB'), 'ok');
+          NV.download(b, api.name + '.' + (p.format === 'jpeg' ? 'jpg' : p.format));
+          done();
+        });
+      }
+    }]
+  });
+})();
+
+</script>
+
+<script>
+/* Halftones: dot screens and fades for DTF and screen printing. */
+(function () {
+  'use strict';
+
+  var ANG = { c: 15, m: 75, y: 0, k: 45 };
+
+  function shapePath(ctx, x, y, r, shape) {
+    if (shape === 'circle') { ctx.moveTo(x + r, y); ctx.arc(x, y, r, 0, 6.2832); return; }
+    if (shape === 'square') { ctx.rect(x - r * 0.886, y - r * 0.886, r * 1.772, r * 1.772); return; }
+    if (shape === 'diamond') {
+      var d = r * 1.25;
+      ctx.moveTo(x, y - d); ctx.lineTo(x + d, y); ctx.lineTo(x, y + d); ctx.lineTo(x - d, y); ctx.closePath();
+      return;
+    }
+    if (shape === 'cross') {
+      var a = r * 1.3, b = r * 0.42;
+      ctx.rect(x - a, y - b, a * 2, b * 2); ctx.rect(x - b, y - a, b * 2, a * 2);
+      return;
+    }
+    ctx.rect(x - r * 1.6, y - r * 0.9, r * 3.2, r * 1.8);   // line
+  }
+
+  /* Average coverage of one cell: luminance and alpha from the source. */
+  function sampler(id) {
+    var w = id.width, h = id.height, p = id.data;
+    return function (cx, cy, half) {
+      var x0 = Math.max(0, Math.floor(cx - half)), x1 = Math.min(w - 1, Math.ceil(cx + half));
+      var y0 = Math.max(0, Math.floor(cy - half)), y1 = Math.min(h - 1, Math.ceil(cy + half));
+      if (x1 < x0 || y1 < y0) return null;
+      var lum = 0, al = 0, r = 0, g = 0, b = 0, n = 0, x, y, i;
+      var step = Math.max(1, Math.floor((x1 - x0) / 6));
+      for (y = y0; y <= y1; y += step) for (x = x0; x <= x1; x += step) {
+        i = (y * w + x) * 4;
+        var a = p[i + 3] / 255;
+        lum += (0.2126 * p[i] + 0.7152 * p[i + 1] + 0.0722 * p[i + 2]) / 255 * a;
+        r += p[i] * a; g += p[i + 1] * a; b += p[i + 2] * a;
+        al += a; n++;
+      }
+      if (!n) return null;
+      return { lum: lum / n, a: al / n, r: al ? r / al : 0, g: al ? g / al : 0, b: al ? b / al : 0 };
+    };
+  }
+
+  function ramp(p, x, y, w, h) {
+    var t;
+    if (p.dir === 'down') t = y / h;
+    else if (p.dir === 'up') t = 1 - y / h;
+    else if (p.dir === 'right') t = x / w;
+    else if (p.dir === 'left') t = 1 - x / w;
+    else {
+      var dx = (x - w / 2) / (w / 2), dy = (y - h / 2) / (h / 2);
+      t = Math.min(1, Math.sqrt(dx * dx + dy * dy));
+    }
+    var start = p.start / 100, end = p.end / 100;
+    if (end <= start) end = start + 0.001;
+    return IM.clamp((t - start) / (end - start), 0, 1);
+  }
+
+  function pass(ctx, src, p, cellPx, angleDeg, color, chan) {
+    var w = src.width, h = src.height;
+    var smp = sampler(src);
+    var a = angleDeg * Math.PI / 180, cs = Math.cos(a), sn = Math.sin(a);
+    var diag = Math.ceil(Math.sqrt(w * w + h * h) / cellPx) + 2;
+    ctx.fillStyle = color || '#000';
+    ctx.beginPath();
+    for (var i = -diag; i <= diag; i++) for (var j = -diag; j <= diag; j++) {
+      var x = (i * cs - j * sn) * cellPx + w / 2;
+      var y = (i * sn + j * cs) * cellPx + h / 2;
+      if (x < -cellPx || y < -cellPx || x > w + cellPx || y > h + cellPx) continue;
+      var s = smp(x, y, cellPx / 2);
+      if (!s || s.a < 0.02) continue;
+      var cover = 1;
+      if (p.mode === 'tone' || p.mode === 'both') {
+        cover = chan ? chan(s) : (1 - s.lum / Math.max(0.001, s.a));
+        cover = IM.clamp(cover, 0, 1) * s.a;
+      } else cover = s.a;
+      if (p.mode === 'fade' || p.mode === 'both') cover *= (1 - ramp(p, x, y, w, h));
+      if (cover <= 0.004) continue;
+      var r = 0.708 * cellPx * Math.sqrt(cover) * (p.weight / 100);
+      if (p.ink === 'original') {
+        ctx.fill(); ctx.beginPath();
+        ctx.fillStyle = 'rgb(' + (s.r | 0) + ',' + (s.g | 0) + ',' + (s.b | 0) + ')';
+        shapePath(ctx, x, y, r, p.shape);
+        ctx.fill(); ctx.beginPath();
+        continue;
+      }
+      shapePath(ctx, x, y, r, p.shape);
+    }
+    ctx.fill();
+  }
+
+  NV.register({
+    slug: 'halftones',
+    name: 'Halftones and fades',
+    group: 'Print effects',
+    tagline: 'Dot screens with angle and shape, and gradients that dissolve into dots.',
+    icon: NV.svg('<circle cx="6" cy="6" r="3"/><circle cx="17" cy="6" r="2.2"/><circle cx="6" cy="17" r="2.2"/><circle cx="17" cy="17" r="1.2"/>'),
+    intro: 'A dot fade is the right way to make a gradient in DTF: the printer cannot print partial alpha, but it can print solid dots that get smaller.',
+    debounce: 160,
+    controls: [
+      { k: 'seg', id: 'mode', label: 'What to do', def: 'fade', opts: [['fade', 'Fade out'], ['tone', 'Screen tones'], ['both', 'Both']] },
+      { k: 'range', id: 'cell', label: 'Dot size', min: 2, max: 40, step: 0.5, def: 8, unit: ' px', dec: 1, scale: true },
+      { k: 'range', id: 'weight', label: 'Dot weight', min: 40, max: 160, step: 1, def: 100, unit: ' %' },
+      { k: 'select', id: 'shape', label: 'Shape', def: 'circle', opts: [['circle', 'Circle'], ['square', 'Square'], ['diamond', 'Diamond'], ['cross', 'Cross'], ['line', 'Line']] },
+      { k: 'range', id: 'angle', label: 'Screen angle', min: 0, max: 90, step: 1, def: 45, unit: '°' },
+      { k: 'group', label: 'Fade', show: function (p) { return p.mode !== 'tone'; } },
+      { k: 'select', id: 'dir', label: 'Direction', def: 'down', show: function (p) { return p.mode !== 'tone'; }, opts: [['down', 'Downward'], ['up', 'Upward'], ['right', 'To the right'], ['left', 'To the left'], ['center', 'Out from the centre']] },
+      { k: 'range', id: 'start', label: 'Fade starts at', min: 0, max: 100, step: 1, def: 35, unit: ' %', show: function (p) { return p.mode !== 'tone'; } },
+      { k: 'range', id: 'end', label: 'Fully gone at', min: 0, max: 100, step: 1, def: 95, unit: ' %', show: function (p) { return p.mode !== 'tone'; } },
+      { k: 'group', label: 'Colour' },
+      { k: 'seg', id: 'ink', label: 'Dot ink', def: 'original', opts: [['original', 'Original'], ['solid', 'One colour'], ['cmyk', 'CMYK']] },
+      { k: 'color', id: 'tint', label: 'Ink colour', def: '#111111', show: function (p) { return p.ink === 'solid'; } },
+      { k: 'note', text: 'CMYK splits into four screens at the classic angles (C 15°, M 75°, Y 0°, K 45°) to avoid moiré.', show: function (p) { return p.ink === 'cmyk'; } }
+    ],
+    process: function (c) {
+      var src = c.src, w = src.width, h = src.height, p = c.p;
+      var cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+      var ctx = cv.getContext('2d');
+      var cell = Math.max(1.2, p.cell);
+      if (p.ink === 'cmyk') {
+        ctx.globalCompositeOperation = 'source-over';
+        var chans = [
+          ['c', '#00AEEF', function (s) { return IM.clamp(1 - s.r / 255, 0, 1); }],
+          ['m', '#EC008C', function (s) { return IM.clamp(1 - s.g / 255, 0, 1); }],
+          ['y', '#FFF200', function (s) { return IM.clamp(1 - s.b / 255, 0, 1); }],
+          ['k', '#231F20', function (s) { return IM.clamp(1 - Math.max(s.r, s.g, s.b) / 255, 0, 1); }]
+        ];
+        ctx.globalAlpha = 0.9;
+        chans.forEach(function (ch) {
+          var pp = Object.assign({}, p, { mode: p.mode === 'fade' ? 'both' : p.mode });
+          pass(ctx, src, pp, cell, ANG[ch[0]], ch[1], ch[2]);
+        });
+        ctx.globalAlpha = 1;
+      } else {
+        pass(ctx, src, p, cell, p.angle, p.ink === 'solid' ? p.tint : '#000');
+      }
+      return ctx.getImageData(0, 0, w, h);
+    }
+  });
+})();
+
+</script>
+<script>
+/* Rhinestones: turns artwork into a stud placement pattern with a real stone count. */
+(function () {
+  'use strict';
+  var el = NV.el;
+
+  /* Standard stone sizes, in millimetres. */
+  var SS = { ss6: 2.0, ss8: 2.4, ss10: 2.8, ss12: 3.2, ss16: 3.9, ss20: 4.7, ss30: 6.4 };
+
+  /* Colours that actually exist in a stone catalogue. */
+  var STONES = [
+    ['Crystal', '#e8ecf2'], ['Crystal AB', '#d6e6f2'], ['Jet', '#17171b'],
+    ['Black Diamond', '#6d6f77'], ['Hematite', '#4a4c55'], ['Siam', '#a3162b'],
+    ['Light Siam', '#c8324a'], ['Rose', '#e5468b'], ['Fuchsia', '#b8206b'],
+    ['Amethyst', '#6a3b8f'], ['Sapphire', '#1b4f9c'], ['Aquamarine', '#7fc4d8'],
+    ['Emerald', '#157a4e'], ['Peridot', '#a8c64c'], ['Topaz', '#e2a93b'],
+    ['Sun', '#e06a21'], ['Gold Quartz', '#c99a3e'], ['Rose Gold', '#c98a79']
+  ].map(function (s) { return { name: s[0], hex: s[1], rgb: IM.rgb(s[1]) }; });
+
+  function nearestStone(r, g, b) {
+    var best = STONES[0], bd = 1e9;
+    for (var i = 0; i < STONES.length; i++) {
+      var d = IM.colorDistance(r, g, b, STONES[i].rgb[0], STONES[i].rgb[1], STONES[i].rgb[2]);
+      if (d < bd) { bd = d; best = STONES[i]; }
+    }
+    return best;
+  }
+
+  /* Where the stones go. Everything downstream reads this. */
+  function place(src, p) {
+    var w = src.width, h = src.height, d = src.data;
+    var pxPerMm = w / Math.max(1, p.widthCm * 10);
+    var stoneMm = SS[p.stone] || 2.8;
+    var stonePx = stoneMm * pxPerMm;
+    var pitch = (stoneMm + p.gap) * pxPerMm;
+    if (pitch < 1.2) pitch = 1.2;
+
+    var keep = new Uint8Array(w * h), i, n = w * h;
+    for (i = 0; i < n; i++) {
+      var a = d[i * 4 + 3];
+      if (a < p.threshold) continue;
+      if (p.ignoreLight) {
+        var lum = 0.2126 * d[i * 4] + 0.7152 * d[i * 4 + 1] + 0.0722 * d[i * 4 + 2];
+        if (lum > 242) continue;
+      }
+      keep[i] = 1;
+    }
+    if (p.mode === 'outline') {                       // stones only along the contour
+      var sdf = IM.alphaSDF(src, p.threshold);
+      var band = Math.max(stonePx, p.outlineMm * pxPerMm);
+      for (i = 0; i < n; i++) if (keep[i] && (sdf[i] < 0 || sdf[i] > band)) keep[i] = 0;
+    }
+
+    var rowStep = p.layout === 'offset' ? pitch * 0.866 : pitch;   // hex rows sit closer
+    var stones = [], counts = {};
+    var half = stonePx / 2;
+    for (var row = 0, y = half; y <= h - half + pitch; y += rowStep, row++) {
+      var xoff = (p.layout === 'offset' && row % 2) ? pitch / 2 : 0;
+      for (var x = half + xoff; x <= w - half; x += pitch) {
+        var cover = 0, hits = 0, cr = 0, cg = 0, cb = 0;
+        var x0 = Math.max(0, Math.round(x - half)), x1 = Math.min(w - 1, Math.round(x + half));
+        var y0 = Math.max(0, Math.round(y - half)), y1 = Math.min(h - 1, Math.round(y + half));
+        var st = Math.max(1, Math.floor((x1 - x0) / 5));
+        for (var yy = y0; yy <= y1; yy += st) for (var xx = x0; xx <= x1; xx += st) {
+          var k = yy * w + xx;
+          hits++;
+          if (!keep[k]) continue;
+          cover++;
+          cr += d[k * 4]; cg += d[k * 4 + 1]; cb += d[k * 4 + 2];
+        }
+        if (!hits || cover / hits < p.density / 100) continue;
+        var stone = p.colorMode === 'source'
+          ? nearestStone(cr / cover, cg / cover, cb / cover)
+          : { name: 'Chosen colour', hex: p.stoneColor };
+        stones.push({ x: x, y: y, r: half, hex: stone.hex });
+        counts[stone.name] = (counts[stone.name] || 0) + 1;
+      }
+    }
+    return {
+      stones: stones, counts: counts, pxPerMm: pxPerMm,
+      stoneMm: stoneMm, pitchMm: stoneMm + p.gap,
+      heightCm: h / pxPerMm / 10
+    };
+  }
+
+  function shade(hex, k) {
+    var c = IM.rgb(hex);
+    return 'rgb(' + c.map(function (v) {
+      return Math.round(IM.clamp(k > 0 ? v + (255 - v) * k : v * (1 + k), 0, 255));
+    }).join(',') + ')';
+  }
+
+  function draw(res, w, h, p) {
+    var cv = document.createElement('canvas');
+    cv.width = w; cv.height = h;
+    var ctx = cv.getContext('2d');
+    if (p.backdrop !== 'none') {
+      ctx.fillStyle = p.backdrop === 'dark' ? '#14120f' : '#f4f1ea';
+      ctx.fillRect(0, 0, w, h);
+    }
+    res.stones.forEach(function (s) {
+      if (p.template) {                                // flat dots: the cutting template
+        ctx.fillStyle = '#000';
+        ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 6.2832); ctx.fill();
+        return;
+      }
+      var g = ctx.createRadialGradient(s.x - s.r * 0.32, s.y - s.r * 0.32, s.r * 0.1, s.x, s.y, s.r);
+      g.addColorStop(0, shade(s.hex, 0.55));
+      g.addColorStop(0.55, s.hex);
+      g.addColorStop(1, shade(s.hex, -0.32));
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 6.2832); ctx.fill();
+      if (s.r > 2.2) {
+        ctx.strokeStyle = 'rgba(0,0,0,.25)';
+        ctx.lineWidth = Math.max(0.4, s.r * 0.09);
+        ctx.stroke();
+        ctx.fillStyle = 'rgba(255,255,255,.55)';      // the facet catching the light
+        ctx.beginPath();
+        ctx.arc(s.x - s.r * 0.3, s.y - s.r * 0.34, s.r * 0.2, 0, 6.2832);
+        ctx.fill();
+      }
+    });
+    return ctx.getImageData(0, 0, w, h);
+  }
+
+  NV.register({
+    slug: 'rhinestones',
+    name: 'Rhinestone patterns',
+    group: 'Print effects',
+    tagline: 'Turn artwork into a stud layout with the real stone count you need to order.',
+    icon: NV.svg('<circle cx="12" cy="5.5" r="2.4"/><circle cx="6" cy="12" r="2.4"/><circle cx="18" cy="12" r="2.4"/><circle cx="12" cy="18.5" r="2.4"/>'),
+    intro: 'Stones sit on a real lattice at their real size, so the count and the layout match what you will actually stick down. Set the finished width first — everything is measured from it.',
+    debounce: 200,
+    controls: [
+      { k: 'num', id: 'widthCm', label: 'Finished design width', unit: 'cm', def: 25, min: 2, max: 200, step: 0.5 },
+      { k: 'select', id: 'stone', label: 'Stone size', def: 'ss10', opts: [['ss6', 'SS6 · 2.0 mm'], ['ss8', 'SS8 · 2.4 mm'], ['ss10', 'SS10 · 2.8 mm'], ['ss12', 'SS12 · 3.2 mm'], ['ss16', 'SS16 · 3.9 mm'], ['ss20', 'SS20 · 4.7 mm'], ['ss30', 'SS30 · 6.4 mm']] },
+      { k: 'range', id: 'gap', label: 'Gap between stones', min: 0, max: 3, step: 0.1, def: 0.4, unit: ' mm', dec: 1 },
+      { k: 'seg', id: 'layout', label: 'Layout', def: 'offset', opts: [['offset', 'Offset rows'], ['grid', 'Square grid']] },
+      { k: 'group', label: 'Coverage' },
+      { k: 'seg', id: 'mode', label: 'Fill', def: 'fill', opts: [['fill', 'Whole shape'], ['outline', 'Outline only']] },
+      { k: 'range', id: 'outlineMm', label: 'Outline thickness', min: 1, max: 20, step: 0.5, def: 5, unit: ' mm', dec: 1, show: function (p) { return p.mode === 'outline'; } },
+      { k: 'range', id: 'density', label: 'Place a stone from', min: 10, max: 90, step: 5, def: 45, unit: ' % cover' },
+      { k: 'range', id: 'threshold', label: 'Alpha threshold', min: 8, max: 250, step: 2, def: 128, unit: '' },
+      { k: 'check', id: 'ignoreLight', label: 'Skip near-white areas', def: false },
+      { k: 'group', label: 'Stones' },
+      { k: 'seg', id: 'colorMode', label: 'Colour', def: 'source', opts: [['source', 'Match artwork'], ['mono', 'One colour']] },
+      { k: 'color', id: 'stoneColor', label: 'Stone colour', def: '#e8ecf2', show: function (p) { return p.colorMode === 'mono'; } },
+      { k: 'check', id: 'template', label: 'Template view (flat dots for cutting)', def: false },
+      { k: 'seg', id: 'backdrop', label: 'Preview on', def: 'none', opts: [['none', 'Transparent'], ['dark', 'Dark'], ['light', 'Light']] }
+    ],
+    setup: function (api) {
+      var box = el('div', { style: 'border:1px solid var(--line);border-radius:6px;padding:12px;display:flex;flex-direction:column;gap:8px' });
+      var body = document.querySelector('.rail-body');
+      body.insertBefore(box, body.children[1] || null);   // right under the intro
+      api.state.custom.report = box;
+    },
+    process: function (c) {
+      var res = place(c.src, c.p);
+      c.state.custom.last = res;
+      var box = c.state.custom.report;
+      if (box) {
+        var names = Object.keys(res.counts).sort(function (a, b) { return res.counts[b] - res.counts[a]; });
+        box.innerHTML = '';
+        box.appendChild(el('div', { class: 'eyebrow', text: 'Stone count' }));
+        box.appendChild(el('div', {
+          style: 'font-family:var(--f-display);font-size:30px;font-weight:800;line-height:1;color:var(--accent)',
+          text: NV.fmt(res.stones.length, 0)
+        }));
+        box.appendChild(el('p', {
+          class: 'hint',
+          text: res.stoneMm.toFixed(1) + ' mm stones · pitch ' + res.pitchMm.toFixed(1) + ' mm · ' +
+            c.p.widthCm + ' × ' + res.heightCm.toFixed(1) + ' cm · ' +
+            NV.fmt(Math.ceil(res.stones.length / 144), 0) + ' gross'
+        }));
+        if (names.length) {
+          var t = el('table'), tb = el('tbody');
+          names.forEach(function (n) {
+            var hex = (STONES.filter(function (s) { return s.name === n; })[0] || {}).hex || c.p.stoneColor;
+            tb.appendChild(el('tr', {}, [
+              el('td', {}, [
+                el('span', { style: 'display:inline-block;width:11px;height:11px;border-radius:50%;background:' + hex + ';border:1px solid var(--line);margin-right:7px;vertical-align:-1px' }),
+                el('span', { text: n })
+              ]),
+              el('td', { class: 'num', text: NV.fmt(res.counts[n], 0) })
+            ]));
+          });
+          t.appendChild(tb);
+          box.appendChild(el('div', { class: 'scroll-x', style: 'max-height:230px;overflow-y:auto' }, [t]));
+        }
+      }
+      return draw(res, c.src.width, c.src.height, c.p);
+    },
+    exports: [
+      { label: 'Download PNG', short: 'Pattern PNG', ext: 'png' },
+      {
+        label: 'Download SVG template', short: 'SVG template', ext: 'svg', secondary: true,
+        make: function (api, done) {
+          var res = place(api.src, api.params), p = api.params;
+          var mm = function (v) { return +(v / res.pxPerMm).toFixed(2); };
+          var W = mm(api.src.width), H = mm(api.src.height);
+          var s = '<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" ' +
+            'width="' + W + 'mm" height="' + H + 'mm" viewBox="0 0 ' + W + ' ' + H + '">\n' +
+            '  <!-- ' + res.stones.length + ' stones, ' + res.stoneMm.toFixed(1) + ' mm, pitch ' + res.pitchMm.toFixed(1) + ' mm -->\n';
+          res.stones.forEach(function (st) {
+            s += '  <circle cx="' + mm(st.x) + '" cy="' + mm(st.y) + '" r="' + mm(st.r) +
+              '" fill="' + (p.template ? '#000000' : st.hex) + '"/>\n';
+          });
+          NV.download(new Blob([s + '</svg>\n'], { type: 'image/svg+xml' }), api.name + '-rhinestones.svg');
+          done();
+        }
+      },
+      {
+        label: 'Stone list (CSV)', short: 'Stone CSV', ext: 'csv', secondary: true,
+        make: function (api, done) {
+          var res = api.state.custom.last || place(api.src, api.params);
+          var rows = [['Colour', 'Stones', 'Gross']];
+          Object.keys(res.counts).forEach(function (n) {
+            rows.push([n, res.counts[n], Math.ceil(res.counts[n] / 144)]);
+          });
+          rows.push([]);
+          rows.push(['Total', res.stones.length, Math.ceil(res.stones.length / 144)]);
+          rows.push(['Stone size mm', res.stoneMm.toFixed(1)]);
+          rows.push(['Design width cm', api.params.widthCm]);
+          NV.download(new Blob([rows.map(function (r) { return r.join(','); }).join('\n')],
+            { type: 'text/csv' }), api.name + '-stones.csv');
+          done();
+        }
+      }
+    ]
+  });
+})();
+
+</script>
+<script>
+/* Frames and grunge: distress, dirty texture and workshop-style borders. */
+(function () {
+  'use strict';
+
+  function distress(id, p) {
+    var w = id.width, h = id.height, n = w * h, i;
+    var out = IM.copy(id), q = out.data;
+    var nz = IM.noise(w, h, Math.max(2, p.grain), 4, p.seed | 0);
+    var edge = p.edgeOnly ? IM.alphaSDF(id, 128) : null;
+    var thr = 1 - p.amount / 100;
+    for (i = 0; i < n; i++) {
+      var cut = IM.clamp((nz[i] - thr) / 0.12 + 0.5, 0, 1);
+      if (edge) {
+        var near = IM.clamp(1 - (edge[i] - 1) / Math.max(1, p.edgeWidth), 0, 1);
+        cut = 1 - (1 - cut) * near;
+      }
+      q[i * 4 + 3] = q[i * 4 + 3] * cut;
+    }
+    return out;
+  }
+
+  function texture(id, p) {
+    var w = id.width, h = id.height, n = w * h, i, k;
+    var out = IM.copy(id), q = out.data;
+    var nz = IM.noise(w, h, Math.max(2, p.grain), 5, (p.seed | 0) + 7);
+    var amt = p.amount / 100;
+    for (i = 0; i < n; i++) {
+      var m = 1 - (1 - nz[i]) * amt;
+      for (k = 0; k < 3; k++) q[i * 4 + k] = IM.clamp(q[i * 4 + k] * m, 0, 255);
+    }
+    return out;
+  }
+
+  function frame(id, p) {
+    var w = id.width, h = id.height;
+    var cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+    var ctx = cv.getContext('2d');
+    ctx.putImageData(id, 0, 0);
+    var m = Math.min(w, h) * p.margin / 100;
+    var g = Math.max(1, Math.min(w, h) * p.weight / 100);
+    ctx.strokeStyle = p.color; ctx.lineWidth = g;
+    ctx.beginPath();
+    if (p.frame === 'circle') {
+      ctx.arc(w / 2, h / 2, Math.min(w, h) / 2 - m - g / 2, 0, 6.2832);
+    } else if (p.frame === 'rounded' || p.frame === 'stamp') {
+      var r = Math.min(w, h) * 0.06;
+      var x = m + g / 2, y = m + g / 2, ww = w - 2 * x, hh = h - 2 * y;
+      if (ctx.roundRect) ctx.roundRect(x, y, ww, hh, r);
+      else ctx.rect(x, y, ww, hh);
+    } else {
+      ctx.rect(m + g / 2, m + g / 2, w - 2 * m - g, h - 2 * m - g);
+    }
+    ctx.stroke();
+    if (p.frame === 'stamp') {
+      var m2 = m + g * 2.2;
+      ctx.lineWidth = Math.max(1, g * 0.4);
+      ctx.beginPath();
+      ctx.rect(m2, m2, w - 2 * m2, h - 2 * m2);
+      ctx.stroke();
+    }
+    return ctx.getImageData(0, 0, w, h);
+  }
+
+  NV.register({
+    slug: 'frames-grunge',
+    name: 'Frames and grunge',
+    group: 'Print effects',
+    tagline: 'Distress the artwork, add dirty texture and frame it with workshop character.',
+    icon: NV.svg('<path d="M3 3h18v18H3z"/><path d="M7 8.5c1.5.6 2.5-.6 4 0s2.5 1 4 .3M7 13c2 .8 3-.7 4.5 0s2.6.9 4.5 0M8 17c1.5.5 2.4-.5 4 0"/>'),
+    intro: 'Distress breaks up the alpha with fractal noise, the way a worn plate does. Texture dirties the colour without touching the cutout.',
+    debounce: 220,
+    controls: [
+      { k: 'seg', id: 'effect', label: 'Effect', def: 'distress', opts: [['distress', 'Distress'], ['texture', 'Texture'], ['none', 'Frame only']] },
+      { k: 'range', id: 'amount', label: 'Amount', min: 0, max: 95, step: 1, def: 40, unit: ' %', show: function (p) { return p.effect !== 'none'; } },
+      { k: 'range', id: 'grain', label: 'Grain', min: 2, max: 120, step: 1, def: 18, unit: ' px', scale: true, show: function (p) { return p.effect !== 'none'; } },
+      { k: 'range', id: 'seed', label: 'Variant', min: 1, max: 60, step: 1, def: 7, unit: '', show: function (p) { return p.effect !== 'none'; } },
+      { k: 'check', id: 'edgeOnly', label: 'Distress the contour only', def: false, show: function (p) { return p.effect === 'distress'; } },
+      { k: 'range', id: 'edgeWidth', label: 'Distress width', min: 2, max: 80, step: 1, def: 16, unit: ' px', scale: true, show: function (p) { return p.effect === 'distress' && p.edgeOnly; } },
+      { k: 'group', label: 'Frame' },
+      { k: 'select', id: 'frame', label: 'Type', def: 'none', opts: [['none', 'No frame'], ['square', 'Square'], ['rounded', 'Rounded'], ['circle', 'Circle'], ['stamp', 'Double line (stamp)']] },
+      { k: 'range', id: 'weight', label: 'Weight', min: 0.2, max: 8, step: 0.1, def: 1.5, unit: ' %', dec: 1, show: function (p) { return p.frame !== 'none'; } },
+      { k: 'range', id: 'margin', label: 'Margin', min: 0, max: 25, step: 0.5, def: 4, unit: ' %', dec: 1, show: function (p) { return p.frame !== 'none'; } },
+      { k: 'color', id: 'color', label: 'Frame colour', def: '#111111', show: function (p) { return p.frame !== 'none'; } },
+      { k: 'check', id: 'distressFrame', label: 'Distress the frame too', def: true, show: function (p) { return p.frame !== 'none' && p.effect === 'distress'; } }
+    ],
+    process: function (c) {
+      var p = c.p, out = IM.copy(c.src);
+      var framed = p.frame !== 'none';
+      if (framed && p.distressFrame && p.effect === 'distress') out = frame(out, p);
+      if (p.effect === 'distress') out = distress(out, p);
+      else if (p.effect === 'texture') out = texture(out, p);
+      if (framed && !(p.distressFrame && p.effect === 'distress')) out = frame(out, p);
+      return out;
+    }
+  });
+})();
+
+</script>
+
+<script>
+/* Print sheets (gang sheets): lay several designs out on the roll and use the film well. */
+(function () {
+  'use strict';
+  var el = NV.el, CM = 2.54;
+
+  function pack(items, sheetW, gap, margin) {
+    var usable = sheetW - margin * 2, units = [], out = [];
+    items.forEach(function (it) {
+      var wcm = it.cm, hcm = it.cm * it.img.height / it.img.width;
+      for (var i = 0; i < it.qty; i++) units.push({ it: it, w: wcm, h: hcm });
+    });
+    units.sort(function (a, b) { return b.h - a.h; });
+    var x = margin, y = margin, shelf = 0;
+    units.forEach(function (u) {
+      var w = u.w, h = u.h, rot = false;
+      if (u.it.rot && w > usable && h <= usable) { var t = w; w = h; h = t; rot = true; }
+      if (w > usable) { var k = usable / w; w *= k; h *= k; }
+      if (x + w > margin + usable + 1e-6) { y += shelf + gap; x = margin; shelf = 0; }
+      out.push({ it: u.it, x: x, y: y, w: w, h: h, rot: rot });
+      x += w + gap;
+      shelf = Math.max(shelf, h);
+    });
+    return { places: out, length: out.length ? y + shelf + margin : margin * 2 };
+  }
+
+  function draw(cv, st, packed, forExport) {
+    var pxcm = forExport ? st.dpi / CM : cv.width / st.width;
+    var ctx = cv.getContext('2d');
+    ctx.fillStyle = forExport && !st.background ? 'rgba(0,0,0,0)' : (forExport ? st.color : '#ffffff');
+    if (forExport && !st.background) ctx.clearRect(0, 0, cv.width, cv.height);
+    else ctx.fillRect(0, 0, cv.width, cv.height);
+    packed.places.forEach(function (p) {
+      ctx.save();
+      if (p.rot) {
+        ctx.translate(p.x * pxcm + p.w * pxcm, p.y * pxcm);
+        ctx.rotate(Math.PI / 2);
+        ctx.drawImage(p.it.img, 0, 0, p.h * pxcm, p.w * pxcm);
+      } else {
+        ctx.drawImage(p.it.img, p.x * pxcm, p.y * pxcm, p.w * pxcm, p.h * pxcm);
+      }
+      ctx.restore();
+      if (!forExport) {
+        ctx.strokeStyle = 'rgba(255,45,126,.45)';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(p.x * pxcm, p.y * pxcm, p.w * pxcm, p.h * pxcm);
+      }
+    });
+    if (!forExport) {
+      ctx.strokeStyle = 'rgba(120,120,120,.5)';
+      ctx.setLineDash([6, 5]);
+      ctx.strokeRect(st.margin * pxcm, st.margin * pxcm,
+        (st.width - st.margin * 2) * pxcm, cv.height - st.margin * 2 * pxcm);
+      ctx.setLineDash([]);
+    }
+  }
+
+  NV.register({
+    slug: 'gang-sheets',
+    name: 'Print sheets',
+    group: 'Production',
+    tagline: 'Gang several designs onto the roll, measure the run and export at real DPI.',
+    icon: NV.svg('<path d="M3 4h18v16H3z"/><path d="M3 10h9v10M12 4v6h9"/>'),
+    kind: 'custom',
+    render: function (host) {
+      var t = this;
+      var parts = NV.bench(host, t);
+      var st = { width: 58, dpi: 300, gap: 0.5, margin: 0.5, background: false, color: '#ffffff' };
+      var items = [], packed = { places: [], length: 1 };
+
+      var wrap = el('div', { style: 'flex:1;overflow:auto;padding:22px;display:flex;justify-content:center;align-items:flex-start' });
+      var cv = el('canvas', { style: 'box-shadow:0 0 0 1px var(--line), 0 20px 50px -30px #000;background:#fff;max-width:100%' });
+      wrap.appendChild(cv);
+      var info = el('div', { class: 'meta' });
+      parts.stage.appendChild(wrap); parts.stage.appendChild(info);
+
+      var listBox = el('div', { style: 'display:flex;flex-direction:column;gap:10px' });
+      var input = el('input', { type: 'file', accept: 'image/*', multiple: true, style: 'display:none' });
+      input.addEventListener('change', function () {
+        var files = [].slice.call(input.files);
+        Promise.all(files.map(function (f) {
+          return NV.loadImage(f).then(function (img) {
+            return { name: f.name.replace(/\.[^.]+$/, ''), img: img, cm: 20, qty: 1, rot: true };
+          });
+        })).then(function (added) {
+          items = items.concat(added);
+          input.value = '';
+          renderList(); update();
+        });
+      });
+
+      function renderList() {
+        listBox.innerHTML = '';
+        if (!items.length) {
+          listBox.appendChild(el('p', { class: 'hint', text: 'No designs yet. Add PNGs with a transparent background and set the width of each one in centimetres.' }));
+          return;
+        }
+        items.forEach(function (it, i) {
+          var row = el('div', { style: 'border:1px solid var(--line);border-radius:6px;padding:10px;display:flex;flex-direction:column;gap:8px' });
+          var top = el('div', { style: 'display:flex;gap:10px;align-items:center' });
+          var th = el('canvas', { width: 40, height: 40, style: 'flex:none;border-radius:4px;background:var(--ground)' });
+          var tc = th.getContext('2d');
+          var k = Math.min(40 / it.img.width, 40 / it.img.height);
+          tc.drawImage(it.img, (40 - it.img.width * k) / 2, (40 - it.img.height * k) / 2, it.img.width * k, it.img.height * k);
+          top.appendChild(th);
+          top.appendChild(el('div', { style: 'flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px', text: it.name }));
+          top.appendChild(el('button', {
+            class: 'btn ghost', style: 'padding:4px 9px', text: '✕', title: 'Remove',
+            onclick: function () { items.splice(i, 1); renderList(); update(); }
+          }));
+          row.appendChild(top);
+
+          var g = el('div', { class: 'row' });
+          var wIn = el('input', { type: 'number', value: it.cm, min: 1, max: 200, step: 0.5, title: 'Width in cm' });
+          var qIn = el('input', { type: 'number', value: it.qty, min: 1, max: 200, step: 1, title: 'Quantity' });
+          wIn.addEventListener('input', function () { it.cm = Math.max(0.5, +wIn.value || 1); update(); });
+          qIn.addEventListener('input', function () { it.qty = Math.max(1, Math.min(200, +qIn.value || 1)); update(); });
+          g.appendChild(el('label', { class: 'field' }, [el('span', { class: 'flabel', html: '<span>Width</span><b>cm</b>' }), wIn]));
+          g.appendChild(el('label', { class: 'field' }, [el('span', { class: 'flabel', html: '<span>Quantity</span><b>pcs</b>' }), qIn]));
+          row.appendChild(g);
+
+          var rc = el('input', { type: 'checkbox' });
+          rc.checked = it.rot;
+          rc.addEventListener('change', function () { it.rot = rc.checked; update(); });
+          row.appendChild(el('label', { class: 'check' }, [rc, el('span', { text: 'May rotate 90°' })]));
+          listBox.appendChild(row);
+        });
+      }
+
+      function update() {
+        packed = pack(items, st.width, st.gap, st.margin);
+        var length = Math.max(st.margin * 2 + 1, packed.length);
+        var pxcm = 900 / st.width;
+        cv.width = Math.round(st.width * pxcm);
+        cv.height = Math.max(40, Math.round(length * pxcm));
+        cv.style.width = Math.min(900, cv.width) + 'px';
+        draw(cv, st, packed, false);
+        var used = packed.places.reduce(function (a, p) { return a + p.w * p.h; }, 0);
+        var sheet = st.width * length;
+        info.textContent = packed.places.length + ' pieces · ' + length.toFixed(1) + ' cm long (' +
+          (length / 100).toFixed(2) + ' m) · ' + Math.round(used / sheet * 100) + ' % used';
+      }
+
+      NV.controls(parts.body, [
+        { k: 'select', id: 'width', label: 'Roll width', def: '58', opts: [['30', '30 cm'], ['33', '33 cm'], ['40', '40 cm'], ['55', '55 cm'], ['58', '58 cm'], ['60', '60 cm'], ['62', '62 cm']] },
+        { k: 'num', id: 'dpi', label: 'Output resolution', unit: 'DPI', def: 300, min: 100, max: 720, step: 10 },
+        { k: 'range', id: 'gap', label: 'Gap between pieces', min: 0, max: 4, step: 0.1, def: 0.5, unit: ' cm', dec: 1 },
+        { k: 'range', id: 'margin', label: 'Roll margin', min: 0, max: 4, step: 0.1, def: 0.5, unit: ' cm', dec: 1 },
+        { k: 'check', id: 'background', label: 'Export with a solid background', def: false },
+        { k: 'color', id: 'color', label: 'Background colour', def: '#ffffff', show: function (p) { return p.background; } }
+      ], st, function () { st.width = +st.width; update(); }).sync();
+
+      parts.body.appendChild(el('div', { class: 'sep' }));
+      parts.body.appendChild(el('div', { class: 'group-t', text: 'Designs on the sheet' }));
+      parts.body.appendChild(el('button', { class: 'btn wide', text: 'Add designs', onclick: function () { input.click(); } }));
+      parts.body.appendChild(input);
+      parts.body.appendChild(listBox);
+      parts.body.appendChild(el('p', { class: 'hint', text: 'The layout uses shelves by height, the same way a RIP does: sort tallest first and fill each row.' }));
+
+      parts.foot.appendChild(el('button', {
+        class: 'btn primary wide', text: 'Download sheet PNG',
+        onclick: function () {
+          if (!items.length) return NV.toast('Add at least one design.', 'bad');
+          var length = packed.length, pxcm = st.dpi / CM;
+          var W = Math.round(st.width * pxcm), H = Math.round(length * pxcm);
+          if (W * H > 160e6) return NV.toast('That sheet is enormous at ' + st.dpi + ' DPI. Lower the DPI or split the order.', 'bad');
+          var out = document.createElement('canvas');
+          out.width = W; out.height = H;
+          draw(out, st, packed, true);
+          NV.blobOf(out).then(function (b) { return NV.pngWithDpi(b, st.dpi); })
+            .then(function (b) {
+              NV.download(b, 'sheet-' + st.width + 'cm-' + length.toFixed(0) + 'cm.png');
+              NV.toast('Sheet of ' + W + ' × ' + H + ' px ready.', 'ok');
+            });
+        }
+      }));
+      parts.foot.appendChild(el('button', {
+        class: 'btn ghost wide', text: 'Download list (CSV)',
+        onclick: function () {
+          var rows = [['Design', 'Width cm', 'Height cm', 'Quantity', 'Area cm2']];
+          items.forEach(function (it) {
+            var h = it.cm * it.img.height / it.img.width;
+            rows.push([it.name, it.cm.toFixed(1), h.toFixed(1), it.qty, (it.cm * h * it.qty).toFixed(1)]);
+          });
+          rows.push([]);
+          rows.push(['Total length cm', packed.length.toFixed(1)]);
+          rows.push(['Roll width cm', st.width]);
+          var csv = rows.map(function (r) { return r.join(','); }).join('\n');
+          NV.download(new Blob([csv], { type: 'text/csv' }), 'print-sheet.csv');
+        }
+      }));
+
+      renderList(); update();
+    }
+  });
+})();
+
+</script>
+<script>
+/* Mockups: place the artwork on the garment and let the fabric drape show through. */
+(function () {
+  'use strict';
+  var el = NV.el, W = 1200, H = 1400;
+
+  /* Tee silhouette as a Path2D: it fills the shirt and clips the shading. */
+  function teePath() {
+    var d = new Path2D();
+    d.moveTo(600, 239);
+    d.bezierCurveTo(538, 239, 486, 204, 477, 152);
+    d.lineTo(431, 146);
+    d.lineTo(258, 194);
+    d.bezierCurveTo(242, 199, 236, 213, 242, 225);
+    d.lineTo(139, 395);
+    d.bezierCurveTo(133, 407, 141, 421, 157, 425);
+    d.lineTo(292, 459);
+    d.bezierCurveTo(308, 462, 324, 454, 326, 441);
+    d.lineTo(358, 338);
+    d.lineTo(331, 1122);
+    d.quadraticCurveTo(330, 1150, 364, 1150);
+    d.lineTo(836, 1150);
+    d.quadraticCurveTo(870, 1150, 869, 1122);
+    d.lineTo(842, 338);
+    d.lineTo(874, 441);
+    d.bezierCurveTo(876, 454, 892, 462, 908, 459);
+    d.lineTo(1043, 425);
+    d.bezierCurveTo(1059, 421, 1067, 407, 1061, 395);
+    d.lineTo(958, 225);
+    d.bezierCurveTo(964, 213, 958, 199, 942, 194);
+    d.lineTo(769, 146);
+    d.lineTo(723, 152);
+    d.bezierCurveTo(714, 204, 662, 239, 600, 239);
+    d.closePath();
+    return d;
+  }
+
+  function teeDetails(ctx) {
+    ctx.strokeStyle = 'rgba(0,0,0,.20)';
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    ctx.moveTo(479, 157);
+    ctx.bezierCurveTo(493, 211, 544, 245, 600, 245);
+    ctx.bezierCurveTo(656, 245, 707, 211, 721, 157);
+    ctx.stroke();
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = 'rgba(0,0,0,.13)';
+    [[157, 425, 292, 459], [1043, 425, 908, 459], [338, 1122, 862, 1122]].forEach(function (l) {
+      ctx.beginPath(); ctx.moveTo(l[0], l[1]); ctx.lineTo(l[2], l[3]); ctx.stroke();
+    });
+  }
+
+  function totePath() {
+    var d = new Path2D();
+    d.rect(250, 380, 700, 800);
+    return d;
+  }
+
+  function toteDetails(ctx) {
+    ctx.strokeStyle = 'rgba(0,0,0,.3)';
+    ctx.lineWidth = 18;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(400, 392);
+    ctx.bezierCurveTo(400, 172, 800, 172, 800, 392);
+    ctx.stroke();
+    ctx.lineCap = 'butt';
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = 'rgba(0,0,0,.16)';
+    ctx.strokeRect(250, 380, 700, 800);
+  }
+
+  /* Drape shading: applied inside the garment only. */
+  function shade(ctx) {
+    var g = ctx.createRadialGradient(600, 500, 120, 600, 700, 780);
+    g.addColorStop(0, 'rgba(255,255,255,.14)');
+    g.addColorStop(0.5, 'rgba(0,0,0,0)');
+    g.addColorStop(1, 'rgba(0,0,0,.30)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+    var f = ctx.createLinearGradient(0, 0, W, 0);
+    f.addColorStop(0, 'rgba(0,0,0,.20)');
+    f.addColorStop(0.22, 'rgba(0,0,0,0)');
+    f.addColorStop(0.78, 'rgba(0,0,0,0)');
+    f.addColorStop(1, 'rgba(0,0,0,.20)');
+    ctx.fillStyle = f;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  /* Adult tee, flat chest width x body length in cm. */
+  var CHART = {
+    s:  { w: 46, h: 70 }, m: { w: 51, h: 73 }, l: { w: 56, h: 76 },
+    xl: { w: 61, h: 79 }, xxl: { w: 66, h: 81 }, xxxl: { w: 71, h: 84 }
+  };
+  var TOTE = { w: 38, h: 42 };
+
+  var weaveCache = null;
+  function weave() {
+    if (weaveCache) return weaveCache;
+    var c = document.createElement('canvas'); c.width = c.height = 220;
+    var x = c.getContext('2d'), id = x.createImageData(220, 220);
+    var nz = IM.noise(220, 220, 2.2, 3, 11);
+    for (var i = 0; i < 220 * 220; i++) {
+      var v = 128 + (nz[i] - 0.5) * 90;
+      id.data[i * 4] = id.data[i * 4 + 1] = id.data[i * 4 + 2] = v;
+      id.data[i * 4 + 3] = 255;
+    }
+    x.putImageData(id, 0, 0);
+    weaveCache = c;
+    return c;
+  }
+
+  NV.register({
+    slug: 'mockups',
+    name: 'Mockups',
+    group: 'Production',
+    tagline: 'Try the artwork on a tee or a tote, or on a photo of your own.',
+    icon: NV.svg('<path d="M8 3 5 5 3 9l3 2v10h12V11l3-2-2-4-3-2a4 4 0 0 1-8 0z"/>'),
+    kind: 'custom',
+    render: function (host) {
+      var t = this;
+      var parts = NV.bench(host, t);
+      var p = {
+        garment: 'tee', garmentColor: '#f2f0eb', background: '#e8e3d8',
+        size: 42, x: 50, y: 40, rot: 0, opacity: 96, fabric: true, guide: true,
+        garmentSize: 'm', ruler: true
+      };
+      var design = null, photo = null;
+
+      var wrap = el('div', { style: 'flex:1;overflow:auto;padding:20px;display:flex;justify-content:center;align-items:flex-start' });
+      var cv = el('canvas', { width: W, height: H, style: 'max-width:100%;max-height:78vh;box-shadow:0 20px 60px -34px #000;cursor:move;border-radius:4px' });
+      wrap.appendChild(cv);
+      parts.stage.appendChild(wrap);
+      var info = el('div', { class: 'meta', text: 'Drag the artwork to place it' });
+      parts.stage.appendChild(info);
+
+      /* Pixels per centimetre, taken from the drawn garment's real width. */
+      function scale() {
+        if (p.garment === 'tote') return { pxcm: 700 / TOTE.w, g: TOTE };
+        if (p.garment === 'photo') return null;
+        var g = CHART[p.garmentSize] || CHART.m;
+        return { pxcm: 538 / g.w, g: g };          // the tee body spans 331..869 px
+      }
+
+      function measure() {
+        var sc = scale();
+        if (!sc || !design) return null;
+        var z = zone();
+        var dw = z.w * (p.size / 100);
+        return {
+          w: dw / sc.pxcm, h: dw * design.height / design.width / sc.pxcm,
+          gw: sc.g.w, gh: sc.g.h
+        };
+      }
+
+      function zone() {
+        if (p.garment === 'tote') return { x: 320, y: 470, w: 560, h: 600 };
+        if (p.garment === 'photo') return { x: W * 0.2, y: H * 0.2, w: W * 0.6, h: H * 0.6 };
+        return { x: 390, y: 310, w: 420, h: 545 };
+      }
+
+      function render() {
+        var ctx = cv.getContext('2d');
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = p.background;
+        ctx.fillRect(0, 0, W, H);
+
+        var garment = null;
+        if (p.garment === 'photo' && photo) {
+          var k = Math.max(W / photo.width, H / photo.height);
+          ctx.drawImage(photo, (W - photo.width * k) / 2, (H - photo.height * k) / 2, photo.width * k, photo.height * k);
+        } else if (p.garment === 'tote') {
+          garment = totePath();
+          toteDetails(ctx);
+          ctx.fillStyle = p.garmentColor;
+          ctx.fill(garment);
+        } else {
+          garment = teePath();
+          ctx.save();
+          ctx.shadowColor = 'rgba(0,0,0,.28)';
+          ctx.shadowBlur = 40; ctx.shadowOffsetY = 14;
+          ctx.fillStyle = p.garmentColor;
+          ctx.fill(garment);
+          ctx.restore();
+        }
+
+        var z = zone();
+        ctx.save();
+        if (garment) ctx.clip(garment);            // artwork and shading stay on the garment
+        if (design) {
+          var maxw = z.w * (p.size / 100);
+          var dw = maxw, dh = maxw * design.height / design.width;
+          var cx = z.x + z.w * (p.x / 100), cy = z.y + z.h * (p.y / 100);
+          ctx.save();
+          ctx.globalAlpha = p.opacity / 100;
+          ctx.translate(cx, cy);
+          ctx.rotate(p.rot * Math.PI / 180);
+          ctx.drawImage(design, -dw / 2, -dh / 2, dw, dh);
+          ctx.restore();
+        }
+        if (garment) {
+          ctx.globalCompositeOperation = 'multiply';
+          shade(ctx);
+          if (p.fabric) {
+            ctx.globalCompositeOperation = 'overlay';
+            ctx.globalAlpha = 0.2;
+            ctx.fillStyle = ctx.createPattern(weave(), 'repeat');
+            ctx.fillRect(0, 0, W, H);
+          }
+        }
+        ctx.restore();
+
+        if (p.garment === 'tee' && garment) teeDetails(ctx);
+        var mm = measure();
+        if (mm && p.ruler) {
+          var pad = 16, bx = 26, by = 26, bw = 300, bh = 94;
+          ctx.fillStyle = 'rgba(10,9,8,.82)';
+          if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(bx, by, bw, bh, 10); ctx.fill(); }
+          else ctx.fillRect(bx, by, bw, bh);
+          ctx.strokeStyle = 'rgba(255,45,126,.5)'; ctx.lineWidth = 1.5;
+          if (ctx.roundRect) ctx.stroke();
+          ctx.textBaseline = 'top';
+          ctx.fillStyle = '#FF2D7E';
+          ctx.font = '600 13px ui-monospace, monospace';
+          ctx.fillText('ARTWORK SIZE', bx + pad, by + pad);
+          ctx.fillStyle = '#F3EEE6';
+          ctx.font = '700 30px ui-sans-serif, system-ui, sans-serif';
+          ctx.fillText(mm.w.toFixed(1) + ' × ' + mm.h.toFixed(1) + ' cm', bx + pad, by + pad + 20);
+          ctx.fillStyle = '#A99E8F';
+          ctx.font = '500 12px ui-monospace, monospace';
+          ctx.fillText((p.garment === 'tote' ? 'TOTE' : String(p.garmentSize).toUpperCase()) +
+            '  ·  GARMENT ' + mm.gw + ' × ' + mm.gh + ' cm', bx + pad, by + pad + 58);
+        }
+        if (p.guide) {
+          ctx.strokeStyle = 'rgba(255,45,126,.75)';
+          ctx.setLineDash([10, 8]);
+          ctx.lineWidth = 2;
+          ctx.strokeRect(z.x, z.y, z.w, z.h);
+          ctx.setLineDash([]);
+        }
+      }
+
+      var drag = null;
+      cv.addEventListener('pointerdown', function (e) {
+        var r = cv.getBoundingClientRect();
+        drag = { x: e.clientX, y: e.clientY, px: p.x, py: p.y, sx: W / r.width, sy: H / r.height };
+        cv.setPointerCapture(e.pointerId);
+      });
+      cv.addEventListener('pointermove', function (e) {
+        if (!drag) return;
+        var z = zone();
+        p.x = IM.clamp(drag.px + (e.clientX - drag.x) * drag.sx / z.w * 100, -30, 130);
+        p.y = IM.clamp(drag.py + (e.clientY - drag.y) * drag.sy / z.h * 100, -30, 130);
+        ui.sync(); render();
+      });
+      cv.addEventListener('pointerup', function () { drag = null; });
+      cv.addEventListener('wheel', function (e) {
+        e.preventDefault();
+        p.size = IM.clamp(p.size + (e.deltaY < 0 ? 2 : -2), 5, 130);
+        ui.sync(); render();
+      }, { passive: false });
+
+      var dIn = el('input', { type: 'file', accept: 'image/*', style: 'display:none' });
+      dIn.addEventListener('change', function () {
+        if (!dIn.files[0]) return;
+        NV.loadImage(dIn.files[0]).then(function (img) { design = img; render(); });
+      });
+      var pIn = el('input', { type: 'file', accept: 'image/*', style: 'display:none' });
+      pIn.addEventListener('change', function () {
+        if (!pIn.files[0]) return;
+        NV.loadImage(pIn.files[0]).then(function (img) { photo = img; p.garment = 'photo'; ui.sync(); render(); });
+      });
+
+      parts.body.appendChild(el('button', { class: 'btn primary wide', text: 'Load artwork', onclick: function () { dIn.click(); } }));
+      parts.body.appendChild(dIn); parts.body.appendChild(pIn);
+
+      var ui = NV.controls(parts.body, [
+        { k: 'seg', id: 'garment', label: 'Surface', def: 'tee', opts: [['tee', 'T-shirt'], ['tote', 'Tote'], ['photo', 'My photo']] },
+        { k: 'button', label: 'Load a garment photo', act: function () { pIn.click(); }, },
+        { k: 'color', id: 'garmentColor', label: 'Garment colour', def: '#f2f0eb', show: function (q) { return q.garment !== 'photo'; } },
+        { k: 'color', id: 'background', label: 'Background colour', def: '#e8e3d8', show: function (q) { return q.garment !== 'photo'; } },
+        { k: 'select', id: 'garmentSize', label: 'Garment size', def: 'm', show: function (q) { return q.garment === 'tee'; },
+          opts: [['s', 'S · 46 × 70 cm'], ['m', 'M · 51 × 73 cm'], ['l', 'L · 56 × 76 cm'], ['xl', 'XL · 61 × 79 cm'], ['xxl', '2XL · 66 × 81 cm'], ['xxxl', '3XL · 71 × 84 cm']] },
+        { k: 'group', label: 'Placement' },
+        { k: 'range', id: 'size', label: 'Size', min: 5, max: 130, step: 1, def: 42, unit: ' %' },
+        { k: 'range', id: 'x', label: 'Horizontal position', min: -30, max: 130, step: 0.5, def: 50, unit: ' %', dec: 0 },
+        { k: 'range', id: 'y', label: 'Vertical position', min: -30, max: 130, step: 0.5, def: 40, unit: ' %', dec: 0 },
+        { k: 'range', id: 'rot', label: 'Rotation', min: -45, max: 45, step: 1, def: 0, unit: '°' },
+        { k: 'range', id: 'opacity', label: 'Opacity', min: 20, max: 100, step: 1, def: 96, unit: ' %' },
+        { k: 'group', label: 'Realism' },
+        { k: 'check', id: 'fabric', label: 'Fabric texture', def: true },
+        { k: 'check', id: 'guide', label: 'Show the print area', def: true },
+        { k: 'check', id: 'ruler', label: 'Show the artwork size in cm', def: true, show: function (q) { return q.garment !== 'photo'; } }
+      ], p, function () { render(); });
+      ui.sync();
+      parts.body.appendChild(el('p', { class: 'hint', text: 'Drag on the canvas to move it and scroll to scale. The dashed area is the suggested print zone, and the readout is the real size the artwork would print at on this garment.' }));
+
+      parts.foot.appendChild(el('button', {
+        class: 'btn primary wide', text: 'Download mockup',
+        onclick: function () {
+          if (!design) return NV.toast('Load an artwork first.', 'bad');
+          var g = p.guide, r = p.ruler;
+          p.guide = false; p.ruler = false; render();
+          NV.blobOf(cv).then(function (b) {
+            NV.download(b, 'mockup-' + p.garment + '.png');
+            p.guide = g; p.ruler = r; render();
+          });
+        }
+      }));
+      render();
+    }
+  });
+})();
+
+</script>
+<script>
+/* Cost and price calculator for DTF. */
+(function () {
+  'use strict';
+  var el = NV.el, KEY = 'nv-pricing';
+
+  var FIELDS = [
+    ['g1', 'Film roll'],
+    ['roll', 'Price of the roll', 1800, 'money'],
+    ['rollWidth', 'Roll width', 58, 'cm'],
+    ['rollLength', 'Roll length', 100, 'm'],
+    ['g2', 'Consumables per square metre printed'],
+    ['ink', 'Ink (CMYK + white)', 45, 'money'],
+    ['powder', 'Adhesive powder', 12, 'money'],
+    ['other', 'Other (power, maintenance)', 8, 'money'],
+    ['g3', 'Labour'],
+    ['hourly', 'Cost per working hour', 90, 'money'],
+    ['minutes', 'Minutes per piece', 2.5, 'min'],
+    ['waste', 'Waste and reprints', 8, '%'],
+    ['g4', 'The piece you are quoting'],
+    ['width', 'Artwork width', 28, 'cm'],
+    ['height', 'Artwork height', 35, 'cm'],
+    ['qty', 'Quantity', 10, 'pcs'],
+    ['garment', 'Cost of the garment (0 if you only sell the transfer)', 0, 'money'],
+    ['packaging', 'Packaging and label per piece', 3, 'money'],
+    ['g5', 'Your margin'],
+    ['margin', 'Margin on cost', 120, '%']
+  ];
+
+  function calc(v) {
+    var rollArea = (v.rollWidth / 100) * v.rollLength;                   // m²
+    var filmPerM2 = rollArea > 0 ? v.roll / rollArea : 0;
+    var costPerM2 = filmPerM2 + v.ink + v.powder + v.other;
+    var pieceArea = (v.width / 100) * (v.height / 100);                  // m²
+    var material = pieceArea * costPerM2;
+    var labour = (v.minutes / 60) * v.hourly;
+    var base = material + labour + v.garment + v.packaging;
+    var withWaste = base * (1 + v.waste / 100);
+    var price = withWaste * (1 + v.margin / 100);
+    return {
+      filmPerM2: filmPerM2, costPerM2: costPerM2, pieceArea: pieceArea,
+      material: material, labour: labour, base: base, unit: withWaste,
+      price: price, profit: price - withWaste,
+      total: price * v.qty, totalCost: withWaste * v.qty,
+      totalProfit: (price - withWaste) * v.qty,
+      pricePerM2: pieceArea > 0 ? price / pieceArea : 0,
+      linearMetre: costPerM2 * (v.rollWidth / 100)
+    };
+  }
+
+  NV.register({
+    slug: 'pricing',
+    name: 'Pricing calculator',
+    group: 'Production',
+    tagline: 'Real cost per piece and selling price, with film, ink, labour and waste.',
+    icon: NV.svg('<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 10h2M12 10h2M16 10h.01M8 14h2M12 14h2M16 14h.01M8 18h6"/>'),
+    kind: 'custom',
+    render: function (host) {
+      var t = this;
+      var v = {}, saved = {};
+      try { saved = JSON.parse(NV.store.get(KEY) || '{}'); } catch (e) { saved = {}; }
+      FIELDS.forEach(function (f) {
+        if (f[0].charAt(0) === 'g' && f.length === 2) return;
+        v[f[0]] = saved[f[0]] != null ? saved[f[0]] : f[2];
+      });
+      var currency = saved.currency || 'MXN';
+
+      var wrap = el('div', { class: 'wrap doc' });
+      wrap.appendChild(el('div', { class: 'eyebrow', text: 'Production · costs' }));
+      wrap.appendChild(el('h1', { style: 'font-size:34px;text-transform:uppercase;margin:8px 0 10px', text: t.name }));
+      wrap.appendChild(el('p', { text: 'Set these numbers to match your shop once and they stay saved in this browser. The price comes from your real cost, not from copying the shop down the road.' }));
+
+      var cols = el('div', { style: 'display:grid;grid-template-columns:minmax(0,1fr) minmax(0,340px);gap:22px;align-items:start;margin-top:24px' });
+      var form = el('div', { class: 'panelbox', style: 'display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px 18px;align-content:start' });
+      var res = el('div', { class: 'panelbox', style: 'position:sticky;top:72px' });
+
+      var cur = el('input', { type: 'text', value: currency, maxlength: 4, style: 'max-width:90px' });
+      cur.addEventListener('input', function () { currency = cur.value || '$'; save(); update(); });
+      form.appendChild(el('div', { class: 'field' }, [
+        el('div', { class: 'flabel' }, [el('span', { text: 'Currency' })]), cur
+      ]));
+
+      FIELDS.forEach(function (f) {
+        if (f[0].charAt(0) === 'g' && f.length === 2) {
+          form.appendChild(el('div', { class: 'group-t', style: 'grid-column:1/-1', text: f[1] }));
+          return;
+        }
+        var inp = el('input', { type: 'number', value: v[f[0]], step: 'any', min: 0 });
+        inp.addEventListener('input', function () {
+          v[f[0]] = inp.value === '' ? 0 : +inp.value;
+          save(); update();
+        });
+        form.appendChild(el('div', { class: 'field' }, [
+          el('div', { class: 'flabel' }, [el('span', { text: f[1] }), el('b', { text: f[3] === 'money' ? currency : f[3] })]),
+          inp
+        ]));
+      });
+      form.appendChild(el('button', {
+        class: 'btn ghost', style: 'grid-column:1/-1', text: 'Reset values',
+        onclick: function () { NV.store.del(KEY); location.reload(); }
+      }));
+
+      function save() {
+        var o = {}; for (var k in v) o[k] = v[k];
+        o.currency = currency;
+        NV.store.set(KEY, JSON.stringify(o));
+      }
+
+      function money(x) { return currency + ' ' + NV.fmt(x); }
+
+      function update() {
+        var r = calc(v);
+        res.innerHTML = '';
+        res.appendChild(el('div', { class: 'eyebrow', text: 'Result per piece' }));
+        res.appendChild(el('div', {
+          style: 'font-family:var(--f-display);font-size:38px;font-weight:800;margin:6px 0 2px;color:var(--accent)',
+          text: money(r.price)
+        }));
+        res.appendChild(el('p', {
+          class: 'hint',
+          text: 'Cost ' + money(r.unit) + ' · profit ' + money(r.profit) +
+            ' (' + NV.fmt(r.unit > 0 ? r.profit / r.unit * 100 : 0, 0) + ' %)'
+        }));
+        var tbl = el('table', { style: 'margin-top:14px' });
+        var rows = [
+          ['Film per piece', money(r.pieceArea * r.filmPerM2)],
+          ['Ink, powder and other', money(r.pieceArea * (v.ink + v.powder + v.other))],
+          ['Labour', money(r.labour)],
+          ['Garment and packaging', money(v.garment + v.packaging)],
+          ['Waste ' + NV.fmt(v.waste, 0) + ' %', money(r.unit - r.base)],
+          ['Area of the piece', NV.fmt(r.pieceArea * 10000, 0) + ' cm²'],
+          ['Cost per m² printed', money(r.costPerM2)],
+          ['Cost per linear metre', money(r.linearMetre)],
+          ['Price per m² sold', money(r.pricePerM2)]
+        ];
+        var tb = el('tbody');
+        rows.forEach(function (row) {
+          tb.appendChild(el('tr', {}, [el('td', { text: row[0] }), el('td', { class: 'num', text: row[1] })]));
+        });
+        tbl.appendChild(tb);
+        res.appendChild(tbl);
+
+        res.appendChild(el('div', { class: 'sep', style: 'margin:16px 0' }));
+        res.appendChild(el('div', { class: 'eyebrow', text: 'Order of ' + NV.fmt(v.qty, 0) + ' pieces' }));
+        var t2 = el('table'), tb2 = el('tbody');
+        [['Total sale', money(r.total)], ['Total cost', money(r.totalCost)], ['Profit', money(r.totalProfit)]]
+          .forEach(function (row) {
+            tb2.appendChild(el('tr', {}, [el('td', { text: row[0] }), el('td', { class: 'num', text: row[1] })]));
+          });
+        t2.appendChild(tb2);
+        res.appendChild(t2);
+        res.appendChild(el('button', {
+          class: 'btn wide', style: 'margin-top:14px', text: 'Copy the quote',
+          onclick: function () {
+            var txt = 'Quote\n' + NV.fmt(v.qty, 0) + ' pieces at ' + v.width + ' × ' + v.height + ' cm\n' +
+              'Unit price: ' + money(r.price) + '\nTotal: ' + money(r.total) + '\n';
+            if (navigator.clipboard) navigator.clipboard.writeText(txt).then(function () { NV.toast('Quote copied.', 'ok'); });
+          }
+        }));
+      }
+
+      cols.appendChild(form); cols.appendChild(res);
+      wrap.appendChild(cols);
+      wrap.appendChild(el('h2', { text: 'How it is worked out' }));
+      wrap.appendChild(el('p', { text: 'Film is charged by area: the price of the roll divided by the square metres it holds. On top of that go ink, powder and power per square metre, the labour for the minutes of pressing, and a percentage of waste for the pieces that come out wrong. The margin is applied to that finished cost.' }));
+      wrap.appendChild(el('p', { class: 'hint', text: 'If you sell by the linear metre instead of by the piece, use the "cost per linear metre" line as your floor and add your margin on top.' }));
+      host.appendChild(wrap);
+      host.appendChild(NV.footer());
+      update();
+    }
+  });
+})();
+
+</script>
+<script>
+/* Standard sizes: print sizes, placements and cm-to-pixel equivalents. */
+(function () {
+  'use strict';
+  var el = NV.el;
+
+  var SIZES = [
+    ['Kids 2–3', '15 × 18', '4–5', 'Centred, 5 cm below the collar'],
+    ['Kids 4–6', '18 × 22', '5–6', 'Centred, 5 cm below the collar'],
+    ['Kids 8–10', '20 × 25', '6', 'Centred, 6 cm below the collar'],
+    ['Kids 12–14', '22 × 28', '6–7', 'Centred, 6 cm below the collar'],
+    ['Adult XS', '24 × 30', '7', 'Centred, 7 cm below the collar'],
+    ['Adult S', '26 × 32', '7', 'Centred, 7 cm below the collar'],
+    ['Adult M', '28 × 35', '7–8', 'Centred, 7.5 cm below the collar'],
+    ['Adult L', '30 × 38', '8', 'Centred, 8 cm below the collar'],
+    ['Adult XL', '32 × 40', '8', 'Centred, 8 cm below the collar'],
+    ['Adult 2XL', '33 × 42', '8–9', 'Centred, 8.5 cm below the collar'],
+    ['Adult 3XL', '35 × 45', '9', 'Centred, 9 cm below the collar']
+  ];
+
+  var ZONES = [
+    ['Full chest', '28 × 35 cm', 'Centred; top edge 7–8 cm from the collar seam.'],
+    ['Left chest (logo)', '8 × 8 to 10 × 10 cm', '18–20 cm from the shoulder and 12–15 cm from the centre of the chest.'],
+    ['Full back', '30 × 40 cm', 'Top edge 7–10 cm below the collar seam.'],
+    ['Nape', '5 × 5 to 8 × 8 cm', 'Right under the collar seam, 2–3 cm down.'],
+    ['Short sleeve', '8 × 8 cm', 'Centred on the sleeve, 4–5 cm from the hem.'],
+    ['Long sleeve (lengthwise)', '6 × 30 cm', 'Aligned to the shoulder, clear of the seam.'],
+    ['Tote bag', '25 × 25 cm', 'Centred, 8–10 cm from the top edge.'],
+    ['Cap front', '11 × 5 cm', 'Centred, 2 cm from the brim. Use a curved platen.'],
+    ['Hoodie chest', '30 × 30 cm', 'Raise the artwork 2–3 cm if the garment has a kangaroo pocket.'],
+    ['Trousers / shorts', '10 × 10 cm', 'On the thigh or leg, clear of seams and pockets.']
+  ];
+
+  var PRESS = [
+    ['100 % cotton', '150–160 °C', '12–15 s', 'Medium-high', 'Per the film'],
+    ['Polyester', '135–145 °C', '10–12 s', 'Medium', 'Cold peel'],
+    ['50/50 blend', '145–155 °C', '12–14 s', 'Medium-high', 'Per the film'],
+    ['Dry fit / sportswear', '130–140 °C', '8–10 s', 'Medium', 'Cold peel'],
+    ['Nylon / waterproof', '120–130 °C', '8–10 s', 'Low-medium', 'Cold peel'],
+    ['Final re-press (with paper)', '150 °C', '5 s', 'Medium', '—']
+  ];
+
+  function table(head, rows, numeric) {
+    var t = el('table'), th = el('thead'), tr = el('tr');
+    head.forEach(function (h, i) { tr.appendChild(el('th', { text: h, class: i && numeric ? 'num' : '' })); });
+    th.appendChild(tr); t.appendChild(th);
+    var tb = el('tbody');
+    rows.forEach(function (r) {
+      var row = el('tr');
+      r.forEach(function (c, i) { row.appendChild(el('td', { text: c, class: i && numeric ? 'num' : '' })); });
+      tb.appendChild(row);
+    });
+    t.appendChild(tb);
+    return el('div', { class: 'scroll-x' }, [t]);
+  }
+
+  function diagram() {
+    var s = '<svg viewBox="0 0 420 470" style="width:100%;max-width:420px;height:auto" fill="none" ' +
+      'stroke="currentColor" stroke-width="2" stroke-linejoin="round">' +
+      '<path d="M150 58 60 100c-6 3-8 10-5 16l26 47c3 6 11 8 16 4l20-15v255c0 6 5 11 11 11h164c6 0 11-5 11-11V152l20 15c5 4 13 2 16-4l26-47c3-6 1-13-5-16l-90-42c-6 22-27 33-60 33s-54-11-60-33z"/>' +
+      '<path d="M150 58c6 22 27 34 60 34s54-12 60-34" stroke-opacity=".5"/>' +
+      '<g stroke="var(--accent)" stroke-dasharray="6 5">' +
+      '<rect x="140" y="128" width="140" height="175" rx="2"/>' +
+      '<rect x="252" y="122" width="42" height="42" rx="2"/>' +
+      '</g>' +
+      '<g stroke="var(--accent)" stroke-width="1.4" stroke-opacity=".85">' +
+      '<path d="M210 92v34M204 96l6-6 6 6"/>' +
+      '</g>' +
+      '<g fill="var(--text)" stroke="none" font-family="var(--f-mono)" font-size="11">' +
+      '<text x="150" y="220" font-size="12">Full chest</text>' +
+      '<text x="150" y="236" fill="var(--mute)">28 × 35 cm</text>' +
+      '<text x="222" y="112" fill="var(--mute)">7–8 cm</text>' +
+      '<text x="300" y="150">Logo</text>' +
+      '<text x="300" y="164" fill="var(--mute)">8 × 8 cm</text>' +
+      '</g></svg>';
+    return el('div', { html: s, style: 'display:flex;justify-content:center;padding:10px 0;color:var(--dim)' });
+  }
+
+  NV.register({
+    slug: 'sizing',
+    name: 'Standard sizes',
+    group: 'Production',
+    tagline: 'Print sizes by garment size, exact placements and centimetres to pixels.',
+    icon: NV.svg('<path d="M2 8h20v8H2z"/><path d="M6 8v4M10 8v6M14 8v4M18 8v6"/>'),
+    kind: 'custom',
+    render: function (host) {
+      var t = this;
+      var wrap = el('div', { class: 'wrap doc' });
+      wrap.appendChild(el('div', { class: 'eyebrow', text: 'Production · reference' }));
+      wrap.appendChild(el('h1', { style: 'font-size:34px;text-transform:uppercase;margin:8px 0 10px', text: t.name }));
+      wrap.appendChild(el('p', { text: 'The measurements that save you a reprint: size by garment size, how far each placement sits from the collar, and how many pixels you need to print at 300 DPI.' }));
+
+      var top = el('div', { style: 'display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:22px;align-items:start;margin-top:26px' });
+      top.appendChild(el('div', { class: 'panelbox' }, [diagram()]));
+
+      /* Centimetres to pixels */
+      var box = el('div', { class: 'panelbox', style: 'display:flex;flex-direction:column;gap:14px' });
+      box.appendChild(el('div', { class: 'eyebrow', text: 'Centimetres to pixels' }));
+      var vals = { width: 28, height: 35, dpi: 300 };
+      var out = el('div', { class: 'mono', style: 'font-size:26px;font-family:var(--f-display);font-weight:800' });
+      var note = el('p', { class: 'hint' });
+      function recalc() {
+        var w = Math.round(vals.width / 2.54 * vals.dpi), h = Math.round(vals.height / 2.54 * vals.dpi);
+        out.textContent = w + ' × ' + h + ' px';
+        note.textContent = 'A file smaller than this will look pixelated in print. That is ' +
+          NV.fmt(w * h / 1e6, 1) + ' megapixels and ' + NV.fmt(vals.width * vals.height, 0) + ' cm² of film.';
+      }
+      NV.controls(box, [
+        { k: 'num', id: 'width', label: 'Width', unit: 'cm', def: 28, min: 1, step: 0.5 },
+        { k: 'num', id: 'height', label: 'Height', unit: 'cm', def: 35, min: 1, step: 0.5 },
+        { k: 'seg', id: 'dpi', label: 'Resolution', def: 300, opts: [[150, '150'], [200, '200'], [300, '300'], [600, '600']] }
+      ], vals, recalc).sync();
+      box.appendChild(out); box.appendChild(note);
+      top.appendChild(box);
+      wrap.appendChild(top);
+
+      wrap.appendChild(el('h2', { text: 'Front print size by garment size' }));
+      wrap.appendChild(el('p', { text: 'Artwork measurements in centimetres (width × height) for a chest print. These are the most common starting point; adjust if the design is very wide.' }));
+      wrap.appendChild(table(['Size', 'Artwork size (cm)', 'Below the collar (cm)', 'Placement'], SIZES, false));
+
+      wrap.appendChild(el('h2', { text: 'Placements' }));
+      wrap.appendChild(table(['Zone', 'Typical size', 'How it sits'], ZONES, false));
+
+      wrap.appendChild(el('h2', { text: 'Pressing by fabric' }));
+      wrap.appendChild(el('p', { text: 'Starting values for a DTF transfer. Every film comes with its own spec sheet: if your supplier says otherwise, their sheet wins. Always test on the same garment before a production run.' }));
+      wrap.appendChild(table(['Fabric', 'Temperature', 'Time', 'Pressure', 'Peel'], PRESS, false));
+
+      wrap.appendChild(el('h2', { text: 'Rolls and yield' }));
+      wrap.appendChild(table(
+        ['Roll width', 'Area per metre', 'Pieces of 28 × 35 cm per metre'],
+        [['30 cm', '0.30 m²', '1'], ['33 cm', '0.33 m²', '1'], ['40 cm', '0.40 m²', '1'],
+         ['55 cm', '0.55 m²', '2'], ['58 cm', '0.58 m²', '2'], ['60 cm', '0.60 m²', '2'], ['62 cm', '0.62 m²', '2']],
+        true));
+      wrap.appendChild(el('p', { class: 'hint', text: 'To squeeze the roll, build the layout with the print sheets tool: it packs by height and tells you the exact run length.' }));
+      wrap.appendChild(el('a', { class: 'btn', href: '#/gang-sheets', text: 'Open print sheets', style: 'margin-top:8px;align-self:flex-start' }));
+
+      host.appendChild(wrap);
+      host.appendChild(NV.footer());
+    }
+  });
+})();
+
+</script>
+
+<noscript><div style="max-width:34em;margin:12vh auto;padding:0 24px;font:16px/1.6 system-ui,sans-serif">
+<h1 style="font-size:26px;margin:0 0 10px">JavaScript is switched off</h1>
+<p style="color:#666;margin:0">Open Press does all its image work in your browser, so it needs JavaScript.
+Turn it on for this page and reload.</p></div></noscript>
+
+<script>
+/* Boot defensively. Scripts above are inline, but some hosts (Cloudflare's
+   Rocket Loader, for one) rewrite or defer inline scripts, which can leave the
+   page blank with nothing to explain it. Wait for the globals, then say so
+   plainly if they never arrive - a visible message beats a white screen. */
+(function boot(tries) {
+  'use strict';
+  function fail(msg) {
+    document.body.innerHTML =
+      '<div style="max-width:36em;margin:12vh auto;padding:0 24px;' +
+      'font:16px/1.6 system-ui,-apple-system,sans-serif;color:#191512">' +
+      '<h1 style="font-size:26px;margin:0 0 10px">Open Press could not start</h1>' +
+      '<p style="color:#615749">' + msg + '</p>' +
+      '<p style="color:#615749">This page is one self-contained file. If you are viewing it ' +
+      'through a preview pane or an embed, try opening it in its own browser tab.</p></div>';
+  }
+  if (window.NV && window.IM) {
+    try { NV.start(); } catch (e) { fail('It loaded but failed while starting: ' + e.message); }
+    return;
+  }
+  if (tries > 120) { return fail('Its scripts did not run. Something on the host may be rewriting or blocking inline scripts.'); }
+  setTimeout(function () { boot(tries + 1); }, 50);
+})(0);
+</script>

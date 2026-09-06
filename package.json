@@ -1,0 +1,15 @@
+{
+  "name": "open-press",
+  "version": "1.0.0",
+  "description": "A free DTF tool suite that runs entirely in the browser.",
+  "private": true,
+  "scripts": {
+    "build": "python3 build.py",
+    "test": "node test/smoke.js",
+    "serve": "python3 -m http.server 8080",
+    "package": "python3 package.py"
+  },
+  "devDependencies": {
+    "playwright": "^1.49.1"
+  }
+}

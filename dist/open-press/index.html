@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Open Press — choose your device</title>
+<meta name="description" content="Open Press DTF tools: pick the build made for the device you are on.">
+<meta name="color-scheme" content="dark light">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FF2D7E' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='6.2'/%3E%3Cpath d='M12 1.5v5M12 17.5v5M1.5 12h5M17.5 12h5'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
+<style>
+:root{
+  color-scheme:dark;
+  --ground:#13110F; --sheet:#1B1815; --raise:#232019; --line:#342E27; --line-soft:#262119;
+  --text:#F3EEE6; --dim:#A99E8F; --mute:#7B7266; --accent:#FF2D7E; --on-accent:#1A0710;
+}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){
+  color-scheme:light;
+  --ground:#F4F0E7; --sheet:#FFFDF8; --raise:#EDE7DA; --line:#D8CFBD; --line-soft:#E6DFD1;
+  --text:#191512; --dim:#615749; --mute:#8A8073; --accent:#D1005F; --on-accent:#FFF;
+}}
+*{box-sizing:border-box}
+body{
+  margin:0; min-height:100dvh; background:var(--ground); color:var(--text);
+  font-family:'Instrument Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  display:grid; place-items:center;
+  padding:max(18px,env(safe-area-inset-top)) 16px max(18px,env(safe-area-inset-bottom));
+}
+.ruler{position:fixed; top:0; left:0; right:0; height:16px; background:var(--sheet);
+  border-bottom:1px solid var(--line);
+  background-image:repeating-linear-gradient(90deg,var(--line) 0 1px,transparent 1px 20px);
+  background-position:0 60%; background-size:auto 40%; background-repeat:repeat-x}
+main{width:min(760px,100%)}
+.eyebrow{font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:11px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--mute); margin-bottom:10px}
+h1{font-family:'Archivo',system-ui,sans-serif; font-weight:800; letter-spacing:-.025em;
+  font-size:clamp(28px,6vw,42px); margin:0 0 8px; text-transform:uppercase; text-wrap:balance}
+.sub{color:var(--dim); font-size:14.5px; line-height:1.55; margin:0 0 6px; max-width:52ch}
+.detect{display:flex; align-items:center; gap:7px; color:var(--mute); font-size:12px; margin:14px 0 20px;
+  min-height:18px; font-family:'IBM Plex Mono',ui-monospace,monospace}
+.detect i{width:6px;height:6px;border-radius:50%;background:var(--accent);flex:none}
+.choices{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+@media (max-width:640px){.choices{grid-template-columns:1fr}}
+.choice{
+  display:block; text-decoration:none; color:var(--text); background:var(--sheet);
+  border:1px solid var(--line); border-radius:10px; padding:20px;
+  transition:transform .16s ease, border-color .16s ease;
+}
+.choice:hover,.choice:focus-visible{transform:translateY(-2px);
+  border-color:color-mix(in srgb,var(--accent) 55%,var(--line)); outline:none}
+.choice.pick{border-color:color-mix(in srgb,var(--accent) 70%,var(--line))}
+.ico{width:34px;height:34px;color:var(--accent);margin-bottom:14px}
+.choice strong{display:block; font-family:'Archivo',system-ui,sans-serif; font-size:19px; letter-spacing:-.01em}
+.choice span{display:block; margin-top:6px; color:var(--dim); font-size:13px; line-height:1.5}
+.choice b{display:inline-block; margin-top:14px; color:var(--accent); font-size:12px; font-weight:600}
+.tag{float:right; font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:9.5px;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--accent);
+  border:1px solid color-mix(in srgb,var(--accent) 45%,transparent); border-radius:100px; padding:3px 8px}
+.foot{color:var(--mute); font-size:11.5px; margin-top:20px; line-height:1.6}
+.foot a{color:var(--dim)}
+/* .choice span sets display:block, which outranks the UA sheet's [hidden] rule
+   and left BOTH cards badged "Suggested". */
+[hidden]{display:none !important}
+</style>
+</head>
+<body>
+<div class="ruler" aria-hidden="true"></div>
+<main>
+  <div class="eyebrow">Open Press · 16 DTF tools</div>
+  <h1>Choose your device</h1>
+  <p class="sub">The same sixteen tools either way. Each build is laid out for the screen it runs on,
+  so pick the one that matches what you are holding.</p>
+  <div class="detect"><i></i><span id="detected">Checking this device…</span></div>
+  <section class="choices">
+    <a class="choice" id="mobileChoice" href="./mobile.html">
+      <span class="tag" id="tagM" hidden>Suggested</span>
+      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2.3"/><line x1="6.5" y1="17.3" x2="17.5" y2="17.3"/><circle cx="12" cy="19.4" r=".9" fill="currentColor" stroke="none"/></svg>
+      <strong>Phone</strong>
+      <span>Preview pinned to the top, controls folded into sections you tap open, and every slider sized for a thumb.</span>
+      <b>Open the phone build →</b>
+    </a>
+    <a class="choice" id="computerChoice" href="./computer.html">
+      <span class="tag" id="tagC" hidden>Suggested</span>
+      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4" width="19" height="12.5" rx="1.8"/><line x1="8" y1="20.5" x2="16" y2="20.5"/><line x1="12" y1="16.5" x2="12" y2="20.5"/></svg>
+      <strong>Computer</strong>
+      <span>Controls on a permanent side rail with the artwork full height beside them — every setting in view at once.</span>
+      <b>Open the computer build →</b>
+    </a>
+  </section>
+  <p class="foot">Both run entirely in your browser. Nothing is uploaded, no account, no limits.<br>
+  Bookmark whichever one you land on — it works offline afterwards.</p>
+</main>
+<script>
+(function () {
+  'use strict';
+  var coarse = matchMedia('(pointer: coarse)').matches;
+  var narrow = Math.min(screen.width || innerWidth, innerWidth || screen.width) < 820;
+  var uaMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '');
+  var phone = uaMobile || (coarse && narrow);
+  var el = document.getElementById('detected');
+  if (el) el.textContent = phone
+    ? 'This looks like a phone or tablet — the phone build is the one you want.'
+    : 'This looks like a computer — the computer build is the one you want.';
+  var pick = document.getElementById(phone ? 'mobileChoice' : 'computerChoice');
+  var tag = document.getElementById(phone ? 'tagM' : 'tagC');
+  if (pick) pick.classList.add('pick');
+  if (tag) tag.hidden = false;
+})();
+</script>
+</body>
+</html>
