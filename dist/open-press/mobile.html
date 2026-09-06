@@ -1,4 +1,14 @@
-<title>Open Press DTF</title>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Open Press — free DTF tools</title>
+<meta name="description" content="16 free tools for DTF printing, screen printing and cut vinyl: remove backgrounds, reduce edges, halftones, vectorize, rhinestones, gang sheets, mockups, a file check and a pricing calculator. Everything runs in your browser.">
+<meta name="color-scheme" content="dark light">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FF2D7E' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='6.2'/%3E%3Cpath d='M12 1.5v5M12 17.5v5M1.5 12h5M17.5 12h5'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap"></noscript>
 <style>
@@ -398,7 +408,6 @@ tbody tr:hover{background:var(--raise)}
 
 </style>
 <style>
-@media (max-width:900px){
 /* Phone layer, on top of app.css: mobile.html loads it outright, and the
    responsive build behind (max-width:900px).
    A phone is not a small desktop. The folding rail and the pinned preview are
@@ -471,32 +480,12 @@ th,td{padding:8px 9px}
 .doc > div[style*="grid-template-columns"]{grid-template-columns:1fr !important}
 .panelbox[style*="sticky"]{position:static !important}
 
-}
-@media (min-width:901px){
-/* Desktop layer, on top of app.css: computer.html loads it outright, and the
-   responsive build behind (min-width:901px).
-   None of the phone compromises: a permanent side rail, a full-height stage,
-   and nothing folded away. */
-
-.bench{grid-template-columns:360px 1fr}
-.rail-body{padding:16px 20px 20px}
-.rail-head{padding:20px 20px 15px}
-.rail-foot{padding:13px 20px}
-
-/* Room to actually see the artwork. */
-.stage{min-height:calc(100vh - var(--chrome))}
-.hero{padding:76px 0 46px}
-.grid{grid-template-columns:repeat(auto-fill,minmax(272px,1fr))}
-
-/* Pointer-only affordances are safe to lean on here. */
-.card:hover{transform:translateY(-3px)}
-.picker-menu{width:min(600px,90vw)}
-
-}
-
 </style>
+</head>
+<body>
 <div class="ruler" aria-hidden="true"></div>
 
+<script>window.NV_VARIANT='mobile';</script>
 <script>
 /* Image-processing primitives. Everything runs in the browser. */
 (function (root) {
@@ -4026,3 +4015,5 @@ Turn it on for this page and reload.</p></div></noscript>
   setTimeout(function () { boot(tries + 1); }, 50);
 })(0);
 </script>
+</body>
+</html>

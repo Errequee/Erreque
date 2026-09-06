@@ -113,7 +113,7 @@
     },
     exports: [
       {
-        label: 'Download SVG', ext: 'svg',
+        label: 'Download SVG', short: 'SVG', ext: 'svg',
         make: function (api, done) {
           var v = api.state.custom.vec || vectorize(api.src, api.params);
           var txt = svgText(v, api.src.width, api.src.height);
@@ -122,7 +122,7 @@
         }
       },
       {
-        label: 'Download PNG', ext: 'png', secondary: true,
+        label: 'Download PNG', short: 'PNG', ext: 'png', secondary: true,
         make: function (api, done) {
           var v = api.state.custom.vec || vectorize(api.src, api.params);
           var id = raster(v, api.src.width, api.src.height);
@@ -130,7 +130,7 @@
         }
       },
       {
-        label: 'Ink separation (ZIP)', ext: 'zip', secondary: true,
+        label: 'Ink separation (ZIP)', short: 'Ink ZIP', ext: 'zip', secondary: true,
         make: function (api, done) {
           var v = api.state.custom.vec || vectorize(api.src, api.params);
           var W = api.src.width, H = api.src.height, files = [], jobs = [];

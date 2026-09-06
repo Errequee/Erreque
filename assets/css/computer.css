@@ -1,0 +1,18 @@
+/* Desktop layer, on top of app.css: computer.html loads it outright, and the
+   responsive build behind (min-width:901px).
+   None of the phone compromises: a permanent side rail, a full-height stage,
+   and nothing folded away. */
+
+.bench{grid-template-columns:360px 1fr}
+.rail-body{padding:16px 20px 20px}
+.rail-head{padding:20px 20px 15px}
+.rail-foot{padding:13px 20px}
+
+/* Room to actually see the artwork. */
+.stage{min-height:calc(100vh - var(--chrome))}
+.hero{padding:76px 0 46px}
+.grid{grid-template-columns:repeat(auto-fill,minmax(272px,1fr))}
+
+/* Pointer-only affordances are safe to lean on here. */
+.card:hover{transform:translateY(-3px)}
+.picker-menu{width:min(600px,90vw)}

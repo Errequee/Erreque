@@ -36,6 +36,12 @@
   --check-b:#211D19;
   --shadow:0 1px 2px rgba(0,0,0,.5), 0 12px 32px -18px rgba(0,0,0,.9);
   --rail:340px;
+  /* The sticky bar, the ruler that sits above it, and the two together. The
+     workbench used to size itself against the bar alone and hang a ruler's
+     worth of itself off the bottom of the screen. */
+  --bar:56px;
+  --ruler:26px;
+  --chrome:calc(var(--bar) + var(--ruler));
   --r-sm:3px; --r-md:6px; --r-lg:10px;
   --f-display:'Archivo','Archivo Black',system-ui,sans-serif;
   --f-body:'Instrument Sans','Segoe UI',system-ui,sans-serif;
@@ -65,6 +71,7 @@
 }
 
 *{box-sizing:border-box}
+[hidden]{display:none !important}
 /* min-height, not height: a fixed 100% caps body's box at one viewport, and a
    position:sticky child can only stick inside its parent's box - the top bar
    would come unstuck the moment you scrolled past the first screenful. */
@@ -88,7 +95,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .topbar{
   position:sticky; top:0; z-index:60;
   display:flex; align-items:center; gap:18px;
-  padding:0 18px; height:56px;
+  padding:0 18px; height:var(--bar);
   background:color-mix(in srgb, var(--ground) 88%, transparent);
   backdrop-filter:blur(10px);
   border-bottom:1px solid var(--line);
@@ -126,7 +133,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .picker-menu .head{grid-column:1/-1; padding:10px 10px 4px}
 
 /* ---------- home ---------- */
-.ruler{height:26px; border-bottom:1px solid var(--line); position:relative; overflow:hidden; background:var(--sunk)}
+.ruler{height:var(--ruler); border-bottom:1px solid var(--line); position:relative; overflow:hidden; background:var(--sunk)}
 .ruler::before{
   content:''; position:absolute; inset:0;
   background:
@@ -178,7 +185,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .card:hover::after{opacity:.85}
 
 /* ---------- workbench ---------- */
-.bench{display:grid; grid-template-columns:var(--rail) 1fr; height:calc(100vh - 56px)}
+.bench{display:grid; grid-template-columns:var(--rail) 1fr; height:calc(100vh - var(--chrome))}
 .rail{
   border-right:1px solid var(--line); background:var(--sheet);
   overflow-y:auto; display:flex; flex-direction:column;
@@ -187,12 +194,36 @@ button,input,select,textarea{font:inherit;color:inherit}
 .rail-head h1{font-size:21px; text-transform:uppercase; letter-spacing:.01em}
 .rail-head p{margin:7px 0 0; color:var(--dim); font-size:13px}
 .rail-body{padding:14px 18px 18px; display:flex; flex-direction:column; gap:15px; flex:1}
+/* The foot is pinned to the bottom of the rail, so every row it grows by is a
+   row of controls pushed out of sight. The main action gets its own line and
+   the rest pack two-up. */
 .rail-foot{
   position:sticky; bottom:0; padding:12px 18px;
   border-top:1px solid var(--line); background:var(--sheet);
-  display:flex; flex-direction:column; gap:8px;
+  display:flex; flex-flow:row wrap; gap:8px;
 }
+/* .btn.wide is width:100%, which as a flex base puts every button on its own
+   row - hence the matching specificity here. */
+.rail-foot .btn.wide{flex:1 1 auto; min-width:0; width:auto; padding-left:12px; padding-right:12px}
+.rail-foot .btn.wide:first-child{flex-basis:100%}
 .stage{position:relative; background:var(--sunk); overflow:hidden; display:flex; flex-direction:column}
+
+/* Folded control sections. NV.collapseGroups builds these wherever the rail is
+   taller than the screen, so the affordance lives here beside every layout
+   that can trigger it, not only in the phone build. */
+.group-toggle{
+  display:flex; align-items:center; justify-content:space-between;
+  margin:2px 0 0; padding:12px 0; cursor:pointer;
+  border-top:1px solid var(--line-soft); user-select:none;
+}
+.group-toggle::after{
+  content:''; width:8px; height:8px; margin-right:3px;
+  border-right:1.5px solid var(--mute); border-bottom:1.5px solid var(--mute);
+  transform:rotate(45deg) translateY(-2px); transition:transform .18s ease;
+}
+.group-toggle.open::after{transform:rotate(-135deg) translateY(-1px)}
+.group-body{display:flex; flex-direction:column; gap:13px; padding-bottom:4px}
+
 
 /* controls */
 .field{display:flex; flex-direction:column; gap:7px}
@@ -360,7 +391,7 @@ tbody tr:hover{background:var(--raise)}
      under the top bar: you can see what a slider is doing while you drag it. */
   .stage{
     order:1; height:46vh; min-height:230px;
-    position:sticky; top:56px; z-index:5;
+    position:sticky; top:var(--bar); z-index:5;
     border-bottom:1px solid var(--line);
   }
   .rail-foot{position:sticky; bottom:0}
@@ -373,6 +404,104 @@ tbody tr:hover{background:var(--raise)}
   .topbar,.foot,.ruler,.no-print{display:none}
   body{background:#fff; color:#000}
   .panelbox{border-color:#ccc}
+}
+
+</style>
+<style>
+@media (max-width:900px){
+/* Phone layer, on top of app.css: mobile.html loads it outright, and the
+   responsive build behind (max-width:900px).
+   A phone is not a small desktop. The folding rail and the pinned preview are
+   in app.css because the behaviour is shared; what is here is the sizing that
+   only makes sense under a thumb. */
+
+/* --- chrome --- */
+:root{--bar:52px; --ruler:14px}   /* --chrome follows from these */
+.topbar{padding:0 12px}
+.brand b{font-size:15px}
+.brand span{font-size:9px}
+.topnav a,.iconbtn{padding:9px 10px; min-height:42px}
+
+/* The menu is pinned to the viewport, not to the button it hangs off:
+   anchoring it to the button pushed it off the left edge on a phone. */
+.picker-menu{
+  position:fixed; left:10px; right:10px; top:calc(var(--bar) + 4px);
+  /* The bar's backdrop-filter makes it the containing block for this fixed box,
+     so `top` is measured from the bar, not the viewport - the cap has to pay for
+     the ruler above it too. svh, not dvh, so it still fits with the browser
+     chrome fully out. */
+  width:auto; max-height:calc(100svh - var(--ruler) - var(--bar) - 16px);
+  grid-template-columns:1fr; gap:0;
+}
+.picker-menu a{padding:13px 12px; border-bottom:1px solid var(--line-soft)}
+.picker-menu a:last-child{border-bottom:0}
+
+/* --- home --- */
+.hero{padding:26px 0 20px}
+.hero h1{font-size:clamp(30px,10vw,44px)}
+.hero p{font-size:15px; margin-top:12px}
+.hero canvas{opacity:.32}
+.badges{gap:6px; margin-top:16px}
+.badge{font-size:10px; padding:4px 9px}
+.wrap{padding:0 14px}
+.sheet-head{padding:24px 0 10px}
+.sheet-head h2{font-size:18px}
+.grid{grid-template-columns:1fr; gap:10px}
+.card{padding:15px}
+.card h3{font-size:16px}
+.card .num{top:12px; right:13px}
+
+/* --- workbench --- */
+.rail-head{padding:14px 14px 12px}
+.rail-head h1{font-size:18px}
+.rail-head p{font-size:12.5px}
+.rail-body{padding:12px 14px 16px; gap:13px}
+.rail-foot{padding:9px 14px calc(9px + env(safe-area-inset-bottom))}
+.rail-foot .btn.wide{min-height:46px; padding-left:10px; padding-right:10px}
+
+/* --- thumb-sized targets --- */
+input[type=range]{height:34px}
+input[type=range]::-webkit-slider-thumb{width:22px;height:22px;margin-top:-10px}
+input[type=range]::-moz-range-thumb{width:20px;height:20px}
+.seg button{min-height:42px; font-size:13px}
+.btn{min-height:48px; font-size:14.5px}
+.check{min-height:40px}
+.check input{width:19px;height:19px}
+input[type=text],input[type=number],select{min-height:44px; font-size:16px}  /* 16px stops iOS zooming on focus */
+.swatch{height:44px}
+.toolbar button{min-width:40px; height:38px}
+
+/* --- reference pages --- */
+.doc{padding:18px 0 40px}
+.doc h1{font-size:26px !important}
+.doc h2{font-size:20px; margin:24px 0 10px}
+.panelbox{padding:15px}
+table{font-size:12.5px}
+th,td{padding:8px 9px}
+.doc > div[style*="grid-template-columns"]{grid-template-columns:1fr !important}
+.panelbox[style*="sticky"]{position:static !important}
+
+}
+@media (min-width:901px){
+/* Desktop layer, on top of app.css: computer.html loads it outright, and the
+   responsive build behind (min-width:901px).
+   None of the phone compromises: a permanent side rail, a full-height stage,
+   and nothing folded away. */
+
+.bench{grid-template-columns:360px 1fr}
+.rail-body{padding:16px 20px 20px}
+.rail-head{padding:20px 20px 15px}
+.rail-foot{padding:13px 20px}
+
+/* Room to actually see the artwork. */
+.stage{min-height:calc(100vh - var(--chrome))}
+.hero{padding:76px 0 46px}
+.grid{grid-template-columns:repeat(auto-fill,minmax(272px,1fr))}
+
+/* Pointer-only affordances are safe to lean on here. */
+.card:hover{transform:translateY(-3px)}
+.picker-menu{width:min(600px,90vw)}
+
 }
 
 </style>
@@ -1148,6 +1277,9 @@ tbody tr:hover{background:var(--raise)}
       host.appendChild(wrap);
       nodes.push({ c: c, node: wrap });
     });
+    /* Every rail goes through here - imageTool's and the ones the bigger tools
+       assemble themselves - so this is the one place the folding has to live. */
+    if (NV.variant === 'mobile' && host.classList.contains('rail-body')) NV.collapseGroups(host);
     return {
       sync: function () {
         nodes.forEach(function (n) {
@@ -1162,6 +1294,50 @@ tbody tr:hover{background:var(--raise)}
     var p = {};
     spec.forEach(function (c) { if (c.id) p[c.id] = c.def; });
     return p;
+  };
+
+  /* Which build is running. The chooser sends people to the right one; the
+     responsive build has no flag to read and asks the same 900 px breakpoint the
+     stylesheet switches on, so the folding and the layout never disagree. */
+  NV.variant = (function () {
+    var v = window.NV_VARIANT;
+    if (v !== 'mobile' && v !== 'computer') {
+      v = matchMedia('(max-width: 900px)').matches ? 'mobile' : 'computer';
+    }
+    document.documentElement.setAttribute('data-variant', v);
+    return v;
+  })();
+
+  /* On a phone the control rail runs well past a screenful - the rhinestone tool
+     wants 1469 px of it - so every section after the first folds away, and a tap
+     on its heading brings it back. */
+  NV.collapseGroups = function (body) {
+    var groups = [], cur = null;
+    [].slice.call(body.children).forEach(function (node) {
+      if (node.classList.contains('group-toggle')) { cur = null; }  /* already folded */
+      else if (node.classList.contains('group-t')) { cur = { head: node, items: [] }; groups.push(cur); }
+      else if (cur) cur.items.push(node);
+    });
+    groups.forEach(function (g, i) {
+      if (!g.items.length) return;
+      var box = el('div', { class: 'group-body' });
+      g.items.forEach(function (it) { box.appendChild(it); });
+      g.head.parentNode.insertBefore(box, g.head.nextSibling);
+      g.head.className = 'group-t group-toggle';
+      g.head.setAttribute('role', 'button');
+      g.head.setAttribute('tabindex', '0');
+      function set(open) {
+        g.head.classList.toggle('open', open);
+        box.hidden = !open;
+        g.head.setAttribute('aria-expanded', open ? 'true' : 'false');
+      }
+      set(i === 0);  /* first section open, so the tool is usable on arrival */
+      function toggle() { set(box.hidden); }
+      g.head.addEventListener('click', toggle);
+      g.head.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+      });
+    });
   };
 
   /* ---------------- viewer ---------------- */
@@ -1344,14 +1520,20 @@ tbody tr:hover{background:var(--raise)}
       (t.exports || [{ label: 'Download PNG', ext: 'png' }]).forEach(function (ex) {
         foot.appendChild(el('button', {
           class: 'btn ' + (ex.secondary ? 'ghost' : 'primary') + ' wide',
-          text: ex.label,
+          /* A wrapped label costs the foot a whole row, so the packed secondary
+             buttons always take the short name and a phone takes it throughout. */
+          text: ex.short && (ex.secondary || NV.variant === 'mobile') ? ex.short : ex.label,
           onclick: function () { doExport(ex, api); }
         }));
       });
-      foot.appendChild(el('button', {
-        class: 'btn ghost wide', text: 'Change image',
+      /* On a phone the foot is pinned to the screen, so it holds downloads only:
+         starting over goes to the end of the rail, out of thumb range of the
+         download button it would otherwise sit beside. */
+      var swap = el('button', {
+        class: 'btn ghost wide', text: NV.variant === 'mobile' ? 'Use a different image' : 'Change image',
         onclick: function () { stage.innerHTML = ''; stage.appendChild(drop); stage.appendChild(input); body.innerHTML = ''; foot.innerHTML = ''; state.out = null; }
-      }));
+      });
+      (NV.variant === 'mobile' ? body : foot).appendChild(swap);
 
       vw.size(state.prev.width, state.prev.height);
       vw.paintBase(state.prev);
@@ -1852,9 +2034,9 @@ tbody tr:hover{background:var(--raise)}
       return out;
     },
     exports: [
-      { label: 'Download corrected PNG', ext: 'png' },
+      { label: 'Download corrected PNG', short: 'Corrected PNG', ext: 'png' },
       {
-        label: 'Save the report (TXT)', ext: 'txt', secondary: true,
+        label: 'Save the report (TXT)', short: 'Report (TXT)', ext: 'txt', secondary: true,
         make: function (api, done) {
           var a = analyse(api.src, api.state.full, api.params);
           var lines = ['DTF file check — ' + api.name,
@@ -2341,7 +2523,7 @@ tbody tr:hover{background:var(--raise)}
     },
     exports: [
       {
-        label: 'Download SVG', ext: 'svg',
+        label: 'Download SVG', short: 'SVG', ext: 'svg',
         make: function (api, done) {
           var v = api.state.custom.vec || vectorize(api.src, api.params);
           var txt = svgText(v, api.src.width, api.src.height);
@@ -2350,7 +2532,7 @@ tbody tr:hover{background:var(--raise)}
         }
       },
       {
-        label: 'Download PNG', ext: 'png', secondary: true,
+        label: 'Download PNG', short: 'PNG', ext: 'png', secondary: true,
         make: function (api, done) {
           var v = api.state.custom.vec || vectorize(api.src, api.params);
           var id = raster(v, api.src.width, api.src.height);
@@ -2358,7 +2540,7 @@ tbody tr:hover{background:var(--raise)}
         }
       },
       {
-        label: 'Ink separation (ZIP)', ext: 'zip', secondary: true,
+        label: 'Ink separation (ZIP)', short: 'Ink ZIP', ext: 'zip', secondary: true,
         make: function (api, done) {
           var v = api.state.custom.vec || vectorize(api.src, api.params);
           var W = api.src.width, H = api.src.height, files = [], jobs = [];
@@ -2856,9 +3038,9 @@ tbody tr:hover{background:var(--raise)}
       return draw(res, c.src.width, c.src.height, c.p);
     },
     exports: [
-      { label: 'Download PNG', ext: 'png' },
+      { label: 'Download PNG', short: 'Pattern PNG', ext: 'png' },
       {
-        label: 'Download SVG template', ext: 'svg', secondary: true,
+        label: 'Download SVG template', short: 'SVG template', ext: 'svg', secondary: true,
         make: function (api, done) {
           var res = place(api.src, api.params), p = api.params;
           var mm = function (v) { return +(v / res.pxPerMm).toFixed(2); };
@@ -2875,7 +3057,7 @@ tbody tr:hover{background:var(--raise)}
         }
       },
       {
-        label: 'Stone list (CSV)', ext: 'csv', secondary: true,
+        label: 'Stone list (CSV)', short: 'Stone CSV', ext: 'csv', secondary: true,
         make: function (api, done) {
           var res = api.state.custom.last || place(api.src, api.params);
           var rows = [['Colour', 'Stones', 'Gross']];

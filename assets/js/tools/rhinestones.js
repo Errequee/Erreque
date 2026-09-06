@@ -190,9 +190,9 @@
       return draw(res, c.src.width, c.src.height, c.p);
     },
     exports: [
-      { label: 'Download PNG', ext: 'png' },
+      { label: 'Download PNG', short: 'Pattern PNG', ext: 'png' },
       {
-        label: 'Download SVG template', ext: 'svg', secondary: true,
+        label: 'Download SVG template', short: 'SVG template', ext: 'svg', secondary: true,
         make: function (api, done) {
           var res = place(api.src, api.params), p = api.params;
           var mm = function (v) { return +(v / res.pxPerMm).toFixed(2); };
@@ -209,7 +209,7 @@
         }
       },
       {
-        label: 'Stone list (CSV)', ext: 'csv', secondary: true,
+        label: 'Stone list (CSV)', short: 'Stone CSV', ext: 'csv', secondary: true,
         make: function (api, done) {
           var res = api.state.custom.last || place(api.src, api.params);
           var rows = [['Colour', 'Stones', 'Gross']];

@@ -1,4 +1,14 @@
-<title>Open Press DTF</title>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Open Press — free DTF tools</title>
+<meta name="description" content="16 free tools for DTF printing, screen printing and cut vinyl: remove backgrounds, reduce edges, halftones, vectorize, rhinestones, gang sheets, mockups, a file check and a pricing calculator. Everything runs in your browser.">
+<meta name="color-scheme" content="dark light">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FF2D7E' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='6.2'/%3E%3Cpath d='M12 1.5v5M12 17.5v5M1.5 12h5M17.5 12h5'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap"></noscript>
 <style>
@@ -398,81 +408,6 @@ tbody tr:hover{background:var(--raise)}
 
 </style>
 <style>
-@media (max-width:900px){
-/* Phone layer, on top of app.css: mobile.html loads it outright, and the
-   responsive build behind (max-width:900px).
-   A phone is not a small desktop. The folding rail and the pinned preview are
-   in app.css because the behaviour is shared; what is here is the sizing that
-   only makes sense under a thumb. */
-
-/* --- chrome --- */
-:root{--bar:52px; --ruler:14px}   /* --chrome follows from these */
-.topbar{padding:0 12px}
-.brand b{font-size:15px}
-.brand span{font-size:9px}
-.topnav a,.iconbtn{padding:9px 10px; min-height:42px}
-
-/* The menu is pinned to the viewport, not to the button it hangs off:
-   anchoring it to the button pushed it off the left edge on a phone. */
-.picker-menu{
-  position:fixed; left:10px; right:10px; top:calc(var(--bar) + 4px);
-  /* The bar's backdrop-filter makes it the containing block for this fixed box,
-     so `top` is measured from the bar, not the viewport - the cap has to pay for
-     the ruler above it too. svh, not dvh, so it still fits with the browser
-     chrome fully out. */
-  width:auto; max-height:calc(100svh - var(--ruler) - var(--bar) - 16px);
-  grid-template-columns:1fr; gap:0;
-}
-.picker-menu a{padding:13px 12px; border-bottom:1px solid var(--line-soft)}
-.picker-menu a:last-child{border-bottom:0}
-
-/* --- home --- */
-.hero{padding:26px 0 20px}
-.hero h1{font-size:clamp(30px,10vw,44px)}
-.hero p{font-size:15px; margin-top:12px}
-.hero canvas{opacity:.32}
-.badges{gap:6px; margin-top:16px}
-.badge{font-size:10px; padding:4px 9px}
-.wrap{padding:0 14px}
-.sheet-head{padding:24px 0 10px}
-.sheet-head h2{font-size:18px}
-.grid{grid-template-columns:1fr; gap:10px}
-.card{padding:15px}
-.card h3{font-size:16px}
-.card .num{top:12px; right:13px}
-
-/* --- workbench --- */
-.rail-head{padding:14px 14px 12px}
-.rail-head h1{font-size:18px}
-.rail-head p{font-size:12.5px}
-.rail-body{padding:12px 14px 16px; gap:13px}
-.rail-foot{padding:9px 14px calc(9px + env(safe-area-inset-bottom))}
-.rail-foot .btn.wide{min-height:46px; padding-left:10px; padding-right:10px}
-
-/* --- thumb-sized targets --- */
-input[type=range]{height:34px}
-input[type=range]::-webkit-slider-thumb{width:22px;height:22px;margin-top:-10px}
-input[type=range]::-moz-range-thumb{width:20px;height:20px}
-.seg button{min-height:42px; font-size:13px}
-.btn{min-height:48px; font-size:14.5px}
-.check{min-height:40px}
-.check input{width:19px;height:19px}
-input[type=text],input[type=number],select{min-height:44px; font-size:16px}  /* 16px stops iOS zooming on focus */
-.swatch{height:44px}
-.toolbar button{min-width:40px; height:38px}
-
-/* --- reference pages --- */
-.doc{padding:18px 0 40px}
-.doc h1{font-size:26px !important}
-.doc h2{font-size:20px; margin:24px 0 10px}
-.panelbox{padding:15px}
-table{font-size:12.5px}
-th,td{padding:8px 9px}
-.doc > div[style*="grid-template-columns"]{grid-template-columns:1fr !important}
-.panelbox[style*="sticky"]{position:static !important}
-
-}
-@media (min-width:901px){
 /* Desktop layer, on top of app.css: computer.html loads it outright, and the
    responsive build behind (min-width:901px).
    None of the phone compromises: a permanent side rail, a full-height stage,
@@ -492,11 +427,12 @@ th,td{padding:8px 9px}
 .card:hover{transform:translateY(-3px)}
 .picker-menu{width:min(600px,90vw)}
 
-}
-
 </style>
+</head>
+<body>
 <div class="ruler" aria-hidden="true"></div>
 
+<script>window.NV_VARIANT='computer';</script>
 <script>
 /* Image-processing primitives. Everything runs in the browser. */
 (function (root) {
@@ -4026,3 +3962,5 @@ Turn it on for this page and reload.</p></div></noscript>
   setTimeout(function () { boot(tries + 1); }, 50);
 })(0);
 </script>
+</body>
+</html>

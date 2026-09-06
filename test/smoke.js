@@ -1,4 +1,4 @@
-/* Smoke test: opens all 13 tools in Chromium, loads an image, moves every
+/* Smoke test: opens all 16 tools in Chromium, loads an image, moves every
    control and fails if anything errors.
    Usage: npm test   (needs playwright and an installed Chromium) */
 const { chromium } = require('playwright');
@@ -7,7 +7,8 @@ const path = require('path');
 const fs = require('fs');
 
 const SP = path.join(__dirname, 'tmp');
-const SITE = 'file://' + path.resolve(__dirname, '..', 'index.html');
+// Defaults to the source tree; point SITE at a built page to test a bundle.
+const SITE = process.env.SITE || 'file://' + path.resolve(__dirname, '..', 'index.html');
 const CHROME = process.env.CHROME_PATH || undefined;
 
 if (!fs.existsSync(path.join(SP, 'test.png'))) {
@@ -42,6 +43,23 @@ const CUSTOM_TOOLS = ['guide','gang-sheets','mockups','pricing','sizing'];
   const groups = await page.$$eval('.sheet-head h2', n => n.map(x => x.textContent));
   ok('groups: ' + groups.join(' | '));
 
+  // Click a control if it is actually on screen. Hidden ones are not failures -
+  // a `show:` rule takes them out - but waiting out the 30 s action timeout on
+  // each of them costs more than the whole rest of the run.
+  async function tap(el, settle) {
+    if (!await el.isVisible()) return;
+    await el.click({ timeout: 2000 }).catch(() => {});
+    await page.waitForTimeout(settle || 260);
+  }
+
+  // The phone build folds the rail into tap-open sections; open them all so the
+  // controls behind them are clickable. A no-op on the desktop build.
+  async function unfold() {
+    await page.evaluate(() => document.querySelectorAll('.group-toggle:not(.open)')
+      .forEach(h => h.click()));
+    await page.waitForTimeout(150);
+  }
+
   async function loadImage(file) {
     await page.setInputFiles('.stage input[type=file]', path.join(SP, file));
     await page.waitForTimeout(700);
@@ -67,6 +85,7 @@ const CUSTOM_TOOLS = ['guide','gang-sheets','mockups','pricing','sizing'];
     await page.goto(SITE + '#/' + slug);
     await page.waitForTimeout(300);
     await loadImage(slug === 'reduce-edges' || slug === 'semi-transparency' ? 'cutout.png' : 'test.png');
+    await unfold();
     const manual = await page.$('.rail-foot button:text-is("Run")');
     if (manual) { await manual.click(); await page.waitForTimeout(2500); }
     await page.waitForTimeout(500);
@@ -75,11 +94,18 @@ const CUSTOM_TOOLS = ['guide','gang-sheets','mockups','pricing','sizing'];
     if (s.opaque + s.semi === 0) fail('empty result (fully transparent)');
     else ok(`output ${s.w}×${s.h} · ${Math.round((s.opaque+s.semi)/s.total*100)}% has pixels`);
 
-    // push every slider towards one end
+    // Push every slider towards one end. The click has to land at 85 % of the
+    // track to move the value, so it goes through raw mouse coordinates - which
+    // means scrolling the slider to the middle of the viewport first. Left where
+    // it was, a slider below the fold put the click on the sticky foot, and
+    // "change image" cleared the stage out from under the next assertion.
     const ranges = await page.$$('.rail-body input[type=range]');
     for (const r of ranges.slice(0, 6)) {
+      if (!await r.isVisible()) continue;
+      await r.evaluate(el => el.scrollIntoView({ block: 'center' }));
+      await page.waitForTimeout(80);
       const box = await r.boundingBox();
-      if (!box) continue;
+      if (!box || box.y < 0 || box.y > page.viewportSize().height) continue;
       await page.mouse.click(box.x + box.width * 0.85, box.y + box.height / 2);
       await page.waitForTimeout(120);
     }
@@ -88,11 +114,9 @@ const CUSTOM_TOOLS = ['guide','gang-sheets','mockups','pricing','sizing'];
     if (!s2) fail('the canvas vanished when controls moved');
     else ok(`after moving controls: ${s2.w}×${s2.h}`);
 
-    // toggle every segment and checkbox
-    const segs = await page.$$('.rail-body .seg button');
-    for (const b of segs) { await b.click().catch(()=>{}); await page.waitForTimeout(260); }
-    const checks = await page.$$('.rail-body .check input');
-    for (const c of checks) { await c.click().catch(()=>{}); await page.waitForTimeout(260); }
+    // toggle every segment and checkbox that a `show:` rule has not hidden
+    for (const b of await page.$$('.rail-body .seg button')) await tap(b);
+    for (const c of await page.$$('.rail-body .check input')) await tap(c);
     await page.waitForTimeout(700);
     const news = errors.slice(before);
     if (news.length) news.forEach(e => fail(e));
@@ -104,6 +128,7 @@ const CUSTOM_TOOLS = ['guide','gang-sheets','mockups','pricing','sizing'];
     const before = errors.length;
     await page.goto(SITE + '#/' + slug);
     await page.waitForTimeout(500);
+    await unfold();
     if (slug === 'gang-sheets') {
       await page.setInputFiles('.rail-body input[type=file]', [path.join(SP,'test.png'), path.join(SP,'cutout.png')]);
       await page.waitForTimeout(800);
@@ -124,15 +149,20 @@ const CUSTOM_TOOLS = ['guide','gang-sheets','mockups','pricing','sizing'];
       await page.setInputFiles('.rail-body input[type=file]', path.join(SP,'cutout.png'));
       await page.waitForTimeout(700);
       const segs = await page.$$('.rail-body .seg button');
-      for (const b of segs) { await b.click().catch(()=>{}); await page.waitForTimeout(300); }
+      for (const b of segs) await tap(b, 300);
+      // The last surface is "My photo", which has no photo here - go back to the
+      // T-shirt before counting, or the artwork has nothing to sit on.
+      if (segs[0]) { await segs[0].click(); await page.waitForTimeout(500); }
       const cvs = await page.evaluate(() => {
         const c = document.querySelector('.stage canvas');
         const d = c.getContext('2d').getImageData(0,0,c.width,c.height).data;
-        let ink = 0;
-        for (let i=0;i<d.length;i+=4) if (d[i]>150 && d[i+1]<160 && d[i+2]<90) ink++;
+        let ink = 0;   // the fixture's disc is amber: warm, mid green, almost no blue
+        for (let i=0;i<d.length;i+=4) if (d[i]>190 && d[i+1]>120 && d[i+1]<210 && d[i+2]<110) ink++;
         return { w:c.width, h:c.height, ink };
       });
-      ok(`mockup ${cvs.w}×${cvs.h}, artwork pixels: ${cvs.ink}`);
+      cvs.ink > 500
+        ? ok(`mockup ${cvs.w}×${cvs.h} with the artwork on the garment (${cvs.ink} px)`)
+        : fail(`the artwork never landed on the garment (${cvs.ink} px)`);
     }
     if (slug === 'pricing') {
       const price = await page.textContent('.panelbox div[style*="38px"]');

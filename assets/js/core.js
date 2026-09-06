@@ -242,6 +242,9 @@
       host.appendChild(wrap);
       nodes.push({ c: c, node: wrap });
     });
+    /* Every rail goes through here - imageTool's and the ones the bigger tools
+       assemble themselves - so this is the one place the folding has to live. */
+    if (NV.variant === 'mobile' && host.classList.contains('rail-body')) NV.collapseGroups(host);
     return {
       sync: function () {
         nodes.forEach(function (n) {
@@ -256,6 +259,50 @@
     var p = {};
     spec.forEach(function (c) { if (c.id) p[c.id] = c.def; });
     return p;
+  };
+
+  /* Which build is running. The chooser sends people to the right one; the
+     responsive build has no flag to read and asks the same 900 px breakpoint the
+     stylesheet switches on, so the folding and the layout never disagree. */
+  NV.variant = (function () {
+    var v = window.NV_VARIANT;
+    if (v !== 'mobile' && v !== 'computer') {
+      v = matchMedia('(max-width: 900px)').matches ? 'mobile' : 'computer';
+    }
+    document.documentElement.setAttribute('data-variant', v);
+    return v;
+  })();
+
+  /* On a phone the control rail runs well past a screenful - the rhinestone tool
+     wants 1469 px of it - so every section after the first folds away, and a tap
+     on its heading brings it back. */
+  NV.collapseGroups = function (body) {
+    var groups = [], cur = null;
+    [].slice.call(body.children).forEach(function (node) {
+      if (node.classList.contains('group-toggle')) { cur = null; }  /* already folded */
+      else if (node.classList.contains('group-t')) { cur = { head: node, items: [] }; groups.push(cur); }
+      else if (cur) cur.items.push(node);
+    });
+    groups.forEach(function (g, i) {
+      if (!g.items.length) return;
+      var box = el('div', { class: 'group-body' });
+      g.items.forEach(function (it) { box.appendChild(it); });
+      g.head.parentNode.insertBefore(box, g.head.nextSibling);
+      g.head.className = 'group-t group-toggle';
+      g.head.setAttribute('role', 'button');
+      g.head.setAttribute('tabindex', '0');
+      function set(open) {
+        g.head.classList.toggle('open', open);
+        box.hidden = !open;
+        g.head.setAttribute('aria-expanded', open ? 'true' : 'false');
+      }
+      set(i === 0);  /* first section open, so the tool is usable on arrival */
+      function toggle() { set(box.hidden); }
+      g.head.addEventListener('click', toggle);
+      g.head.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+      });
+    });
   };
 
   /* ---------------- viewer ---------------- */
@@ -438,14 +485,20 @@
       (t.exports || [{ label: 'Download PNG', ext: 'png' }]).forEach(function (ex) {
         foot.appendChild(el('button', {
           class: 'btn ' + (ex.secondary ? 'ghost' : 'primary') + ' wide',
-          text: ex.label,
+          /* A wrapped label costs the foot a whole row, so the packed secondary
+             buttons always take the short name and a phone takes it throughout. */
+          text: ex.short && (ex.secondary || NV.variant === 'mobile') ? ex.short : ex.label,
           onclick: function () { doExport(ex, api); }
         }));
       });
-      foot.appendChild(el('button', {
-        class: 'btn ghost wide', text: 'Change image',
+      /* On a phone the foot is pinned to the screen, so it holds downloads only:
+         starting over goes to the end of the rail, out of thumb range of the
+         download button it would otherwise sit beside. */
+      var swap = el('button', {
+        class: 'btn ghost wide', text: NV.variant === 'mobile' ? 'Use a different image' : 'Change image',
         onclick: function () { stage.innerHTML = ''; stage.appendChild(drop); stage.appendChild(input); body.innerHTML = ''; foot.innerHTML = ''; state.out = null; }
-      }));
+      });
+      (NV.variant === 'mobile' ? body : foot).appendChild(swap);
 
       vw.size(state.prev.width, state.prev.height);
       vw.paintBase(state.prev);

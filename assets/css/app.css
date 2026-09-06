@@ -22,6 +22,12 @@
   --check-b:#211D19;
   --shadow:0 1px 2px rgba(0,0,0,.5), 0 12px 32px -18px rgba(0,0,0,.9);
   --rail:340px;
+  /* The sticky bar, the ruler that sits above it, and the two together. The
+     workbench used to size itself against the bar alone and hang a ruler's
+     worth of itself off the bottom of the screen. */
+  --bar:56px;
+  --ruler:26px;
+  --chrome:calc(var(--bar) + var(--ruler));
   --r-sm:3px; --r-md:6px; --r-lg:10px;
   --f-display:'Archivo','Archivo Black',system-ui,sans-serif;
   --f-body:'Instrument Sans','Segoe UI',system-ui,sans-serif;
@@ -51,6 +57,7 @@
 }
 
 *{box-sizing:border-box}
+[hidden]{display:none !important}
 /* min-height, not height: a fixed 100% caps body's box at one viewport, and a
    position:sticky child can only stick inside its parent's box - the top bar
    would come unstuck the moment you scrolled past the first screenful. */
@@ -74,7 +81,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .topbar{
   position:sticky; top:0; z-index:60;
   display:flex; align-items:center; gap:18px;
-  padding:0 18px; height:56px;
+  padding:0 18px; height:var(--bar);
   background:color-mix(in srgb, var(--ground) 88%, transparent);
   backdrop-filter:blur(10px);
   border-bottom:1px solid var(--line);
@@ -112,7 +119,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .picker-menu .head{grid-column:1/-1; padding:10px 10px 4px}
 
 /* ---------- home ---------- */
-.ruler{height:26px; border-bottom:1px solid var(--line); position:relative; overflow:hidden; background:var(--sunk)}
+.ruler{height:var(--ruler); border-bottom:1px solid var(--line); position:relative; overflow:hidden; background:var(--sunk)}
 .ruler::before{
   content:''; position:absolute; inset:0;
   background:
@@ -164,7 +171,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .card:hover::after{opacity:.85}
 
 /* ---------- workbench ---------- */
-.bench{display:grid; grid-template-columns:var(--rail) 1fr; height:calc(100vh - 56px)}
+.bench{display:grid; grid-template-columns:var(--rail) 1fr; height:calc(100vh - var(--chrome))}
 .rail{
   border-right:1px solid var(--line); background:var(--sheet);
   overflow-y:auto; display:flex; flex-direction:column;
@@ -173,12 +180,36 @@ button,input,select,textarea{font:inherit;color:inherit}
 .rail-head h1{font-size:21px; text-transform:uppercase; letter-spacing:.01em}
 .rail-head p{margin:7px 0 0; color:var(--dim); font-size:13px}
 .rail-body{padding:14px 18px 18px; display:flex; flex-direction:column; gap:15px; flex:1}
+/* The foot is pinned to the bottom of the rail, so every row it grows by is a
+   row of controls pushed out of sight. The main action gets its own line and
+   the rest pack two-up. */
 .rail-foot{
   position:sticky; bottom:0; padding:12px 18px;
   border-top:1px solid var(--line); background:var(--sheet);
-  display:flex; flex-direction:column; gap:8px;
+  display:flex; flex-flow:row wrap; gap:8px;
 }
+/* .btn.wide is width:100%, which as a flex base puts every button on its own
+   row - hence the matching specificity here. */
+.rail-foot .btn.wide{flex:1 1 auto; min-width:0; width:auto; padding-left:12px; padding-right:12px}
+.rail-foot .btn.wide:first-child{flex-basis:100%}
 .stage{position:relative; background:var(--sunk); overflow:hidden; display:flex; flex-direction:column}
+
+/* Folded control sections. NV.collapseGroups builds these wherever the rail is
+   taller than the screen, so the affordance lives here beside every layout
+   that can trigger it, not only in the phone build. */
+.group-toggle{
+  display:flex; align-items:center; justify-content:space-between;
+  margin:2px 0 0; padding:12px 0; cursor:pointer;
+  border-top:1px solid var(--line-soft); user-select:none;
+}
+.group-toggle::after{
+  content:''; width:8px; height:8px; margin-right:3px;
+  border-right:1.5px solid var(--mute); border-bottom:1.5px solid var(--mute);
+  transform:rotate(45deg) translateY(-2px); transition:transform .18s ease;
+}
+.group-toggle.open::after{transform:rotate(-135deg) translateY(-1px)}
+.group-body{display:flex; flex-direction:column; gap:13px; padding-bottom:4px}
+
 
 /* controls */
 .field{display:flex; flex-direction:column; gap:7px}
@@ -346,7 +377,7 @@ tbody tr:hover{background:var(--raise)}
      under the top bar: you can see what a slider is doing while you drag it. */
   .stage{
     order:1; height:46vh; min-height:230px;
-    position:sticky; top:56px; z-index:5;
+    position:sticky; top:var(--bar); z-index:5;
     border-bottom:1px solid var(--line);
   }
   .rail-foot{position:sticky; bottom:0}

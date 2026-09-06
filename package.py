@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """Build the deployable bundle: dist/open-press-site.zip
 
-Produces one folder, ready to drag onto Cloudflare Pages, Netlify, or any
-static host:
+One folder, ready to drag onto Cloudflare Pages, Netlify, or any static host:
 
     open-press/
-      index.html   the whole app, self-contained
+      index.html      device chooser
+      computer.html   the whole app, desktop layout, self-contained
+      mobile.html     the whole app, phone layout, self-contained
       404.html
       _headers
       README.md
@@ -16,13 +17,16 @@ ROOT = pathlib.Path(__file__).parent
 DIST = ROOT / "dist"
 SITE = DIST / "open-press"
 
-subprocess.run([sys.executable, str(ROOT / "build.py")], check=True)
+for args in ([], ["--variant", "computer"], ["--variant", "mobile"]):
+    subprocess.run([sys.executable, str(ROOT / "build.py")] + args, check=True)
 
 if SITE.exists():
     shutil.rmtree(SITE)
 SITE.mkdir(parents=True)
 
-shutil.copy(DIST / "open-press.html", SITE / "index.html")
+shutil.copy(ROOT / "chooser.html", SITE / "index.html")
+shutil.copy(DIST / "computer.html", SITE / "computer.html")
+shutil.copy(DIST / "mobile.html", SITE / "mobile.html")
 
 (SITE / "404.html").write_text("""<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
@@ -90,14 +94,21 @@ never uploaded anywhere.
 
 ## What is in here
 
-    index.html   the entire application, one file, roughly 200 KB
-    404.html     shown for any path that is not the app
-    _headers     Content-Type and cache rules for Cloudflare Pages / Netlify
-    README.md    this file
+    index.html      device chooser - detects the device and points at one of the two
+    computer.html   the entire application, desktop layout, one file
+    mobile.html     the entire application, phone layout, one file
+    404.html        shown for any path that is not the app
+    _headers        Content-Type and cache rules for Cloudflare Pages / Netlify
+    README.md       this file
 
-`index.html` has no external dependencies except the Google Fonts stylesheet,
-and it falls back to system faces when that is unavailable. Open it straight
-from disk and it works offline.
+Both builds carry the same sixteen tools and the same engine. They differ in
+layout only: the computer build keeps a permanent side rail beside a full-height
+canvas, while the phone build pins the preview to the top, folds the controls
+into sections you tap open, and sizes every target for a thumb.
+
+Neither build has external dependencies beyond the Google Fonts stylesheet, which
+does not block rendering and falls back to system faces when unavailable. Open
+either file straight from disk and it works offline.
 
 ## Deploy it
 
@@ -117,12 +128,14 @@ nothing breaks.
 
 Every tool is a hash route on the one page, so there is nothing to configure:
 
-    /#/guide             where to start
-    /#/dtf-check         audit a file before printing
-    /#/remove-background /#/reduce-edges     /#/semi-transparency
-    /#/enhance           /#/vectorize        /#/resize        /#/convert
-    /#/halftones         /#/rhinestones      /#/frames-grunge
-    /#/gang-sheets       /#/mockups          /#/pricing       /#/sizing
+    /computer.html#/guide      or    /mobile.html#/guide
+Tool routes, on either build:
+
+    #/guide        #/dtf-check      #/remove-background  #/reduce-edges
+    #/semi-transparency             #/enhance            #/vectorize
+    #/resize       #/convert        #/halftones          #/rhinestones
+    #/frames-grunge                 #/gang-sheets        #/mockups
+    #/pricing      #/sizing
 
 Because the routes live after the `#`, the server only ever serves one file.
 Deep links and refreshes work with no rewrite rules.

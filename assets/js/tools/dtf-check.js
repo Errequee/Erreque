@@ -164,9 +164,9 @@
       return out;
     },
     exports: [
-      { label: 'Download corrected PNG', ext: 'png' },
+      { label: 'Download corrected PNG', short: 'Corrected PNG', ext: 'png' },
       {
-        label: 'Save the report (TXT)', ext: 'txt', secondary: true,
+        label: 'Save the report (TXT)', short: 'Report (TXT)', ext: 'txt', secondary: true,
         make: function (api, done) {
           var a = analyse(api.src, api.state.full, api.params);
           var lines = ['DTF file check — ' + api.name,
