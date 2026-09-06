@@ -1,5 +1,6 @@
 <title>Open Press DTF</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap"></noscript>
 <style>
 /* Open Press — visual system */
 
@@ -925,6 +926,15 @@ tbody tr:hover{background:var(--raise)}
     setTimeout(function () { t.style.opacity = '0'; t.style.transition = 'opacity .3s'; setTimeout(function () { t.remove(); }, 320); }, 3200);
   };
 
+  /* Storage can throw outright, not just return null: an embedded frame, Safari
+     with cross-site tracking prevention, a browser set to block site data. None
+     of what we keep there is worth taking the whole page down for. */
+  NV.store = {
+    get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set: function (k, v) { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } },
+    del: function (k) { try { localStorage.removeItem(k); } catch (e) { /* nothing to undo */ } }
+  };
+
   NV.fmt = function (v, d) {
     return Number(v).toLocaleString('en-US', { minimumFractionDigits: d == null ? 2 : d, maximumFractionDigits: d == null ? 2 : d });
   };
@@ -1412,8 +1422,8 @@ tbody tr:hover{background:var(--raise)}
     theme.addEventListener('click', function () {
       var cur = document.documentElement.getAttribute('data-theme');
       var next = cur === 'dark' ? 'light' : cur === 'light' ? '' : (matchMedia('(prefers-color-scheme: dark)').matches ? 'light' : 'dark');
-      if (next) { document.documentElement.setAttribute('data-theme', next); localStorage.setItem('nv-theme', next); }
-      else { document.documentElement.removeAttribute('data-theme'); localStorage.removeItem('nv-theme'); }
+      if (next) { document.documentElement.setAttribute('data-theme', next); NV.store.set('nv-theme', next); }
+      else { document.documentElement.removeAttribute('data-theme'); NV.store.del('nv-theme'); }
     });
 
     var bar = el('header', { class: 'topbar' }, [
@@ -1548,7 +1558,7 @@ tbody tr:hover{background:var(--raise)}
   }
 
   NV.start = function () {
-    var saved = localStorage.getItem('nv-theme');
+    var saved = NV.store.get('nv-theme');
     if (saved) document.documentElement.setAttribute('data-theme', saved);
     chrome();
     addEventListener('hashchange', route);
@@ -3547,7 +3557,7 @@ tbody tr:hover{background:var(--raise)}
     render: function (host) {
       var t = this;
       var v = {}, saved = {};
-      try { saved = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { saved = {}; }
+      try { saved = JSON.parse(NV.store.get(KEY) || '{}'); } catch (e) { saved = {}; }
       FIELDS.forEach(function (f) {
         if (f[0].charAt(0) === 'g' && f.length === 2) return;
         v[f[0]] = saved[f[0]] != null ? saved[f[0]] : f[2];
@@ -3586,13 +3596,13 @@ tbody tr:hover{background:var(--raise)}
       });
       form.appendChild(el('button', {
         class: 'btn ghost', style: 'grid-column:1/-1', text: 'Reset values',
-        onclick: function () { localStorage.removeItem(KEY); location.reload(); }
+        onclick: function () { NV.store.del(KEY); location.reload(); }
       }));
 
       function save() {
         var o = {}; for (var k in v) o[k] = v[k];
         o.currency = currency;
-        try { localStorage.setItem(KEY, JSON.stringify(o)); } catch (e) { /* private mode */ }
+        NV.store.set(KEY, JSON.stringify(o));
       }
 
       function money(x) { return currency + ' ' + NV.fmt(x); }
@@ -3805,4 +3815,32 @@ tbody tr:hover{background:var(--raise)}
 
 </script>
 
-<script>NV.start();</script>
+<noscript><div style="max-width:34em;margin:12vh auto;padding:0 24px;font:16px/1.6 system-ui,sans-serif">
+<h1 style="font-size:26px;margin:0 0 10px">JavaScript is switched off</h1>
+<p style="color:#666;margin:0">Open Press does all its image work in your browser, so it needs JavaScript.
+Turn it on for this page and reload.</p></div></noscript>
+
+<script>
+/* Boot defensively. Scripts above are inline, but some hosts (Cloudflare's
+   Rocket Loader, for one) rewrite or defer inline scripts, which can leave the
+   page blank with nothing to explain it. Wait for the globals, then say so
+   plainly if they never arrive - a visible message beats a white screen. */
+(function boot(tries) {
+  'use strict';
+  function fail(msg) {
+    document.body.innerHTML =
+      '<div style="max-width:36em;margin:12vh auto;padding:0 24px;' +
+      'font:16px/1.6 system-ui,-apple-system,sans-serif;color:#191512">' +
+      '<h1 style="font-size:26px;margin:0 0 10px">Open Press could not start</h1>' +
+      '<p style="color:#615749">' + msg + '</p>' +
+      '<p style="color:#615749">This page is one self-contained file. If you are viewing it ' +
+      'through a preview pane or an embed, try opening it in its own browser tab.</p></div>';
+  }
+  if (window.NV && window.IM) {
+    try { NV.start(); } catch (e) { fail('It loaded but failed while starting: ' + e.message); }
+    return;
+  }
+  if (tries > 120) { return fail('Its scripts did not run. Something on the host may be rewriting or blocking inline scripts.'); }
+  setTimeout(function () { boot(tries + 1); }, 50);
+})(0);
+</script>

@@ -24,6 +24,10 @@
 # SharedArrayBuffer or worker threads - it is plain Canvas on the main thread -
 # and COEP would only risk blocking the Google Fonts stylesheet.
 
+# No X-Frame-Options here on purpose. SAMEORIGIN makes the page render as a
+# blank white screen inside any iframe - a preview pane, an embed, a builder's
+# live view - with nothing in the page to explain why. A public tool page gains
+# nothing from it.
+
 /*
-  X-Frame-Options: SAMEORIGIN
   Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=()

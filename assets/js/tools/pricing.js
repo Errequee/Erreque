@@ -57,7 +57,7 @@
     render: function (host) {
       var t = this;
       var v = {}, saved = {};
-      try { saved = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { saved = {}; }
+      try { saved = JSON.parse(NV.store.get(KEY) || '{}'); } catch (e) { saved = {}; }
       FIELDS.forEach(function (f) {
         if (f[0].charAt(0) === 'g' && f.length === 2) return;
         v[f[0]] = saved[f[0]] != null ? saved[f[0]] : f[2];
@@ -96,13 +96,13 @@
       });
       form.appendChild(el('button', {
         class: 'btn ghost', style: 'grid-column:1/-1', text: 'Reset values',
-        onclick: function () { localStorage.removeItem(KEY); location.reload(); }
+        onclick: function () { NV.store.del(KEY); location.reload(); }
       }));
 
       function save() {
         var o = {}; for (var k in v) o[k] = v[k];
         o.currency = currency;
-        try { localStorage.setItem(KEY, JSON.stringify(o)); } catch (e) { /* private mode */ }
+        NV.store.set(KEY, JSON.stringify(o));
       }
 
       function money(x) { return currency + ' ' + NV.fmt(x); }

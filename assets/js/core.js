@@ -32,6 +32,15 @@
     setTimeout(function () { t.style.opacity = '0'; t.style.transition = 'opacity .3s'; setTimeout(function () { t.remove(); }, 320); }, 3200);
   };
 
+  /* Storage can throw outright, not just return null: an embedded frame, Safari
+     with cross-site tracking prevention, a browser set to block site data. None
+     of what we keep there is worth taking the whole page down for. */
+  NV.store = {
+    get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set: function (k, v) { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } },
+    del: function (k) { try { localStorage.removeItem(k); } catch (e) { /* nothing to undo */ } }
+  };
+
   NV.fmt = function (v, d) {
     return Number(v).toLocaleString('en-US', { minimumFractionDigits: d == null ? 2 : d, maximumFractionDigits: d == null ? 2 : d });
   };
@@ -519,8 +528,8 @@
     theme.addEventListener('click', function () {
       var cur = document.documentElement.getAttribute('data-theme');
       var next = cur === 'dark' ? 'light' : cur === 'light' ? '' : (matchMedia('(prefers-color-scheme: dark)').matches ? 'light' : 'dark');
-      if (next) { document.documentElement.setAttribute('data-theme', next); localStorage.setItem('nv-theme', next); }
-      else { document.documentElement.removeAttribute('data-theme'); localStorage.removeItem('nv-theme'); }
+      if (next) { document.documentElement.setAttribute('data-theme', next); NV.store.set('nv-theme', next); }
+      else { document.documentElement.removeAttribute('data-theme'); NV.store.del('nv-theme'); }
     });
 
     var bar = el('header', { class: 'topbar' }, [
@@ -655,7 +664,7 @@
   }
 
   NV.start = function () {
-    var saved = localStorage.getItem('nv-theme');
+    var saved = NV.store.get('nv-theme');
     if (saved) document.documentElement.setAttribute('data-theme', saved);
     chrome();
     addEventListener('hashchange', route);
